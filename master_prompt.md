@@ -99,3 +99,20 @@ You are an expert Django developer and frontend designer. Build a premium, dark-
 - All code commented and organized.
 
 Build this step by step. Start with project setup, then core models, then templates, then frontend styling, then GSAP/Lenis integration, then forms, then SEO, then testing.
+
+
+
+##Color  
+:root {
+  --color-bg: #0A0A0A;
+  --color-surface: #111111;
+  --color-primary: #FF4500;
+  --color-secondary: #8B0000;
+  --color-text: #FFFFFF;
+  --color-text-muted: #A1A1A1;
+  --color-whatsapp: #25D366;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --radius: 12px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
