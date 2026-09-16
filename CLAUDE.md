@@ -62,6 +62,7 @@ Apply these skills from `vee_claude_skills/` directory:
 - Theme: dark-mode only at launch (per `02_DESIGN_SYSTEM_MOTION_ACCESSIBILITY.md`). A real light-mode + toggle is Phase 2 — do not build a half-finished toggle at launch.
 - Website Development page must include a static mockup showcase: 3 example layouts (Portfolio, E-commerce, Booking/Hospitality) — visual only, no backend/models, clearly labeled as example layouts (never presented as real client work, per the never-fabricate-proof rule).
 - Build order for this project: backend fully implemented and verified first (models, admin, forms, URLs) before frontend/template/styling work begins.
+- SEO/AEO/GEO local targeting is not limited to the Locations app — it must be applied site-wide: every service page, the website-type mockup showcase (e.g. "E-commerce Website Design — Kenya" style headings, not generic labels), meta tags, Open Graph/social-sharing tags, and schema markup all carry location-aware language (Nairobi, Machakos, Kajiado, Kiambu, Kenya) so the site surfaces for local + AI-driven search regardless of which page a visitor lands on.
 
 ## Never Do This
 
