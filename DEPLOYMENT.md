@@ -69,8 +69,31 @@ certificate working first.
 ## Stage 1 — Provision
 
 1. Point `veeagency.co.ke` and `www.veeagency.co.ke` DNS at the HostAfrica server.
-2. Create the PostgreSQL database and user. Record the name, user, password, host and port.
-3. Install and verify the SSL certificate for both hostnames.
+2. Install and verify the SSL certificate for both hostnames.
+3. Create the database — **on Aiven, not HostAfrica** (see below).
+
+### The database lives outside the hosting
+
+HostAfrica does not offer PostgreSQL, so the database is a managed **Aiven
+PostgreSQL** service that the HostAfrica server reaches over the public internet.
+
+From the Aiven console, take the service URI and record the host, port, database
+name, user and password. Then:
+
+- **TLS is mandatory.** Aiven rejects unencrypted connections. The connection must
+  set `sslmode=require` — this is *not* the default in the current `prod.py`, so it
+  has to be configured before the first connect will succeed.
+- **`POSTGRES_HOST` is the Aiven hostname, not `localhost`.** The `.env.example`
+  default of `localhost` is wrong for this setup.
+- **`POSTGRES_PORT` is usually not 5432.** Aiven assigns a per-service port; copy it
+  from the console rather than assuming.
+- **Restrict network access.** In Aiven, limit allowed IPs to the HostAfrica
+  server's address instead of leaving the service open to the internet.
+- **Latency is higher than a local socket.** `CONN_MAX_AGE = 60` is already set in
+  `prod.py` and should stay — without connection reuse, every request pays a new
+  TLS handshake across the internet.
+- **Back-ups are Aiven's, not HostAfrica's.** Confirm the retention period on your
+  plan; a HostAfrica account backup will not contain your data.
 
 ## Stage 2 — Get the code onto the server
 
@@ -96,11 +119,12 @@ DJANGO_ALLOWED_HOSTS=veeagency.co.ke,www.veeagency.co.ke
 DJANGO_CSRF_TRUSTED_ORIGINS=https://veeagency.co.ke,https://www.veeagency.co.ke
 SITE_BASE_URL=https://veeagency.co.ke
 
+# PostgreSQL — Aiven managed service, reached over the internet
 POSTGRES_DB=...
 POSTGRES_USER=...
 POSTGRES_PASSWORD=...
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
+POSTGRES_HOST=<your-service>.aivencloud.com    # not localhost
+POSTGRES_PORT=<port from the Aiven console>    # usually not 5432
 
 EMAIL_HOST=...
 EMAIL_PORT=587

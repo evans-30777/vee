@@ -44,7 +44,12 @@ Apply these skills from `vee_claude_skills/` directory:
   - WhatsApp: 0759 643 882 (+254 759 643 882 international) — `https://wa.me/254759643882`
 - Email: hello@veeagency.co.ke
 - Social: Facebook, Instagram (confirmed; X, TikTok, LinkedIn only in content/posts, not primary brand channels)
-- Hosting: HostAfrica
+- Hosting: **HostAfrica for the application only.** HostAfrica does not offer PostgreSQL,
+  so the database is a managed **Aiven PostgreSQL** instance reached over the public
+  internet from the HostAfrica server. Consequences to respect: the DB connection must
+  use TLS (`sslmode=require`), latency is higher than a local socket so avoid chatty
+  query patterns, and Aiven's connection limit is lower than a self-hosted server's —
+  keep `CONN_MAX_AGE` set rather than opening a connection per request.
 - Operator: Solo — Evans (VEE Agency founder/author). No other team members unless confirmed later.
 - **Package Pricing (current):**
   - Essential: KES 15,000/month
