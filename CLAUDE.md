@@ -71,21 +71,30 @@ Apply these skills from `vee_claude_skills/` directory:
 - Build order for this project: backend fully implemented and verified first (models, admin, forms, URLs) before frontend/template/styling work begins.
 - SEO/AEO/GEO local targeting is not limited to the Locations app — it must be applied site-wide: every service page, the website-type mockup showcase (e.g. "E-commerce Website Design — Kenya" style headings, not generic labels), meta tags, Open Graph/social-sharing tags, and schema markup all carry location-aware language (Nairobi, Machakos, Kajiado, Kiambu, Kenya) so the site surfaces for local + AI-driven search regardless of which page a visitor lands on.
 
+## Decided Against — Do Not Build
+
+Owner-approved decisions (2026-09-17), not backlog. Do not implement these
+because a spec or guide mentions them; raise it with the owner first if you
+believe the reasoning no longer holds.
+
+- **Tawk.to live chat** — appears in `02_DESIGN_SYSTEM_MOTION_ACCESSIBILITY.md`
+  §16, and is still not being built. VEE is a solo operation and cannot staff a
+  live-chat widget; an unanswered chat box costs more trust than it earns, and
+  WhatsApp already covers real-time contact. Revisit only if chat can genuinely
+  be answered.
+- **reCAPTCHA v3** — the honeypot plus per-IP hourly rate limit are holding. Add
+  it only if real spam starts getting through, not pre-emptively: it adds a
+  third-party script, a consent question, and friction on the main conversion path.
+
 ## Next Batch — Agreed, Not Yet Built
 
 Deliberately deferred. Do not treat these as oversights, and do not build them
 outside an agreed batch.
 
-- **Tawk.to live chat** (design guide §16) — deliberately NOT built. A solo operator
-  cannot staff a live-chat widget, and an unanswered chat box costs more trust than
-  it earns; WhatsApp already covers real-time contact. Revisit only if chat can
-  actually be answered.
-- **reCAPTCHA v3** — deferred while the honeypot and per-IP rate limit are holding.
-  Add it if real spam gets through, not before.
 - **Phase 2 platform work:** templates marketplace; payments (M-Pesa first, then
   Stripe, then PayPal); light-mode theme toggle.
 
-*Done and dropped from this list: image resize on upload, media backup docs,
+*Completed and removed from this list: image resize on upload, media backup docs,
 cookie consent banner, consent-gated analytics. `POSTGRES_SSLMODE` was dropped
 outright — it existed only for the Aiven plan that SQLite replaced.*
 
