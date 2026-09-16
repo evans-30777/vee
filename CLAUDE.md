@@ -44,12 +44,14 @@ Apply these skills from `vee_claude_skills/` directory:
   - WhatsApp: 0759 643 882 (+254 759 643 882 international) — `https://wa.me/254759643882`
 - Email: hello@veeagency.co.ke
 - Social: Facebook, Instagram (confirmed; X, TikTok, LinkedIn only in content/posts, not primary brand channels)
-- Hosting: **HostAfrica for the application only.** HostAfrica does not offer PostgreSQL,
-  so the database is a managed **Aiven PostgreSQL** instance reached over the public
-  internet from the HostAfrica server. Consequences to respect: the DB connection must
-  use TLS (`sslmode=require`), latency is higher than a local socket so avoid chatty
-  query patterns, and Aiven's connection limit is lower than a self-hosted server's —
-  keep `CONN_MAX_AGE` set rather than opening a connection per request.
+- Hosting: **HostAfrica.** HostAfrica does not offer PostgreSQL, so **production runs
+  on SQLite** (decided 2026-09-16, superseding an earlier plan to use managed Aiven
+  PostgreSQL). This suits the site's write volume — enquiries, newsletter signups and
+  owner admin edits. `prod.py` enables WAL mode and a 20s lock timeout. PostgreSQL is
+  revisited only if sustained concurrent writes cause real `database is locked` errors.
+- **The SQLite file must live outside the public web root** (`SQLITE_PATH` env var).
+  Inside the web root it is directly downloadable, exposing every enquiry and the admin
+  password hash. This is a security requirement, not a preference.
 - Operator: Solo — Evans (VEE Agency founder/author). No other team members unless confirmed later.
 - **Package Pricing (current):**
   - Essential: KES 15,000/month
@@ -74,11 +76,15 @@ Apply these skills from `vee_claude_skills/` directory:
 Deliberately deferred. Do not treat these as oversights, and do not build them
 outside an agreed batch.
 
-- **`POSTGRES_SSLMODE` setting (blocks go-live).** `prod.py` passes no `sslmode`,
-  and Aiven rejects unencrypted connections, so the first connection attempt will
-  fail as things stand. Add it to the `DATABASES["default"]["OPTIONS"]` dict, read
-  from the environment and defaulting to `require`, so a local PostgreSQL instance
-  is still usable. Owner approved 2026-09-16; scheduled for the next batch.
+- **Resize images on upload.** Featured images and headshots are uploaded straight
+  from a phone — a 3–5MB JPEG would ship at full size to every mobile visitor and
+  undo the frontend's performance work. Pillow is already a dependency; resize in
+  the model's `save()`. No new vendor needed.
+- **Media backup.** Uploads live on the HostAfrica filesystem. Document/schedule a
+  backup alongside the SQLite one.
+
+*Dropped: `POSTGRES_SSLMODE`. It existed only for the Aiven plan, which SQLite in
+production replaced.*
 
 ## Never Do This
 

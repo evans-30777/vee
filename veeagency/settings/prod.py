@@ -1,7 +1,7 @@
 """Production settings. Every secret comes from the environment."""
 
 from .base import *  # noqa: F403
-from .base import os
+from .base import BASE_DIR, os
 
 DEBUG = False
 
@@ -19,15 +19,25 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+# SQLite in production: HostAfrica does not offer PostgreSQL, and this site's
+# write volume (enquiries, newsletter signups, admin edits) is comfortably within
+# what SQLite handles. Revisit if write concurrency ever becomes real.
+#
+# SQLITE_PATH must point OUTSIDE the public web root. If the database file is
+# web-reachable, anyone can download every enquiry and password hash — see
+# DEPLOYMENT.md.
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ["POSTGRES_DB"],
-        "USER": os.environ["POSTGRES_USER"],
-        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-        "CONN_MAX_AGE": 60,
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.environ.get("SQLITE_PATH") or BASE_DIR / "db.sqlite3",
+        "OPTIONS": {
+            # WAL lets readers continue during a write, which is what stops a
+            # single enquiry submission from blocking page views.
+            # timeout makes a brief lock wait rather than raising
+            # "database is locked" straight away.
+            "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+            "timeout": 20,
+        },
     }
 }
 

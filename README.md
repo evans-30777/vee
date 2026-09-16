@@ -5,7 +5,8 @@ Django application for [veeagency.co.ke](https://veeagency.co.ke) — a digital 
 ## Stack
 
 - Django 5.2 (LTS), Python 3.11
-- PostgreSQL in production, SQLite in local development
+- SQLite in both production and local development (HostAfrica does not offer
+  PostgreSQL; production enables WAL mode and a lock timeout)
 - WhiteNoise for static files, Gunicorn as the WSGI server
 
 ## Project layout

@@ -15,6 +15,7 @@ This is the fork that changes the most steps.
 | Plan type | How the app runs |
 |---|---|
 | **Shared / cPanel** | cPanel's Python app tool (usually "Setup Python App") creates the virtualenv and runs the WSGI app under Passenger. You do *not* start Gunicorn yourself. |
+| | *With SQLite, keep the worker count low — SQLite serialises writes, so many workers gain you nothing on writes and raise the chance of lock contention.* |
 | **VPS** | You run Gunicorn yourself (systemd service) with Nginx in front. |
 
 `gunicorn` is already in `requirements.txt` for the VPS case. On shared cPanel
@@ -31,12 +32,21 @@ hosting it is simply unused.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "veeagency.settings.dev")
 ```
 
-Every management command you run on the server must say otherwise, or it will
-silently use SQLite instead of your PostgreSQL database:
+Every management command you run on the server must say otherwise:
 
 ```bash
 python manage.py migrate --settings=veeagency.settings.prod
 ```
+
+**Now that both environments use SQLite, this trap is quieter and worse.** Dev
+settings write to `db.sqlite3` inside the project directory; production writes to
+`SQLITE_PATH` outside the web root. Forget `--settings` and nothing errors — you
+just migrate the wrong file, and create a stray `db.sqlite3` *inside the web root*
+that the live site never reads.
+
+If you find an unexpected `db.sqlite3` in the project directory on the server,
+that is what happened. Delete it (it is also publicly downloadable) and re-run the
+command with `--settings`.
 
 Alternatively, export it once per shell (or in the deploy user's profile):
 
@@ -70,30 +80,55 @@ certificate working first.
 
 1. Point `veeagency.co.ke` and `www.veeagency.co.ke` DNS at the HostAfrica server.
 2. Install and verify the SSL certificate for both hostnames.
-3. Create the database — **on Aiven, not HostAfrica** (see below).
+3. Create the directory that will hold the database — **outside the web root**
+   (see below).
 
-### The database lives outside the hosting
+### The database is SQLite
 
-HostAfrica does not offer PostgreSQL, so the database is a managed **Aiven
-PostgreSQL** service that the HostAfrica server reaches over the public internet.
+HostAfrica does not offer PostgreSQL, so production runs on SQLite. For this site
+that is a reasonable fit: writes are limited to enquiries, newsletter signups and
+your own admin edits, which is well within what SQLite handles. `prod.py` enables
+WAL mode so a write never blocks page views, and sets a 20-second lock timeout.
 
-From the Aiven console, take the service URI and record the host, port, database
-name, user and password. Then:
+> ### ⚠️ Put the database file outside `public_html`
+>
+> This is the one mistake that turns SQLite into a breach. If the file sits inside
+> the web root, **anyone can download your entire database** by guessing the URL —
+> every contact enquiry, every email address, and your admin password hash.
+>
+> Create a directory *beside* the web root, not inside it:
+>
+> ```bash
+> mkdir -p ~/vee-data
+> chmod 700 ~/vee-data
+> ```
+>
+> Then point `SQLITE_PATH` at it:
+>
+> ```
+> SQLITE_PATH=/home/<cpanel-user>/vee-data/db.sqlite3
+> ```
+>
+> Verify after going live — this must **not** return 200:
+>
+> ```bash
+> curl -I https://veeagency.co.ke/db.sqlite3
+> ```
 
-- **TLS is mandatory.** Aiven rejects unencrypted connections. The connection must
-  set `sslmode=require` — this is *not* the default in the current `prod.py`, so it
-  has to be configured before the first connect will succeed.
-- **`POSTGRES_HOST` is the Aiven hostname, not `localhost`.** The `.env.example`
-  default of `localhost` is wrong for this setup.
-- **`POSTGRES_PORT` is usually not 5432.** Aiven assigns a per-service port; copy it
-  from the console rather than assuming.
-- **Restrict network access.** In Aiven, limit allowed IPs to the HostAfrica
-  server's address instead of leaving the service open to the internet.
-- **Latency is higher than a local socket.** `CONN_MAX_AGE = 60` is already set in
-  `prod.py` and should stay — without connection reuse, every request pays a new
-  TLS handshake across the internet.
-- **Back-ups are Aiven's, not HostAfrica's.** Confirm the retention period on your
-  plan; a HostAfrica account backup will not contain your data.
+**Back it up yourself.** The database is a single file, which makes this easy —
+but nobody else is doing it. A scheduled copy is enough:
+
+```bash
+sqlite3 ~/vee-data/db.sqlite3 ".backup '~/vee-backups/db-$(date +%F).sqlite3'"
+```
+
+Use `.backup` rather than `cp` — it is safe to run while the site is serving.
+Keep the backups off the server as well, and remember they are as sensitive as the
+live database.
+
+**If you outgrow SQLite** — sustained concurrent writes causing `database is
+locked` errors under normal traffic — that is the signal to move to PostgreSQL.
+At this data volume the migration is a `dumpdata` / `loaddata` round trip.
 
 ## Stage 2 — Get the code onto the server
 
@@ -119,12 +154,8 @@ DJANGO_ALLOWED_HOSTS=veeagency.co.ke,www.veeagency.co.ke
 DJANGO_CSRF_TRUSTED_ORIGINS=https://veeagency.co.ke,https://www.veeagency.co.ke
 SITE_BASE_URL=https://veeagency.co.ke
 
-# PostgreSQL — Aiven managed service, reached over the internet
-POSTGRES_DB=...
-POSTGRES_USER=...
-POSTGRES_PASSWORD=...
-POSTGRES_HOST=<your-service>.aivencloud.com    # not localhost
-POSTGRES_PORT=<port from the Aiven console>    # usually not 5432
+# Database — SQLite. MUST be outside the public web root.
+SQLITE_PATH=/home/<cpanel-user>/vee-data/db.sqlite3
 
 EMAIL_HOST=...
 EMAIL_PORT=587
