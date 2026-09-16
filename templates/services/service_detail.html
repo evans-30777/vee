@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ service.name }}</h1>
+{% if service.tagline %}<p>{{ service.tagline }}</p>{% endif %}
+<p>{{ service.short_description }}</p>
+{% if service.full_description %}<div>{{ service.full_description|linebreaks }}</div>{% endif %}
+{% if service.deliverables %}
+<h2>What's included</h2>
+<ul>{% for item in service.deliverables %}<li>{{ item }}</li>{% endfor %}</ul>
+{% endif %}
+{% if service.starting_price %}<p>From KES {{ service.starting_price|floatformat:0 }}</p>{% endif %}
+<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+{% if related_services %}
+<h2>Related services</h2>
+{% for service in related_services %}{% include "partials/service_card.html" %}{% endfor %}
+{% endif %}
+{% endblock %}

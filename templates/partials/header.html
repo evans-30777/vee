@@ -1,0 +1,15 @@
+<header>
+    <a href="{% url 'core:home' %}">VEE Agency</a>
+    <nav aria-label="Main">
+        <a href="{% url 'core:home' %}">Home</a>
+        <a href="{% url 'services:list' %}">Services</a>
+        <a href="{% url 'packages:list' %}">Packages</a>
+        <a href="{% url 'core:web_development' %}">Web Development</a>
+        <a href="{% url 'core:about' %}">About</a>
+        <a href="{% url 'blog:list' %}">Blog</a>
+        <a href="{% url 'contact:contact' %}">Contact</a>
+    </nav>
+    {% if site_settings %}
+    <a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+    {% endif %}
+</header>

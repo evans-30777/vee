@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <p>Digital Growth Agency</p>
+    <h1>Get found. Build trust. Grow online.</h1>
+    <p>VEE Agency helps Kenyan businesses build stronger websites, search visibility, Google presence, social media and digital campaigns — all working together around your business goals.</p>
+    <a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+    {% if site_settings %}<a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
+</section>
+
+{% if services %}
+<section>
+    <h2>What we do</h2>
+    {% for service in services %}
+        {% include "partials/service_card.html" %}
+    {% endfor %}
+    <a href="{% url 'services:list' %}">See all services</a>
+</section>
+{% endif %}
+
+{% if packages %}
+<section>
+    <h2>Growth packages</h2>
+    {% for package in packages %}
+        {% include "partials/package_card.html" %}
+    {% endfor %}
+    <a href="{% url 'packages:list' %}">Compare packages</a>
+</section>
+{% endif %}
+
+{% if website_package %}
+<section>
+    <h2>{{ website_package.name }}</h2>
+    <p>{{ website_package.short_description }}</p>
+    <p>{% if website_package.price_is_from %}from {% endif %}KES {{ website_package.price|floatformat:0 }}</p>
+    <a href="{% url 'core:web_development' %}">Get Your Website</a>
+</section>
+{% endif %}
+
+{% if testimonials %}
+<section>
+    <h2>What clients say</h2>
+    {% for testimonial in testimonials %}
+    <blockquote>
+        <p>{{ testimonial.quote }}</p>
+        <cite>{{ testimonial.client_name }}{% if testimonial.business %}, {{ testimonial.business }}{% endif %}</cite>
+    </blockquote>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% if case_studies %}
+<section>
+    <h2>Recent work</h2>
+    {% for case_study in case_studies %}
+    <article>
+        <h3>{{ case_study.client_label }}</h3>
+        <p>{{ case_study.result }}</p>
+    </article>
+    {% endfor %}
+    <a href="{% url 'core:case_studies' %}">See all case studies</a>
+</section>
+{% endif %}
+
+{% if recent_posts %}
+<section>
+    <h2>Insights</h2>
+    {% for post in recent_posts %}
+        {% include "partials/post_card.html" %}
+    {% endfor %}
+    <a href="{% url 'blog:list' %}">Read the blog</a>
+</section>
+{% endif %}
+
+<section>
+    <h2>Ready to grow?</h2>
+    <a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+</section>
+{% endblock %}

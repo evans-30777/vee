@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="legal-document">
+    <h1>{{ doc_title }}</h1>
+    <p><em>Last updated: {% now "j F Y" %}</em></p>
+    {% block legal_content %}{% endblock %}
+    <h2>Contact us</h2>
+    {% if site_settings %}
+    <p>Questions about this document? Email <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a> or call <a href="tel:{{ site_settings.phone_calls }}">{{ site_settings.phone_calls }}</a>.</p>
+    {% endif %}
+</article>
+{% endblock %}

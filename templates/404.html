@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Page not found</h1>
+<p>That page doesn't exist or has moved.</p>
+<a href="{% url 'core:home' %}">Back to home</a>
+<a href="{% url 'services:list' %}">See our services</a>
+<a href="{% url 'contact:contact' %}">Contact us</a>
+{% endblock %}

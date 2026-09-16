@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Case Studies</h1>
+{% if case_studies %}
+    {% for case_study in case_studies %}
+    <article>
+        <h2>{{ case_study.client_label }}</h2>
+        {% if case_study.industry %}<p>{{ case_study.industry }}</p>{% endif %}
+        <h3>Challenge</h3><p>{{ case_study.challenge }}</p>
+        <h3>What we did</h3><p>{{ case_study.solution }}</p>
+        <h3>Result</h3><p>{{ case_study.result }}</p>
+    </article>
+    {% endfor %}
+{% else %}
+    <p>Case studies are on the way. In the meantime, tell us about your business and we'll show you what's possible.</p>
+{% endif %}
+<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+{% endblock %}

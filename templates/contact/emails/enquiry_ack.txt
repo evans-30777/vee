@@ -1,0 +1,13 @@
+Hi {{ submission.name }},
+
+Thanks for reaching out to VEE Agency. We've received your enquiry and will get back to you shortly.
+{% if site_settings %}
+If it's urgent, you can reach us on WhatsApp: {{ site_settings.whatsapp_url }}
+{% endif %}
+Here's what you sent us:
+
+{{ submission.message }}
+
+Talk soon,
+VEE Agency
+{% if site_settings %}{{ site_settings.tagline }}{% endif %}

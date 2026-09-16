@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Thank you — we've got your enquiry</h1>
+<p>We'll be in touch shortly. If it's urgent, reach us on WhatsApp.</p>
+{% if site_settings %}<a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
+<a href="{% url 'core:home' %}">Back to home</a>
+<a href="{% url 'blog:list' %}">Read our insights</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+New enquiry from the VEE Agency website.
+
+Name: {{ submission.name }}
+Email: {{ submission.email }}
+Phone: {{ submission.phone|default:"Not provided" }}
+Service interest: {{ submission.get_service_display|default:"Not specified" }}
+Budget: {{ submission.get_budget_display|default:"Not specified" }}
+Received: {{ submission.created_at }}
+
+Message:
+{{ submission.message }}

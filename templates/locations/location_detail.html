@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ location.hero_headline }}</h1>
+<div>{{ location.intro|linebreaks }}</div>
+{% if location.body %}<div>{{ location.body|linebreaks }}</div>{% endif %}
+{% if featured_services %}
+<h2>Services for businesses in {{ location.county }}</h2>
+{% for service in featured_services %}{% include "partials/service_card.html" %}{% endfor %}
+{% endif %}
+<p>We also serve clients across Kenya remotely.</p>
+<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+{% endblock %}

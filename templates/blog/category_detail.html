@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ category.name }}</h1>
+{% if category.description %}<p>{{ category.description }}</p>{% endif %}
+{% if page_obj %}
+    {% for post in page_obj %}{% include "partials/post_card.html" %}{% endfor %}
+    {% include "partials/pagination.html" %}
+{% else %}
+    <p>No posts in this category yet.</p>
+{% endif %}
+<a href="{% url 'blog:list' %}">All insights</a>
+{% endblock %}

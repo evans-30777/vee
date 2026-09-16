@@ -1,0 +1,29 @@
+<footer>
+    {% if site_settings %}
+    <p>{{ site_settings.tagline }}</p>
+    <p>{{ site_settings.location_label }}</p>
+    <p>
+        <a href="tel:{{ site_settings.phone_calls }}">{{ site_settings.phone_calls }}</a>
+        <a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a>
+    </p>
+    <p>
+        {% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
+        {% if site_settings.instagram_url %}<a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+    </p>
+    {% endif %}
+    <nav aria-label="Legal">
+        <a href="{% url 'core:privacy' %}">Privacy</a>
+        <a href="{% url 'core:terms' %}">Terms</a>
+        <a href="{% url 'core:cookies' %}">Cookies</a>
+        <a href="{% url 'core:disclaimer' %}">Disclaimer</a>
+        <a href="{% url 'locations:list' %}">Areas We Serve</a>
+    </nav>
+    <form method="post" action="{% url 'contact:newsletter_subscribe' %}">
+        {% csrf_token %}
+        <label for="newsletter-email">Get practical growth tips</label>
+        <input type="email" name="email" id="newsletter-email" required>
+        <input type="hidden" name="source" value="{{ page_class }}">
+        <button type="submit">Subscribe</button>
+    </form>
+</footer>

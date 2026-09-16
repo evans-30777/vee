@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block schema %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "{{ post.title|escapejs }}",
+    "description": "{{ post.excerpt|escapejs }}",
+    "datePublished": "{{ post.published_at|date:'c' }}",
+    "dateModified": "{{ post.updated_at|date:'c' }}",
+    "author": {"@type": "Person", "name": "{{ post.author.display_name|escapejs }}"},
+    "publisher": {"@type": "Organization", "name": "VEE Agency"},
+    "mainEntityOfPage": "{{ canonical_url }}"
+}
+</script>
+{% if post.faqs %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{% for faq in post.faqs %}{
+        "@type": "Question",
+        "name": "{{ faq.question|escapejs }}",
+        "acceptedAnswer": {"@type": "Answer", "text": "{{ faq.answer|escapejs }}"}
+    }{% if not forloop.last %},{% endif %}{% endfor %}]
+}
+</script>
+{% endif %}
+{% endblock %}
+{% block content %}
+<article>
+    <h1>{{ post.title }}</h1>
+    <p>By <a href="{% url 'blog:author' post.author.username %}">{{ post.author.display_name }}</a> ·
+       <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"j F Y" }}</time></p>
+    {% if post.featured_image %}<img src="{{ post.featured_image.url }}" alt="{{ post.featured_image_alt }}">{% endif %}
+    {% if post.quick_answer %}
+    <aside><h2>Quick answer</h2><p>{{ post.quick_answer }}</p></aside>
+    {% endif %}
+    <div>{{ post.body|linebreaks }}</div>
+    {% if post.faqs %}
+    <section><h2>Frequently asked questions</h2>
+    {% for faq in post.faqs %}<h3>{{ faq.question }}</h3><p>{{ faq.answer }}</p>{% endfor %}
+    </section>
+    {% endif %}
+</article>
+<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+{% if related_posts %}
+<section><h2>Related reading</h2>{% for post in related_posts %}{% include "partials/post_card.html" %}{% endfor %}</section>
+{% endif %}
+{% endblock %}

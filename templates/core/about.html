@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>About VEE Agency</h1>
+<p>VEE Agency helps businesses get found, build trust and grow online through connected digital services rather than isolated marketing activities.</p>
+{% if site_settings %}<p>Based in {{ site_settings.location_label }}. We work with clients across every county in Kenya.</p>{% endif %}
+{% if case_studies %}
+<section>
+    <h2>Our work</h2>
+    {% for case_study in case_studies %}<article><h3>{{ case_study.client_label }}</h3><p>{{ case_study.result }}</p></article>{% endfor %}
+</section>
+{% endif %}
+<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+{% endblock %}

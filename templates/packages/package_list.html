@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Packages &amp; Pricing</h1>
+{% if monthly_packages %}
+<section><h2>Monthly growth packages</h2>
+{% for package in monthly_packages %}{% include "partials/package_card.html" %}{% endfor %}
+<p>Advertising media spend is billed separately from VEE Agency's management fee.</p>
+</section>
+{% endif %}
+{% if one_time_packages %}
+<section><h2>One-time services</h2>
+{% for package in one_time_packages %}{% include "partials/package_card.html" %}{% endfor %}
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en-KE">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ meta.title|default:"VEE Agency" }}</title>
+    <meta name="description" content="{{ meta.description|default:'' }}">
+    {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+    {% if noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ meta.title|default:'VEE Agency' }}">
+    <meta property="og:description" content="{{ meta.description|default:'' }}">
+    {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
+    <meta property="og:locale" content="en_KE">
+    <meta property="og:site_name" content="VEE Agency">
+    {% if meta.image %}<meta property="og:image" content="{{ meta.image }}">
+    {% elif site_settings.default_social_image %}<meta property="og:image" content="{{ site_settings.default_social_image.url }}">{% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+
+    {% block schema %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "VEE Agency",
+        "description": "Digital growth agency helping Kenyan businesses get found, build trust and grow online.",
+        "url": "{{ canonical_url }}",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Syokimau",
+            "addressRegion": "Machakos County",
+            "addressCountry": "KE"
+        },
+        "areaServed": [{% for county in site_settings.service_counties %}"{{ county }}"{% if not forloop.last %}, {% endif %}{% endfor %}]{% if site_settings %},
+        "telephone": "{{ site_settings.phone_calls }}",
+        "email": "{{ site_settings.email }}"{% endif %}
+    }
+    </script>
+    {% endblock %}
+
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="{{ page_class }}">
+    {% include "partials/header.html" %}
+
+    <main id="main">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "partials/footer.html" %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

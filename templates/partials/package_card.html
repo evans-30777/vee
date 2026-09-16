@@ -1,0 +1,11 @@
+<article{% if package.is_highlighted %} class="is-highlighted"{% endif %}>
+    <h3>{{ package.name }}</h3>
+    {% if package.reference_price %}<s>KES {{ package.reference_price|floatformat:0 }}</s>{% endif %}
+    <p>{% if package.price_is_from %}from {% endif %}KES {{ package.price|floatformat:0 }}{% if package.billing_type == "monthly" %}/month{% endif %}</p>
+    {% if package.short_description %}<p>{{ package.short_description }}</p>{% endif %}
+    {% if package.features %}
+    <ul>{% for feature in package.features %}<li>{{ feature }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if package.ideal_for %}<p>Ideal for: {{ package.ideal_for }}</p>{% endif %}
+    <a href="{% url 'contact:contact' %}?service={{ package.slug }}">Choose Plan</a>
+</article>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Book Your Free Audit</h1>
+<p>Tell us about your business and we'll come back with practical next steps.</p>
+{% if site_settings %}
+<p>
+    <a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+    <a href="tel:{{ site_settings.phone_calls }}">Call {{ site_settings.phone_calls }}</a>
+    <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a>
+</p>
+<p>{{ site_settings.location_label }} — we also serve clients across Kenya remotely.</p>
+{% endif %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form.visible_fields %}
+    <p>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<span>{{ field.help_text }}</span>{% endif %}
+        {{ field.errors }}
+    </p>
+    {% endfor %}
+    {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+    <button type="submit">Send enquiry</button>
+</form>
+{% endblock %}

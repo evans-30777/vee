@@ -1,0 +1,6 @@
+<article>
+    <h3><a href="{{ service.get_absolute_url }}">{{ service.name }}</a></h3>
+    {% if service.tagline %}<p>{{ service.tagline }}</p>{% endif %}
+    <p>{{ service.short_description }}</p>
+    {% if service.starting_price %}<p>From KES {{ service.starting_price|floatformat:0 }}</p>{% endif %}
+</article>
