@@ -1,0 +1,36 @@
+{
+  "slash_commands": {
+    "grill-me": {
+      "description": "Interrogate a plan or feature idea into full clarity before code is written",
+      "skill": "grill-me"
+    },
+    "no-guessing": {
+      "description": "Evidence hierarchy and forbidden assumptions",
+      "skill": "no-guessing-evidence"
+    },
+    "economical": {
+      "description": "Minimal token use, efficient reasoning",
+      "skill": "economical-agent"
+    },
+    "safe-django": {
+      "description": "Django implementation protocols and safety checks",
+      "skill": "safe-django"
+    },
+    "design-seo": {
+      "description": "Design, content, SEO & UX rules",
+      "skill": "design-content-seo"
+    },
+    "verify": {
+      "description": "Verification checklist and evidence-based reporting",
+      "skill": "verify-and-report"
+    },
+    "route": {
+      "description": "Task router decision tree",
+      "skill": "task-router"
+    },
+    "plan": {
+      "description": "Plan tracking and human-in-the-loop control",
+      "skill": "plan-state-human-loop"
+    }
+  }
+}
