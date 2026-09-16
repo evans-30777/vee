@@ -31,6 +31,11 @@
     <meta name="geo.placename" content="Syokimau, Machakos County, Kenya">
     {% if site_settings %}<meta name="geo.position" content="Kenya">{% endif %}
 
+    {# Search Console verification sets no cookie, so it needs no consent. #}
+    {% if site_settings.google_site_verification %}
+    <meta name="google-site-verification" content="{{ site_settings.google_site_verification }}">
+    {% endif %}
+
     <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32">
     <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
 
@@ -107,6 +112,8 @@
             </svg>
         </button>
     </div>
+
+    {% include "partials/cookie_banner.html" %}
 
     <script src="{% static 'js/main.js' %}" defer></script>
     {% block scripts %}{% endblock %}

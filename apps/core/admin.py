@@ -25,6 +25,21 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             },
         ),
         ("Search", {"fields": ("service_counties",)}),
+        (
+            "Analytics",
+            {
+                "fields": (
+                    "google_site_verification",
+                    "ga4_measurement_id",
+                    "meta_pixel_id",
+                ),
+                "description": (
+                    "Leave blank to set no tracking cookies at all — the cookie consent "
+                    "banner only appears once GA4 or the Meta Pixel is configured here. "
+                    "Neither loads until a visitor accepts."
+                ),
+            },
+        ),
     )
 
     def has_add_permission(self, request):

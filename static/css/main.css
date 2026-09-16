@@ -1575,6 +1575,89 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
 .float-btn--top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
 .float-btn--top:hover { color: var(--brand); border-color: var(--border-brand); }
 
+/* 19b. Cookie banner
+   ========================================================================== */
+
+.cookie-banner {
+    position: fixed;
+    left: clamp(0.75rem, 3vw, 1.5rem);
+    right: clamp(0.75rem, 3vw, 1.5rem);
+    bottom: clamp(0.75rem, 3vw, 1.5rem);
+    z-index: 95;
+    max-width: 62rem;
+    margin-inline: auto;
+    padding: clamp(1.1rem, 2.5vw, 1.5rem);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.cookie-banner.is-open { opacity: 1; transform: none; }
+
+.cookie-banner__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.75rem;
+}
+
+.cookie-banner__inner > div:first-child { flex: 1 1 22rem; }
+
+.cookie-banner__title {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+}
+
+.cookie-banner__text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 62ch;
+}
+
+.cookie-banner__text a {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Equal visual weight: declining must not be made harder than accepting. */
+.cookie-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+.cookie-banner__actions .btn { flex: 1 1 auto; }
+
+/* The floating controls lift clear of the banner rather than colliding with it.
+   The offset is the banner's measured height, published by JS as a custom
+   property — a fixed value cannot work, because the banner grows as its text
+   wraps and its buttons stack on narrow screens. */
+body.cookie-banner-open .floats {
+    bottom: calc(clamp(0.9rem, 3vw, 1.75rem) + var(--cookie-banner-height, 0px) + 0.75rem);
+}
+
+.footer__cookie-settings {
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    text-align: left;
+    border-radius: var(--r-sm);
+    transition: color var(--dur) var(--ease);
+}
+
+.footer__cookie-settings:hover { color: var(--brand); }
+
+@media (max-width: 560px) {
+    .cookie-banner__actions { width: 100%; }
+}
+
 /* 20. Preloader
    ========================================================================== */
 

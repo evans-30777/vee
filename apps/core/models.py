@@ -2,6 +2,14 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 
+from .imaging import optimise_image_field
+
+# Ceilings per image role. A social image only ever renders at Open Graph size,
+# and a client logo only ever renders small, so neither needs more.
+SOCIAL_IMAGE_MAX = (1200, 1200)
+LOGO_MAX = (400, 400)
+FEATURE_IMAGE_MAX = (1600, 1600)
+
 
 def default_service_counties():
     return ["Nairobi", "Machakos", "Kajiado", "Kiambu"]
@@ -56,6 +64,25 @@ class SiteSettings(TimeStampedModel):
         help_text="Fallback Open Graph image used when a page has none.",
     )
 
+    google_site_verification = models.CharField(
+        max_length=120,
+        blank=True,
+        help_text=(
+            "Google Search Console verification token (the content value only, "
+            "not the whole meta tag). Sets no cookie, so it needs no consent."
+        ),
+    )
+    ga4_measurement_id = models.CharField(
+        max_length=40,
+        blank=True,
+        help_text="Google Analytics 4 ID, e.g. G-XXXXXXXXXX. Only loads after cookie consent.",
+    )
+    meta_pixel_id = models.CharField(
+        max_length=40,
+        blank=True,
+        help_text="Meta (Facebook) Pixel ID. Only loads after cookie consent.",
+    )
+
     class Meta:
         verbose_name = "Site settings"
         verbose_name_plural = "Site settings"
@@ -69,11 +96,25 @@ class SiteSettings(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         self.full_clean()
+        optimise_image_field(
+            self.default_social_image,
+            max_width=SOCIAL_IMAGE_MAX[0],
+            max_height=SOCIAL_IMAGE_MAX[1],
+        )
         return super().save(*args, **kwargs)
 
     @property
     def whatsapp_url(self):
         return f"https://wa.me/{self.whatsapp_number}"
+
+    @property
+    def sets_optional_cookies(self):
+        """Whether anything on the site needs consent.
+
+        With no analytics configured the site sets only essential cookies, so
+        showing a consent banner would be both pointless and untrue.
+        """
+        return bool(self.ga4_measurement_id or self.meta_pixel_id)
 
     @property
     def phone_calls_e164(self):
@@ -109,6 +150,10 @@ class Testimonial(TimeStampedModel):
     def __str__(self):
         return f"{self.client_name} — {self.business}" if self.business else self.client_name
 
+    def save(self, *args, **kwargs):
+        optimise_image_field(self.logo, max_width=LOGO_MAX[0], max_height=LOGO_MAX[1])
+        return super().save(*args, **kwargs)
+
 
 class CaseStudy(TimeStampedModel):
     client_label = models.CharField(
@@ -139,6 +184,11 @@ class CaseStudy(TimeStampedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.client_label)[:180]
+        optimise_image_field(
+            self.featured_image,
+            max_width=FEATURE_IMAGE_MAX[0],
+            max_height=FEATURE_IMAGE_MAX[1],
+        )
         return super().save(*args, **kwargs)
 
 

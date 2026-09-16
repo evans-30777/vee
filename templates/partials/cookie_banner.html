@@ -1,0 +1,41 @@
+{% comment %}
+Shown only when something actually sets a non-essential cookie. With no
+analytics configured the site sets essential cookies only, and asking for
+consent it does not need would be misleading.
+
+The analytics IDs are published here as configuration, not as trackers — no
+third-party script is present in the page until the visitor accepts.
+{% endcomment %}
+{% if site_settings.sets_optional_cookies %}
+<script type="application/json" id="analytics-config">
+    {
+        "ga4": "{{ site_settings.ga4_measurement_id|escapejs }}",
+        "pixel": "{{ site_settings.meta_pixel_id|escapejs }}"
+    }
+</script>
+
+<div class="cookie-banner"
+     data-cookie-banner
+     hidden
+     role="dialog"
+     aria-modal="false"
+     aria-labelledby="cookie-banner-title"
+     aria-describedby="cookie-banner-text">
+    <div class="cookie-banner__inner">
+        <div>
+            <h2 class="cookie-banner__title" id="cookie-banner-title">Cookies on this site</h2>
+            <p class="cookie-banner__text" id="cookie-banner-text">
+                We use essential cookies to make this site work. We'd also like to use
+                analytics cookies to understand which pages people find useful. You can
+                decline and everything will keep working.
+                <a href="{% url 'core:cookies' %}">Read our Cookie Policy</a>.
+            </p>
+        </div>
+        <div class="cookie-banner__actions">
+            {# Decline is presented exactly as prominently as accept: consent has to be a real choice. #}
+            <button class="btn btn--secondary btn--sm" type="button" data-cookie-decline>Decline</button>
+            <button class="btn btn--primary btn--sm" type="button" data-cookie-accept>Accept analytics</button>
+        </div>
+    </div>
+</div>
+{% endif %}

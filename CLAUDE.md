@@ -76,15 +76,33 @@ Apply these skills from `vee_claude_skills/` directory:
 Deliberately deferred. Do not treat these as oversights, and do not build them
 outside an agreed batch.
 
-- **Resize images on upload.** Featured images and headshots are uploaded straight
-  from a phone — a 3–5MB JPEG would ship at full size to every mobile visitor and
-  undo the frontend's performance work. Pillow is already a dependency; resize in
-  the model's `save()`. No new vendor needed.
-- **Media backup.** Uploads live on the HostAfrica filesystem. Document/schedule a
-  backup alongside the SQLite one.
+- **Tawk.to live chat** (design guide §16) — deliberately NOT built. A solo operator
+  cannot staff a live-chat widget, and an unanswered chat box costs more trust than
+  it earns; WhatsApp already covers real-time contact. Revisit only if chat can
+  actually be answered.
+- **reCAPTCHA v3** — deferred while the honeypot and per-IP rate limit are holding.
+  Add it if real spam gets through, not before.
+- **Phase 2 platform work:** templates marketplace; payments (M-Pesa first, then
+  Stripe, then PayPal); light-mode theme toggle.
 
-*Dropped: `POSTGRES_SSLMODE`. It existed only for the Aiven plan, which SQLite in
-production replaced.*
+*Done and dropped from this list: image resize on upload, media backup docs,
+cookie consent banner, consent-gated analytics. `POSTGRES_SSLMODE` was dropped
+outright — it existed only for the Aiven plan that SQLite replaced.*
+
+## Analytics & Cookies — How It Works
+
+- GA4, Meta Pixel and the Search Console token are **SiteSettings fields**, editable
+  in admin without a redeploy. All blank by default.
+- **No tracking script is rendered server-side.** IDs are published as JSON config;
+  `main.js` injects the scripts only after the visitor accepts.
+- **The consent banner only appears when GA4 or the Pixel is configured.** With both
+  blank the site sets essential cookies only, so asking for consent would be untrue.
+- Declining is presented as prominently as accepting, Escape declines rather than
+  dismissing, and the footer's "Cookie settings" link withdraws consent and clears
+  the analytics cookies.
+- If you change any of this, re-verify that no request reaches `googletagmanager.com`
+  or `connect.facebook.net` before consent. Tests cover the server side; the browser
+  side needs a real check.
 
 ## Never Do This
 

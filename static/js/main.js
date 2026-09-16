@@ -315,6 +315,165 @@
         });
     }
 
+    /* ------------------------------------------------------ Cookies & analytics */
+
+    var CONSENT_KEY = "vee-cookie-consent";
+
+    function readConsent() {
+        try {
+            return window.localStorage.getItem(CONSENT_KEY);
+        } catch (error) {
+            // Private browsing or blocked site data. Treat as "not decided" —
+            // the banner reappears, and nothing loads without an explicit yes.
+            return null;
+        }
+    }
+
+    function writeConsent(value) {
+        try {
+            window.localStorage.setItem(CONSENT_KEY, value);
+        } catch (error) {
+            /* Consent simply is not remembered; it is never assumed. */
+        }
+    }
+
+    function loadAnalytics(config) {
+        if (config.ga4) {
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+            window.gtag("js", new Date());
+            window.gtag("config", config.ga4, { anonymize_ip: true });
+
+            var ga = document.createElement("script");
+            ga.async = true;
+            ga.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(config.ga4);
+            document.head.appendChild(ga);
+        }
+
+        if (config.pixel) {
+            /* eslint-disable */
+            !function (f, b, e, v, n, t, s) {
+                if (f.fbq) return; n = f.fbq = function () {
+                    n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+                };
+                if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+                t = b.createElement(e); t.async = !0; t.src = v;
+                s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+            }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+            /* eslint-enable */
+            window.fbq("init", config.pixel);
+            window.fbq("track", "PageView");
+        }
+    }
+
+    // Best effort: withdrawing consent should take the cookies with it. These are
+    // first-party, so the page can clear them; anything already sent cannot be recalled.
+    function clearAnalyticsCookies() {
+        var host = window.location.hostname;
+        var domains = [host, "." + host];
+        var parts = host.split(".");
+        if (parts.length > 2) domains.push("." + parts.slice(-2).join("."));
+
+        document.cookie.split(";").forEach(function (entry) {
+            var name = entry.split("=")[0].trim();
+            if (!/^(_ga|_gid|_gat|_fbp|_fbc)/.test(name)) return;
+            domains.forEach(function (domain) {
+                document.cookie = name + "=; path=/; domain=" + domain +
+                    "; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            });
+            document.cookie = name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        });
+    }
+
+    function initCookieConsent() {
+        var banner = document.querySelector("[data-cookie-banner]");
+        var configNode = document.getElementById("analytics-config");
+
+        // No banner means nothing on this site sets a non-essential cookie.
+        if (!banner || !configNode) return;
+
+        var config;
+        try {
+            config = JSON.parse(configNode.textContent);
+        } catch (error) {
+            return;
+        }
+
+        var accept = banner.querySelector("[data-cookie-accept]");
+        var decline = banner.querySelector("[data-cookie-decline]");
+        var lastFocused = null;
+
+        // Publish the banner's real height so the floating controls can sit clear
+        // of it. The height varies with text wrapping and button stacking, so it
+        // has to be measured rather than assumed.
+        function publishHeight() {
+            var height = banner.hidden ? 0 : banner.getBoundingClientRect().height;
+            root.style.setProperty("--cookie-banner-height", height + "px");
+        }
+
+        function show() {
+            lastFocused = document.activeElement;
+            banner.hidden = false;
+            document.body.classList.add("cookie-banner-open");
+            publishHeight();
+            // Next frame, so the entrance transition has a starting state.
+            window.requestAnimationFrame(function () {
+                banner.classList.add("is-open");
+                publishHeight();
+            });
+        }
+
+        function hide() {
+            banner.classList.remove("is-open");
+            banner.hidden = true;
+            document.body.classList.remove("cookie-banner-open");
+            publishHeight();
+            if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+        }
+
+        window.addEventListener("resize", function () {
+            if (!banner.hidden) publishHeight();
+        }, { passive: true });
+
+        function onAccept() {
+            writeConsent("accepted");
+            hide();
+            loadAnalytics(config);
+        }
+
+        function onDecline() {
+            writeConsent("declined");
+            hide();
+            clearAnalyticsCookies();
+        }
+
+        if (accept) accept.addEventListener("click", onAccept);
+        if (decline) decline.addEventListener("click", onDecline);
+
+        banner.addEventListener("keydown", function (event) {
+            // Escape declines rather than dismissing silently: no choice is not consent.
+            if (event.key === "Escape") onDecline();
+        });
+
+        // Let the footer link reopen the banner so consent can be withdrawn as
+        // easily as it was given.
+        Array.prototype.forEach.call(
+            document.querySelectorAll("[data-cookie-settings]"),
+            function (trigger) {
+                trigger.hidden = false;
+                trigger.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    show();
+                    if (decline) decline.focus();
+                });
+            }
+        );
+
+        var stored = readConsent();
+        if (stored === "accepted") loadAnalytics(config);
+        else if (stored !== "declined") show();
+    }
+
     /* --------------------------------------------------------------- Bootstrap */
 
     function init() {
@@ -324,6 +483,7 @@
         initReveals();
         initBackToTop();
         initNewsletter();
+        initCookieConsent();
 
         Array.prototype.forEach.call(
             document.querySelectorAll("[data-carousel]"),

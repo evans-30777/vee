@@ -114,6 +114,61 @@ class PublicPageTests(TestCase):
         self.assertContains(response, "css/main.css")
         self.assertContains(response, "js/main.js")
 
+    def test_no_cookie_banner_when_nothing_sets_optional_cookies(self):
+        """Asking consent for cookies the site does not set would be untrue."""
+        response = self.client.get(reverse("core:home"))
+        self.assertNotContains(response, "data-cookie-banner")
+        self.assertNotContains(response, "Cookie settings")
+
+    def test_cookie_banner_appears_once_analytics_is_configured(self):
+        settings_obj = SiteSettings.load()
+        settings_obj.ga4_measurement_id = "G-TEST12345"
+        settings_obj.save()
+
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "data-cookie-banner")
+        self.assertContains(response, "data-cookie-settings")
+
+    def test_tracking_scripts_are_absent_until_consent_is_given(self):
+        """The whole point of the banner: no third-party script ships with the page."""
+        settings_obj = SiteSettings.load()
+        settings_obj.ga4_measurement_id = "G-TEST12345"
+        settings_obj.meta_pixel_id = "111222333"
+        settings_obj.save()
+
+        response = self.client.get(reverse("core:home"))
+        self.assertNotContains(response, "googletagmanager.com")
+        self.assertNotContains(response, "connect.facebook.net")
+        self.assertNotContains(response, "fbevents.js")
+
+    def test_decline_is_offered_as_prominently_as_accept(self):
+        settings_obj = SiteSettings.load()
+        settings_obj.ga4_measurement_id = "G-TEST12345"
+        settings_obj.save()
+
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "data-cookie-decline")
+        self.assertContains(response, "data-cookie-accept")
+
+    def test_search_console_tag_renders_without_consent(self):
+        """It sets no cookie, so it must not be gated behind the banner."""
+        settings_obj = SiteSettings.load()
+        settings_obj.google_site_verification = "verify-token-abc"
+        settings_obj.save()
+
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, 'name="google-site-verification"')
+        self.assertContains(response, "verify-token-abc")
+        self.assertNotContains(response, "data-cookie-banner")
+
+    def test_sets_optional_cookies_property(self):
+        settings_obj = SiteSettings.load()
+        self.assertFalse(settings_obj.sets_optional_cookies)
+
+        settings_obj.meta_pixel_id = "111222333"
+        settings_obj.save()
+        self.assertTrue(settings_obj.sets_optional_cookies)
+
     def test_prices_render_with_thousands_separators(self):
         response = self.client.get(reverse("packages:list"))
         self.assertContains(response, "15,000")

@@ -3,7 +3,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
-from apps.core.models import TimeStampedModel
+from apps.core.imaging import optimise_image_field
+from apps.core.models import FEATURE_IMAGE_MAX, TimeStampedModel
 
 
 class Category(TimeStampedModel):
@@ -75,4 +76,9 @@ class BlogPost(TimeStampedModel):
     def save(self, *args, **kwargs):
         if self.is_published and self.published_at is None:
             self.published_at = timezone.now()
+        optimise_image_field(
+            self.featured_image,
+            max_width=FEATURE_IMAGE_MAX[0],
+            max_height=FEATURE_IMAGE_MAX[1],
+        )
         return super().save(*args, **kwargs)

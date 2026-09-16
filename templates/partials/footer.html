@@ -84,6 +84,10 @@
                 <a href="{% url 'core:terms' %}">Terms</a>
                 <a href="{% url 'core:cookies' %}">Cookies</a>
                 <a href="{% url 'core:disclaimer' %}">Disclaimer</a>
+                {% if site_settings.sets_optional_cookies %}
+                {# Revealed by JS: without it the control could not do anything. #}
+                <button type="button" class="footer__cookie-settings" data-cookie-settings hidden>Cookie settings</button>
+                {% endif %}
             </nav>
         </div>
     </div>

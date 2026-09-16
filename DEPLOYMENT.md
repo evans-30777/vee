@@ -126,6 +126,19 @@ Use `.backup` rather than `cp` — it is safe to run while the site is serving.
 Keep the backups off the server as well, and remember they are as sensitive as the
 live database.
 
+### Back up the media directory too
+
+A database backup alone is **not** a full backup. Uploaded files — blog featured
+images, testimonial logos, author headshot, the social sharing image — live on the
+filesystem, not in the database. Restoring one without the other leaves you with
+posts whose images 404.
+
+```bash
+tar -czf ~/vee-backups/media-$(date +%F).tar.gz -C /path/to/project media
+```
+
+Take both together, on the same schedule, and copy them off the server.
+
 **If you outgrow SQLite** — sustained concurrent writes causing `database is
 locked` errors under normal traffic — that is the signal to move to PostgreSQL.
 At this data volume the migration is a `dumpdata` / `loaddata` round trip.
