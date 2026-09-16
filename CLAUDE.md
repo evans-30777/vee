@@ -39,19 +39,24 @@ Apply these skills from `vee_claude_skills/` directory:
 - Base location: Syokimau, Machakos County, Kenya
 - Primary service areas: Nairobi, Machakos, Kajiado, Kiambu (strong local emphasis)
 - Coverage: All counties in Kenya (nationwide)
-- Primary phone/WhatsApp: 0759 643 882 (+254 759 643 882 international)
+- **Phone numbers (both public, different channels):**
+  - Calls: 0717 115 737
+  - WhatsApp: 0759 643 882 (+254 759 643 882 international) — `https://wa.me/254759643882`
 - Email: hello@veeagency.co.ke
 - Social: Facebook, Instagram (confirmed; X, TikTok, LinkedIn only in content/posts, not primary brand channels)
 - Hosting: HostAfrica
+- Operator: Solo — Evans (VEE Agency founder/author). No other team members unless confirmed later.
 - **Package Pricing (current):**
   - Essential: KES 15,000/month
   - Standard: KES 25,000/month
   - Premium: KES 45,000/month
-  - Website Creation: KES 30,000 (one-time)
+  - Website Creation: **from** KES 30,000 (one-time base price; complex builds — e-commerce, booking/hospitality — quoted case-by-case above base, not itemized on the site)
+- Website Creation approach: One service, not separate SKUs per site type. Site "type" (portfolio, business, e-commerce, booking/hospitality, etc.) determines scope/complexity within the same KES 30,000+ offering — always built with SEO/AEO/GEO-ready structure and clear enquiry/booking paths.
 - Blog: Fully live at launch; author writes weekly posts
 - Testimonials/Case Studies: CMS-ready in Django Admin; added over time, never fabricated
 - Analytics: GA4, Google Search Console, Meta Pixel (client-side for now)
 - Legal: Privacy Policy, Terms of Service, Cookie Policy, Disclaimer required
+- Brand assets: real logo at `initial assets/logo.png` (dark red + orange V mark, confirms master spec colors). `nvidia inspiration/` = motion/layout reference only (hero, menu, footer feel) — not a literal template. Other files in `initial assets/` are marked "context only, do not use directly" per `initial assets/instructions.txt` — do not embed those flyer images/colors (blue scheme) into the live site.
 
 ## Never Do This
 
