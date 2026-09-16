@@ -57,6 +57,11 @@ Apply these skills from `vee_claude_skills/` directory:
 - Analytics: GA4, Google Search Console, Meta Pixel (client-side for now)
 - Legal: Privacy Policy, Terms of Service, Cookie Policy, Disclaimer required
 - Brand assets: real logo at `initial assets/logo.png` (dark red + orange V mark, confirms master spec colors). `nvidia inspiration/` = motion/layout reference only (hero, menu, footer feel) — not a literal template. Other files in `initial assets/` are marked "context only, do not use directly" per `initial assets/instructions.txt` — do not embed those flyer images/colors (blue scheme) into the live site.
+- Social links (Facebook, Instagram): build the field/icon slot now; leave empty until the owner provides real URLs. Per Empty-State Rule, do not render an icon with no URL.
+- Design mandate: this is a conversion-focused sales site, not a portfolio piece for VEE itself. Every section must build enough trust that a cold visitor is ready to enquire before they ever call.
+- Theme: dark-mode only at launch (per `02_DESIGN_SYSTEM_MOTION_ACCESSIBILITY.md`). A real light-mode + toggle is Phase 2 — do not build a half-finished toggle at launch.
+- Website Development page must include a static mockup showcase: 3 example layouts (Portfolio, E-commerce, Booking/Hospitality) — visual only, no backend/models, clearly labeled as example layouts (never presented as real client work, per the never-fabricate-proof rule).
+- Build order for this project: backend fully implemented and verified first (models, admin, forms, URLs) before frontend/template/styling work begins.
 
 ## Never Do This
 
