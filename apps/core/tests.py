@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.template.loader import render_to_string
 from django.test import TestCase
 from django.urls import reverse
 
@@ -26,6 +27,13 @@ class SiteSettingsTests(TestCase):
 
     def test_load_returns_none_when_unconfigured(self):
         self.assertIsNone(SiteSettings.load())
+
+    def test_click_to_call_number_is_normalised_to_international_format(self):
+        """Owners may type any of these; the tel: link must stay dialable."""
+        for entered in ["0717115737", "0717 115 737", "+254 717 115 737", "254717115737"]:
+            with self.subTest(entered=entered):
+                settings_obj = SiteSettings(phone_calls=entered)
+                self.assertEqual(settings_obj.phone_calls_e164, "+254717115737")
 
 
 class PublicPageTests(TestCase):
@@ -83,8 +91,64 @@ class PublicPageTests(TestCase):
 
     def test_blank_social_urls_render_no_links(self):
         response = self.client.get(reverse("core:home"))
-        self.assertNotContains(response, ">Facebook<")
-        self.assertNotContains(response, ">Instagram<")
+        self.assertNotContains(response, "VEE Agency on Facebook")
+        self.assertNotContains(response, "VEE Agency on Instagram")
+        self.assertNotContains(response, "footer__social")
+
+    def test_social_icon_appears_once_a_real_url_exists(self):
+        settings_obj = SiteSettings.load()
+        settings_obj.facebook_url = "https://facebook.com/veeagency"
+        settings_obj.save()
+
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "VEE Agency on Facebook")
+        # Instagram is still blank, so its icon stays hidden.
+        self.assertNotContains(response, "VEE Agency on Instagram")
+
+    def test_click_to_call_link_uses_international_format(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, 'href="tel:+254717115737"')
+
+    def test_stylesheet_and_script_are_linked(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "css/main.css")
+        self.assertContains(response, "js/main.js")
+
+    def test_prices_render_with_thousands_separators(self):
+        response = self.client.get(reverse("packages:list"))
+        self.assertContains(response, "15,000")
+        self.assertNotContains(response, "KES&nbsp;15000")
+
+    def test_skip_link_is_present_for_keyboard_users(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, 'class="skip-link" href="#main"')
+
+    def test_first_hero_slide_is_active_without_javascript(self):
+        """The carousel is progressive enhancement: slide one must render on its own."""
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, 'class="slide is-active"')
+
+    def test_home_exposes_faq_schema_for_answer_engines(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "FAQPage")
+        self.assertContains(response, "How much does a website cost in Kenya?")
+
+    def test_mockups_are_labelled_as_examples_not_client_work(self):
+        response = self.client.get(reverse("core:web_development"))
+        self.assertContains(response, "not screenshots of client websites")
+
+    def test_pages_carry_local_seo_language(self):
+        for url in [reverse("core:home"), reverse("core:web_development"), reverse("services:list")]:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, "Nairobi")
+                self.assertContains(response, "Kenya")
+
+    def test_error_page_renders_standalone(self):
+        """The 500 template must not depend on context processors or static files."""
+        html = render_to_string("500.html")
+        self.assertIn("Something went wrong", html)
+        self.assertNotIn("{%", html)
 
     def test_sitemap_and_robots_are_served(self):
         sitemap = self.client.get("/sitemap.xml")

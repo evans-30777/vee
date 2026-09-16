@@ -1,12 +1,32 @@
 {% extends "base.html" %}
+
 {% block content %}
-<article class="legal-document">
-    <h1>{{ doc_title }}</h1>
-    <p><em>Last updated: {% now "j F Y" %}</em></p>
-    {% block legal_content %}{% endblock %}
-    <h2>Contact us</h2>
-    {% if site_settings %}
-    <p>Questions about this document? Email <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a> or call <a href="tel:{{ site_settings.phone_calls }}">{{ site_settings.phone_calls }}</a>.</p>
-    {% endif %}
-</article>
+<section class="page-head">
+    <div class="container container--narrow">
+        <ol class="breadcrumbs">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li aria-current="page">{{ doc_title }}</li>
+        </ol>
+        <p class="eyebrow">Legal</p>
+        <h1>{{ doc_title }}</h1>
+        <p class="dim">Last updated: {% now "j F Y" %}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container--narrow">
+        <article class="prose legal-document">
+            {% block legal_content %}{% endblock %}
+
+            <h2>Contact us</h2>
+            {% if site_settings %}
+            <p>
+                Questions about this document? Email
+                <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a>
+                or call <a href="tel:{{ site_settings.phone_calls_e164 }}">{{ site_settings.phone_calls }}</a>.
+            </p>
+            {% endif %}
+        </article>
+    </div>
+</section>
 {% endblock %}

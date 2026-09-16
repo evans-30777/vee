@@ -1,12 +1,49 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>{{ author.display_name }}</h1>
-{% if author.job_title %}<p>{{ author.job_title }}</p>{% endif %}
-{% if author.headshot %}<img src="{{ author.headshot.url }}" alt="{{ author.display_name }}">{% endif %}
-{% if author.bio %}<div>{{ author.bio|linebreaks }}</div>{% endif %}
-<h2>Articles</h2>
-{% if page_obj %}
-    {% for post in page_obj %}{% include "partials/post_card.html" %}{% endfor %}
-    {% include "partials/pagination.html" %}
-{% else %}<p>No published articles yet.</p>{% endif %}
+<section class="page-head">
+    <div class="container">
+        <ol class="breadcrumbs">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li><a href="{% url 'blog:list' %}">Blog</a></li>
+            <li aria-current="page">{{ author.display_name }}</li>
+        </ol>
+        <p class="eyebrow">Author</p>
+        <h1>{{ author.display_name }}</h1>
+        {% if author.job_title %}<p class="lead">{{ author.job_title }}</p>{% endif %}
+    </div>
+</section>
+
+{% if author.bio or author.headshot %}
+<section class="section section--tight">
+    <div class="container split">
+        <div class="prose">
+            {% if author.bio %}{{ author.bio|linebreaks }}{% endif %}
+        </div>
+        {% if author.headshot %}
+        <img src="{{ author.headshot.url }}"
+             alt="{{ author.display_name }}"
+             style="border-radius:var(--r-lg); border:1px solid var(--border)"
+             loading="lazy">
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <h2>Articles</h2>
+        </div>
+
+        {% if page_obj %}
+        <div class="grid grid--3 reveal-group">
+            {% for post in page_obj %}{% include "partials/post_card.html" %}{% endfor %}
+        </div>
+        {% include "partials/pagination.html" %}
+        {% else %}
+        <p class="empty-note">No published articles yet.</p>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

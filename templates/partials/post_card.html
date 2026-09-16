@@ -1,5 +1,10 @@
-<article>
-    <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-    <p>{{ post.excerpt }}</p>
-    <p><time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"j F Y" }}</time></p>
+<article class="card">
+    {% if post.categories.exists %}
+    <p class="dim">{% for category in post.categories.all %}{{ category.name }}{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+    {% endif %}
+    <h3><a class="card__link" href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+    <p class="muted">{{ post.excerpt }}</p>
+    <p class="card__meta">
+        <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"j F Y" }}</time>
+    </p>
 </article>

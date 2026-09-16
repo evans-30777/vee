@@ -21,7 +21,34 @@ apps/
 ├── locations/          County landing pages
 └── contact/            Enquiry form, notifications, newsletter signup
 templates/              Server-rendered templates
+static/
+├── css/main.css        Design system + all components (no framework)
+├── js/main.js          Progressive-enhancement behaviours
+└── img/                Logo and favicons
 ```
+
+## Front end
+
+Dark-mode only at launch. Brand tokens are sampled from the real logo
+(`#880000` dark red, `#E64A1A` orange); everything else is derived from the
+tokens at the top of `static/css/main.css`.
+
+There is no CSS framework and no JavaScript dependencies — motion is CSS
+transitions driven by `IntersectionObserver`. This was chosen over GSAP/Lenis
+deliberately: the effects the design calls for are native CSS, and the design
+guide's own performance rules say to avoid large animation bundles where simple
+CSS works. That matters on Kenyan mobile data.
+
+**Everything in `main.js` is an enhancement.** The site is fully readable and
+usable with JavaScript disabled or if the script fails to load:
+
+- the preloader clears on a CSS timer, so it can never trap the page
+- scroll reveals are only armed once JS confirms it can un-arm them, and have a
+  4-second deadline as a second safety net
+- the hero carousel renders its first slide from the server
+
+If you change any of those, re-check both paths — there are tests covering them
+in `apps/core/tests.py` (`test_first_hero_slide_is_active_without_javascript`).
 
 ## Local setup
 

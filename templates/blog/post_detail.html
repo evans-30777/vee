@@ -1,6 +1,8 @@
 {% extends "base.html" %}
-{% block schema %}
-{{ block.super }}
+
+{% block og_type %}article{% endblock %}
+
+{% block schema_extra %}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
@@ -28,24 +30,92 @@
 </script>
 {% endif %}
 {% endblock %}
+
 {% block content %}
-<article>
-    <h1>{{ post.title }}</h1>
-    <p>By <a href="{% url 'blog:author' post.author.username %}">{{ post.author.display_name }}</a> ·
-       <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"j F Y" }}</time></p>
-    {% if post.featured_image %}<img src="{{ post.featured_image.url }}" alt="{{ post.featured_image_alt }}">{% endif %}
-    {% if post.quick_answer %}
-    <aside><h2>Quick answer</h2><p>{{ post.quick_answer }}</p></aside>
-    {% endif %}
-    <div>{{ post.body|linebreaks }}</div>
-    {% if post.faqs %}
-    <section><h2>Frequently asked questions</h2>
-    {% for faq in post.faqs %}<h3>{{ faq.question }}</h3><p>{{ faq.answer }}</p>{% endfor %}
-    </section>
-    {% endif %}
+<article class="section">
+    <div class="container">
+        <header class="article-head">
+            <ol class="breadcrumbs">
+                <li><a href="{% url 'core:home' %}">Home</a></li>
+                <li><a href="{% url 'blog:list' %}">Blog</a></li>
+                <li aria-current="page">{{ post.title|truncatewords:5 }}</li>
+            </ol>
+
+            {% if post.categories.exists %}
+            <nav class="tag-list" aria-label="Categories">
+                {% for category in post.categories.all %}
+                <a class="tag" href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+                {% endfor %}
+            </nav>
+            {% endif %}
+
+            <h1>{{ post.title }}</h1>
+
+            <p class="article-meta">
+                <span>By <a href="{% url 'blog:author' post.author.username %}">{{ post.author.display_name }}</a></span>
+                <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"j F Y" }}</time>
+            </p>
+        </header>
+
+        {% if post.featured_image %}
+        <img src="{{ post.featured_image.url }}"
+             alt="{{ post.featured_image_alt }}"
+             style="margin-block:2rem; border-radius:var(--r-lg); border:1px solid var(--border)"
+             loading="eager">
+        {% endif %}
+
+        {% if post.quick_answer %}
+        <aside class="quick-answer">
+            <h2>Quick answer</h2>
+            <p>{{ post.quick_answer }}</p>
+        </aside>
+        {% endif %}
+
+        <div class="prose">{{ post.body|linebreaks }}</div>
+
+        {% if post.faqs %}
+        <section style="margin-top:3rem">
+            <h2 style="margin-bottom:1.25rem">Frequently asked questions</h2>
+            <div class="faq">
+                {% for faq in post.faqs %}
+                <details class="faq__item">
+                    <summary>{{ faq.question }}</summary>
+                    <div><p>{{ faq.answer }}</p></div>
+                </details>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
 </article>
-<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Put this into practice</p>
+            <h2>Want this done for your business?</h2>
+            <p>Book a free audit and we'll show you exactly where your business stands right now — and what to fix first.</p>
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                {% if site_settings %}
+                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
 {% if related_posts %}
-<section><h2>Related reading</h2>{% for post in related_posts %}{% include "partials/post_card.html" %}{% endfor %}</section>
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Keep reading</p>
+            <h2>Related insights</h2>
+        </div>
+        <div class="grid grid--3 reveal-group">
+            {% for post in related_posts %}{% include "partials/post_card.html" %}{% endfor %}
+        </div>
+    </div>
+</section>
 {% endif %}
 {% endblock %}

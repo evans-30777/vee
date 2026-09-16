@@ -1,6 +1,11 @@
-<article>
-    <h3><a href="{{ service.get_absolute_url }}">{{ service.name }}</a></h3>
-    {% if service.tagline %}<p>{{ service.tagline }}</p>{% endif %}
-    <p>{{ service.short_description }}</p>
-    {% if service.starting_price %}<p>From KES {{ service.starting_price|floatformat:0 }}</p>{% endif %}
+{% load humanize %}
+<article class="card">
+    <span class="card__icon" aria-hidden="true">{{ service.name|slice:":1" }}</span>
+    <h3><a class="card__link" href="{{ service.get_absolute_url }}">{{ service.name }}</a></h3>
+    {% if service.tagline %}<p class="dim">{{ service.tagline }}</p>{% endif %}
+    <p class="muted">{{ service.short_description }}</p>
+    <p class="card__meta">
+        {% if service.starting_price %}<span class="card__price">From KES {{ service.starting_price|floatformat:0|intcomma }}</span>{% else %}<span class="card__price">Learn more</span>{% endif %}
+        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+    </p>
 </article>

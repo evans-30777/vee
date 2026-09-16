@@ -1,9 +1,68 @@
 <!DOCTYPE html>
 <html lang="en-KE">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Something went wrong — VEE Agency</title></head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Something went wrong — VEE Agency</title>
+    <!-- Styles are inlined deliberately: a 500 page must render even if static
+         files or the context processors are part of what is failing. -->
+    <style>
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; margin: 0; }
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 2rem 1.25rem;
+            background: #0A0A0A;
+            color: #fff;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            line-height: 1.65;
+            text-align: center;
+        }
+        main { max-width: 34rem; }
+        .mark {
+            display: inline-block;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: #E64A1A;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-size: clamp(1.8rem, 1.4rem + 2vw, 2.6rem);
+            line-height: 1.12;
+            letter-spacing: -.025em;
+            margin-bottom: 1rem;
+        }
+        p { color: #A8A8A8; margin-bottom: 2rem; }
+        .row { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; }
+        a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 46px;
+            padding: .7rem 1.55rem;
+            border-radius: 999px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+        .primary { background: #E64A1A; color: #fff; }
+        .secondary { border-color: rgba(255,255,255,.14); color: #fff; }
+        a:focus-visible { outline: 3px solid rgba(230,74,26,.65); outline-offset: 2px; }
+    </style>
+</head>
 <body>
-<h1>Something went wrong on our side</h1>
-<p>We've been notified. Please try again shortly.</p>
-<p><a href="/">Back to home</a> · <a href="/contact/">Contact us</a></p>
+    <main>
+        <span class="mark">Error 500</span>
+        <h1>Something went wrong on our side</h1>
+        <p>This one is our fault, not yours. The error has been logged and we're on it — please try again in a moment.</p>
+        <div class="row">
+            <a class="primary" href="/">Back to home</a>
+            <a class="secondary" href="/contact/">Contact us</a>
+        </div>
+    </main>
 </body>
 </html>

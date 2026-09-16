@@ -1,17 +1,104 @@
 {% extends "base.html" %}
+{% load humanize %}
+
+{% block schema_extra %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "{{ service.name|escapejs }}",
+    "description": "{{ service.short_description|escapejs }}",
+    "serviceType": "{{ service.name|escapejs }}",
+    "url": "{{ canonical_url }}",
+    "provider": {
+        "@type": "ProfessionalService",
+        "name": "VEE Agency",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Syokimau",
+            "addressRegion": "Machakos County",
+            "addressCountry": "KE"
+        }
+    },
+    "areaServed": [{% for county in site_settings.service_counties %}{"@type": "AdministrativeArea", "name": "{{ county }}"}, {% endfor %}{"@type": "Country", "name": "Kenya"}]{% if service.starting_price %},
+    "offers": {
+        "@type": "Offer",
+        "price": "{{ service.starting_price|floatformat:0 }}",
+        "priceCurrency": "KES"
+    }{% endif %}
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<h1>{{ service.name }}</h1>
-{% if service.tagline %}<p>{{ service.tagline }}</p>{% endif %}
-<p>{{ service.short_description }}</p>
-{% if service.full_description %}<div>{{ service.full_description|linebreaks }}</div>{% endif %}
-{% if service.deliverables %}
-<h2>What's included</h2>
-<ul>{% for item in service.deliverables %}<li>{{ item }}</li>{% endfor %}</ul>
-{% endif %}
-{% if service.starting_price %}<p>From KES {{ service.starting_price|floatformat:0 }}</p>{% endif %}
-<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+<section class="page-head">
+    <div class="container">
+        <ol class="breadcrumbs">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li><a href="{% url 'services:list' %}">Services</a></li>
+            <li aria-current="page">{{ service.name }}</li>
+        </ol>
+        <p class="eyebrow">Service</p>
+        <h1>{{ service.name }}</h1>
+        {% if service.tagline %}<p class="lead">{{ service.tagline }}</p>{% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container split">
+        <div>
+            <div class="prose">
+                <p>{{ service.short_description }}</p>
+                {% if service.full_description %}{{ service.full_description|linebreaks }}{% endif %}
+            </div>
+
+            {% if service.deliverables %}
+            <div class="panel" style="margin-top:2.25rem">
+                <h2>What's included</h2>
+                <ul class="checklist">
+                    {% for item in service.deliverables %}<li>{{ item }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        <aside class="panel">
+            {% if service.starting_price %}
+            <p class="eyebrow">Starting from</p>
+            <p class="package__amount" style="margin:.4rem 0 1rem">KES&nbsp;{{ service.starting_price|floatformat:0|intcomma }}</p>
+            {% else %}
+            <h2>Talk it through</h2>
+            {% endif %}
+            <p class="muted" style="margin-bottom:1.25rem">
+                Every business is different. Get a free audit and we'll tell you whether
+                {{ service.name|lower }} is the right next step — honestly.
+            </p>
+            <div class="stack">
+                <a class="btn btn--primary btn--block" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                {% if site_settings %}
+                <a class="btn btn--whatsapp btn--block" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                {% endif %}
+            </div>
+            {% if site_settings %}
+            <p class="dim" style="margin-top:1.25rem">
+                Serving {% for county in site_settings.service_counties %}{{ county }}{% if not forloop.last %}, {% endif %}{% endfor %} and all of Kenya.
+            </p>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
 {% if related_services %}
-<h2>Related services</h2>
-{% for service in related_services %}{% include "partials/service_card.html" %}{% endfor %}
+<section class="section section--tight">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Works well with</p>
+            <h2>Related services</h2>
+        </div>
+        <div class="grid grid--3 reveal-group">
+            {% for service in related_services %}{% include "partials/service_card.html" %}{% endfor %}
+        </div>
+    </div>
+</section>
 {% endif %}
 {% endblock %}

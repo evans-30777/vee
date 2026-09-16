@@ -1,15 +1,75 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Packages &amp; Pricing</h1>
+<section class="page-head">
+    <div class="container">
+        <p class="eyebrow">Packages &amp; pricing</p>
+        <h1>Clear prices. No guessing.</h1>
+        <p class="lead">
+            Digital growth packages for businesses in Nairobi, Machakos, Kajiado, Kiambu
+            and across Kenya — priced up front so you know what you're committing to.
+        </p>
+    </div>
+</section>
+
 {% if monthly_packages %}
-<section><h2>Monthly growth packages</h2>
-{% for package in monthly_packages %}{% include "partials/package_card.html" %}{% endfor %}
-<p>Advertising media spend is billed separately from VEE Agency's management fee.</p>
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Monthly</p>
+            <h2>Ongoing growth packages</h2>
+            <p class="lead">Steady, compounding work — visibility that keeps building instead of stopping when a campaign ends.</p>
+        </div>
+
+        <div class="grid grid--3 reveal-group">
+            {% for package in monthly_packages %}{% include "partials/package_card.html" %}{% endfor %}
+        </div>
+
+        <p class="dim" style="margin-top:1.5rem">
+            Advertising media spend (what you pay Google or Meta) is billed separately from
+            VEE Agency's management fee.
+        </p>
+    </div>
 </section>
 {% endif %}
+
 {% if one_time_packages %}
-<section><h2>One-time services</h2>
-{% for package in one_time_packages %}{% include "partials/package_card.html" %}{% endfor %}
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">One-time</p>
+            <h2>Project-based services</h2>
+            <p class="lead">Defined pieces of work with a start and a finish — no ongoing commitment.</p>
+        </div>
+
+        <div class="grid grid--3 reveal-group">
+            {% for package in one_time_packages %}{% include "partials/package_card.html" %}{% endfor %}
+        </div>
+    </div>
 </section>
 {% endif %}
+
+{% if not monthly_packages and not one_time_packages %}
+<section class="section">
+    <div class="container">
+        <p class="empty-note">Packages are being finalised. Get in touch and we'll quote for exactly what your business needs.</p>
+    </div>
+</section>
+{% endif %}
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Still deciding?</p>
+            <h2>Let's work out which package fits</h2>
+            <p>Book a free audit and we'll recommend the right level based on your business — not the most expensive one.</p>
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                {% if site_settings %}
+                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask on WhatsApp</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

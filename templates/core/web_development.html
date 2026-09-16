@@ -1,17 +1,191 @@
 {% extends "base.html" %}
-{% block content %}
-<h1>Website Design &amp; Development in Kenya</h1>
-<p>Custom websites built to bring in enquiries — designed mobile-first and structured for SEO, AEO and GEO from day one. We work with businesses in Nairobi, Machakos, Kajiado, Kiambu and across Kenya.</p>
-{% if website_package %}
-<p>{% if website_package.price_is_from %}From {% endif %}KES {{ website_package.price|floatformat:0 }}</p>
-{% if website_package.features %}<ul>{% for feature in website_package.features %}<li>{{ feature }}</li>{% endfor %}</ul>{% endif %}
-{% endif %}
+{% load humanize %}
 
-<section>
-    <h2>What kind of website do you need?</h2>
-    <p>Example layouts showing how different types of sites work. These are illustrative designs, not client projects.</p>
-    {% include "partials/website_type_mockups.html" %}
+{% block schema_extra %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Website Design & Development in Kenya",
+    "description": "Custom website design and development for Kenyan businesses — portfolio, e-commerce and booking websites built SEO, AEO and GEO ready.",
+    "serviceType": "Website design and development",
+    "url": "{{ canonical_url }}",
+    "provider": {
+        "@type": "ProfessionalService",
+        "name": "VEE Agency",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Syokimau",
+            "addressRegion": "Machakos County",
+            "addressCountry": "KE"
+        }
+    },
+    "areaServed": [{% for county in site_settings.service_counties %}{"@type": "AdministrativeArea", "name": "{{ county }}"}, {% endfor %}{"@type": "Country", "name": "Kenya"}]{% if website_package %},
+    "offers": {
+        "@type": "Offer",
+        "price": "{{ website_package.price|floatformat:0 }}",
+        "priceCurrency": "KES",
+        "description": "{% if website_package.price_is_from %}Starting price. {% endif %}Complex builds such as e-commerce and booking systems are quoted individually."
+    }{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <ol class="breadcrumbs">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li aria-current="page">Web Development</li>
+        </ol>
+        <p class="eyebrow">Website design &amp; development · Kenya</p>
+        <h1>A website that <span class="accent">earns its cost</span></h1>
+        <p class="lead">
+            Custom websites built to bring in enquiries — designed mobile-first and structured
+            for SEO, AEO and GEO from day one. For businesses in Nairobi, Machakos, Kajiado,
+            Kiambu and across Kenya.
+        </p>
+        <div class="btn-row">
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get Your Website</a>
+            {% if site_settings %}
+            <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question</a>
+            {% endif %}
+        </div>
+    </div>
 </section>
 
-<a href="{% url 'contact:contact' %}?service=website">Get Your Website</a>
+{% if website_package %}
+<section class="section">
+    <div class="container split">
+        <div>
+            <p class="eyebrow">Investment</p>
+            <p class="package__amount" style="margin:.5rem 0 .75rem">
+                {% if website_package.price_is_from %}<span class="package__period">from</span> {% endif %}KES&nbsp;{{ website_package.price|floatformat:0|intcomma }}
+            </p>
+            {% if website_package.short_description %}<p class="lead">{{ website_package.short_description }}</p>{% endif %}
+            <p class="muted" style="margin-top:1rem">
+                That base covers a complete, professional, search-ready website. Larger builds —
+                an e-commerce store with a full catalogue, or a hotel with a booking system —
+                are quoted individually, because the work genuinely is bigger. You get that
+                number in writing before anything starts.
+            </p>
+        </div>
+
+        {% if website_package.features %}
+        <aside class="panel">
+            <h2>Every website includes</h2>
+            <ul class="checklist">
+                {% for feature in website_package.features %}<li>{{ feature }}</li>{% endfor %}
+            </ul>
+        </aside>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Choose your type</p>
+            <h2>What kind of website do you need?</h2>
+            <p class="lead">
+                The right structure depends on how your business actually makes money.
+                Here's how each type is put together.
+            </p>
+        </div>
+
+        {% include "partials/website_type_mockups.html" %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Built in from the start</p>
+            <h2>Search-ready, not search-retrofitted</h2>
+            <p class="lead">
+                Most websites in Kenya are built first and optimised later — which is why so many
+                never rank. Yours is structured for search on day one.
+            </p>
+        </div>
+
+        <div class="grid grid--3 reveal-group">
+            <article class="card">
+                <span class="card__icon" aria-hidden="true">S</span>
+                <h3>SEO — traditional search</h3>
+                <p class="muted">Clean structure, fast loading, proper headings, local keywords and a working sitemap, so Google can index and rank every page.</p>
+            </article>
+            <article class="card">
+                <span class="card__icon" aria-hidden="true">A</span>
+                <h3>AEO — answer engines</h3>
+                <p class="muted">Direct answers and FAQ schema so your business gets quoted in featured snippets and voice results, not buried on page two.</p>
+            </article>
+            <article class="card">
+                <span class="card__icon" aria-hidden="true">G</span>
+                <h3>GEO — AI search</h3>
+                <p class="muted">Clear, factual, well-structured content that AI assistants can read and cite when someone asks them to recommend a business like yours.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">The process</p>
+            <h2>How your website gets built</h2>
+        </div>
+
+        <ol class="steps reveal-group">
+            <li class="step">
+                <h3>Understand</h3>
+                <p>We start with how your business makes money and who you need to reach — then decide what the site has to do.</p>
+            </li>
+            <li class="step">
+                <h3>Structure</h3>
+                <p>Pages, content and search structure are planned before any design work, so nothing important gets bolted on later.</p>
+            </li>
+            <li class="step">
+                <h3>Build</h3>
+                <p>We design and build mobile-first, review it with you, and refine until it reflects your business properly.</p>
+            </li>
+            <li class="step">
+                <h3>Launch &amp; support</h3>
+                <p>We go live, submit your site to search engines, and stay available for management if you want it handled.</p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+{% if location_pages %}
+<section class="section section--tight">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Local</p>
+            <h2>Website design near you</h2>
+        </div>
+        <div class="tag-list">
+            {% for location in location_pages %}
+            <a class="tag" href="{{ location.get_absolute_url }}">Website design in {{ location.county }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Let's build it</p>
+            <h2>Tell us what your business needs to do online</h2>
+            <p>Send us the basics and we'll come back with the right type of website, a clear scope and a firm price — before you commit to anything.</p>
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get Your Website</a>
+                {% if site_settings %}
+                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

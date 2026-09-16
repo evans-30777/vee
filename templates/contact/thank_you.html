@@ -1,8 +1,26 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Thank you — we've got your enquiry</h1>
-<p>We'll be in touch shortly. If it's urgent, reach us on WhatsApp.</p>
-{% if site_settings %}<a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
-<a href="{% url 'core:home' %}">Back to home</a>
-<a href="{% url 'blog:list' %}">Read our insights</a>
+<section class="section">
+    <div class="container container--narrow" style="text-align:center">
+        <p class="eyebrow" style="justify-content:center">Enquiry received</p>
+        <h1 style="margin-block:1rem 1.25rem">Thank you — we've got it</h1>
+        <p class="lead" style="margin-inline:auto">
+            Your enquiry has reached us and we'll come back to you personally.
+            If it's urgent, WhatsApp is the fastest way to get a reply.
+        </p>
+
+        <div class="btn-row" style="justify-content:center; margin-top:2rem">
+            {% if site_settings %}
+            <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+            {% endif %}
+            <a class="btn btn--secondary btn--lg" href="{% url 'core:home' %}">Back to home</a>
+        </div>
+
+        <p class="dim" style="margin-top:2.5rem">
+            While you wait, <a href="{% url 'blog:list' %}" style="color:var(--brand)">read our insights</a>
+            or <a href="{% url 'packages:list' %}" style="color:var(--brand)">compare growth packages</a>.
+        </p>
+    </div>
+</section>
 {% endblock %}

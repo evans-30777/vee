@@ -75,6 +75,20 @@ class SiteSettings(TimeStampedModel):
     def whatsapp_url(self):
         return f"https://wa.me/{self.whatsapp_number}"
 
+    @property
+    def phone_calls_e164(self):
+        """Click-to-call value, normalised however the number was entered.
+
+        The field accepts the local form owners actually type ("0717 115 737"),
+        but `tel:` links are more reliable in international format.
+        """
+        digits = "".join(char for char in self.phone_calls if char.isdigit())
+        if digits.startswith("0"):
+            digits = f"254{digits[1:]}"
+        elif not digits.startswith("254"):
+            digits = f"254{digits}"
+        return f"+{digits}"
+
     @classmethod
     def load(cls):
         return cls.objects.first()

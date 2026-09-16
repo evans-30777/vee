@@ -1,15 +1,69 @@
-<header>
-    <a href="{% url 'core:home' %}">VEE Agency</a>
-    <nav aria-label="Main">
-        <a href="{% url 'core:home' %}">Home</a>
-        <a href="{% url 'services:list' %}">Services</a>
-        <a href="{% url 'packages:list' %}">Packages</a>
-        <a href="{% url 'core:web_development' %}">Web Development</a>
-        <a href="{% url 'core:about' %}">About</a>
-        <a href="{% url 'blog:list' %}">Blog</a>
-        <a href="{% url 'contact:contact' %}">Contact</a>
-    </nav>
-    {% if site_settings %}
-    <a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
-    {% endif %}
+{% load static %}
+{% with ns=request.resolver_match.namespace un=request.resolver_match.url_name %}
+<header class="header" data-header>
+    <div class="container header__inner">
+        <a class="brand" href="{% url 'core:home' %}" aria-label="VEE Agency — home">
+            <img src="{% static 'img/vee-logo.png' %}" alt="" width="34" height="34">
+            <span>VEE<span class="text-brand">.</span>Agency</span>
+        </a>
+
+        <nav class="nav" aria-label="Main">
+            <a href="{% url 'core:home' %}"{% if ns == 'core' and un == 'home' %} aria-current="page"{% endif %}>Home</a>
+            <a href="{% url 'services:list' %}"{% if ns == 'services' %} aria-current="page"{% endif %}>Services</a>
+            <a href="{% url 'packages:list' %}"{% if ns == 'packages' %} aria-current="page"{% endif %}>Packages</a>
+            <a href="{% url 'core:web_development' %}"{% if un == 'web_development' %} aria-current="page"{% endif %}>Web Development</a>
+            <a href="{% url 'core:about' %}"{% if un == 'about' %} aria-current="page"{% endif %}>About</a>
+            <a href="{% url 'blog:list' %}"{% if ns == 'blog' %} aria-current="page"{% endif %}>Blog</a>
+            <a href="{% url 'contact:contact' %}"{% if ns == 'contact' %} aria-current="page"{% endif %}>Contact</a>
+        </nav>
+
+        <div class="header__actions">
+            {% if site_settings %}
+            <a class="btn btn--secondary btn--sm" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.17c-.24.68-1.42 1.3-1.95 1.34-.52.04-1 .23-3.37-.7-2.85-1.12-4.65-4.03-4.79-4.22-.14-.19-1.14-1.51-1.14-2.89s.72-2.05.98-2.33c.26-.28.57-.35.76-.35h.54c.17 0 .41-.07.64.49.24.56.81 1.95.88 2.09.07.14.12.3.02.49-.1.19-.14.3-.28.47l-.42.49c-.14.14-.28.3-.12.58.16.28.71 1.17 1.52 1.9 1.04.93 1.92 1.21 2.2 1.35.28.14.44.12.6-.07.16-.19.69-.81.88-1.09.19-.28.37-.23.63-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.34Z"/>
+                </svg>
+                WhatsApp
+            </a>
+            {% endif %}
+            <a class="btn btn--primary btn--sm" href="{% url 'contact:contact' %}">Free Audit</a>
+        </div>
+
+        <button class="menu-toggle" type="button"
+                data-menu-toggle
+                aria-expanded="false"
+                aria-controls="mobile-nav"
+                aria-label="Open menu">
+            <span class="menu-toggle__bars" aria-hidden="true"></span>
+        </button>
+    </div>
 </header>
+
+<div class="mobile-nav" id="mobile-nav" data-mobile-nav>
+    <nav class="mobile-nav__links" aria-label="Mobile">
+        <a href="{% url 'core:home' %}"{% if ns == 'core' and un == 'home' %} aria-current="page"{% endif %}>Home</a>
+        <a href="{% url 'services:list' %}"{% if ns == 'services' %} aria-current="page"{% endif %}>Services</a>
+        <a href="{% url 'packages:list' %}"{% if ns == 'packages' %} aria-current="page"{% endif %}>Packages</a>
+        <a href="{% url 'core:web_development' %}"{% if un == 'web_development' %} aria-current="page"{% endif %}>Web Development</a>
+        <a href="{% url 'core:about' %}"{% if un == 'about' %} aria-current="page"{% endif %}>About</a>
+        <a href="{% url 'blog:list' %}"{% if ns == 'blog' %} aria-current="page"{% endif %}>Blog</a>
+        <a href="{% url 'locations:list' %}"{% if ns == 'locations' %} aria-current="page"{% endif %}>Areas We Serve</a>
+        <a href="{% url 'contact:contact' %}"{% if ns == 'contact' %} aria-current="page"{% endif %}>Contact</a>
+    </nav>
+
+    <div class="mobile-nav__actions">
+        <a class="btn btn--primary btn--block" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+        {% if site_settings %}
+        <a class="btn btn--whatsapp btn--block" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+        {% endif %}
+    </div>
+
+    {% if site_settings %}
+    <div class="mobile-nav__contact">
+        <a href="tel:{{ site_settings.phone_calls_e164 }}">Call {{ site_settings.phone_calls }}</a>
+        <a href="mailto:{{ site_settings.email }}">{{ site_settings.email }}</a>
+        <span>{{ site_settings.location_label }}</span>
+    </div>
+    {% endif %}
+</div>
+{% endwith %}

@@ -1,79 +1,409 @@
 {% extends "base.html" %}
+{% load humanize %}
+
+{% block schema_extra %}
+{# FAQPage schema: every answer below is drawn from confirmed business facts. #}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "How much does a website cost in Kenya?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VEE Agency builds websites from KES 30,000. That base covers a professional, mobile-friendly, SEO-ready site. More complex builds — e-commerce stores or hotel booking systems — are quoted individually because the scope is larger."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Which areas in Kenya does VEE Agency serve?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VEE Agency is based in Syokimau, Machakos County, and works closely with businesses in Nairobi, Machakos, Kajiado and Kiambu. Work is delivered remotely across all 47 counties in Kenya."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What is included in a monthly digital growth package?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Monthly growth packages start at KES 15,000 and combine the services a business needs to stay visible — search optimisation, Google Business Profile management, social media and reporting. Each package lists exactly what it includes on the Packages page."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What type of website does my business need?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "It depends on what the site has to do. A portfolio site suits professionals who need to show work and be contacted. An e-commerce site suits businesses selling products online. A booking site suits hotels, salons and venues taking reservations. VEE Agency recommends the right type during a free audit."
+            }
+        }
+    ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<section>
-    <p>Digital Growth Agency</p>
-    <h1>Get found. Build trust. Grow online.</h1>
-    <p>VEE Agency helps Kenyan businesses build stronger websites, search visibility, Google presence, social media and digital campaigns — all working together around your business goals.</p>
-    <a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
-    {% if site_settings %}<a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>{% endif %}
+
+{# ---------------------------------------------------------------- Hero #}
+<section class="hero">
+    <div class="container hero__grid">
+        <div class="hero__copy reveal">
+            <p class="eyebrow">Digital Growth Agency · Kenya</p>
+            <h1>Get found. Build trust. <span class="accent">Grow online.</span></h1>
+            <p class="lead">
+                VEE Agency builds the websites, search visibility and campaigns that turn
+                online attention into real customers — for businesses in Nairobi, Machakos,
+                Kajiado, Kiambu and across Kenya.
+            </p>
+
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                {% if site_settings %}
+                <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                {% endif %}
+            </div>
+
+            <ul class="hero__trust">
+                <li>Websites from KES 30,000</li>
+                <li>SEO, AEO &amp; GEO ready</li>
+                <li>Based in Syokimau, serving all of Kenya</li>
+            </ul>
+        </div>
+
+        {% comment %}
+        Slides describe what VEE offers. They are deliberately abstract — no stock
+        photography and nothing that implies client work.
+        {% endcomment %}
+        <div class="carousel reveal" data-carousel role="region" aria-roledescription="carousel" aria-label="What VEE Agency does">
+            <div class="carousel__viewport">
+                <div class="carousel__track">
+                    <article class="slide is-active" data-slide role="group" aria-roledescription="slide" aria-label="1 of 5">
+                        <span class="slide__visual" style="--vx:72%; --vy:22%; --vc:rgba(230,74,26,.55)" aria-hidden="true"></span>
+                        <span class="slide__tag">Web Development</span>
+                        <h2>Websites built to sell, not just to exist</h2>
+                        <p>Fast, mobile-first sites for Kenyan businesses — portfolio, e-commerce or booking — structured for search from day one.</p>
+                    </article>
+
+                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="2 of 5">
+                        <span class="slide__visual" style="--vx:28%; --vy:30%; --vc:rgba(136,0,0,.65)" aria-hidden="true"></span>
+                        <span class="slide__tag">SEO &amp; AEO</span>
+                        <h2>Be the answer when Nairobi searches</h2>
+                        <p>Optimised for Google and for AI answer engines, so your business is the one that gets named.</p>
+                    </article>
+
+                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="3 of 5">
+                        <span class="slide__visual" style="--vx:80%; --vy:70%; --vc:rgba(230,74,26,.45)" aria-hidden="true"></span>
+                        <span class="slide__tag">Google Business Profile</span>
+                        <h2>Own your spot on the map</h2>
+                        <p>A complete, active Google profile so nearby customers in Machakos, Kajiado and Kiambu find you first.</p>
+                    </article>
+
+                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="4 of 5">
+                        <span class="slide__visual" style="--vx:20%; --vy:70%; --vc:rgba(255,99,51,.5)" aria-hidden="true"></span>
+                        <span class="slide__tag">Social Media</span>
+                        <h2>Show up consistently, look professional</h2>
+                        <p>Planned content and managed pages that keep your brand credible between enquiries.</p>
+                    </article>
+
+                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="5 of 5">
+                        <span class="slide__visual" style="--vx:50%; --vy:18%; --vc:rgba(136,0,0,.7)" aria-hidden="true"></span>
+                        <span class="slide__tag">Digital Ad Campaigns</span>
+                        <h2>Spend that brings buyers, not noise</h2>
+                        <p>Targeted campaigns aimed at the counties and customers that actually convert for your business.</p>
+                    </article>
+                </div>
+            </div>
+
+            <div class="carousel__controls">
+                <div class="carousel__dots" role="tablist" aria-label="Choose slide">
+                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="true" aria-label="Web Development"></button>
+                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="SEO and AEO"></button>
+                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="Google Business Profile"></button>
+                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="Social Media"></button>
+                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="Digital Ad Campaigns"></button>
+                </div>
+                <button class="carousel__arrow" data-carousel-prev type="button" aria-label="Previous slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="carousel__arrow" data-carousel-next type="button" aria-label="Next slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
 </section>
 
+{# ------------------------------------------------------------ Trust strip #}
+<section class="strip">
+    <div class="container">
+        <ul class="strip__grid reveal-group">
+            <li class="strip__item">
+                <h3>KES 30,000</h3>
+                <p>Starting price for a complete, search-ready business website.</p>
+            </li>
+            <li class="strip__item">
+                <h3>4 counties</h3>
+                <p>Close local focus on Nairobi, Machakos, Kajiado and Kiambu.</p>
+            </li>
+            <li class="strip__item">
+                <h3>47 counties</h3>
+                <p>Nationwide delivery — distance is not a limit on the work.</p>
+            </li>
+            <li class="strip__item">
+                <h3>One partner</h3>
+                <p>You deal directly with the person doing the work. No account handoffs.</p>
+            </li>
+        </ul>
+    </div>
+</section>
+
+{# --------------------------------------------------------------- Services #}
 {% if services %}
-<section>
-    <h2>What we do</h2>
-    {% for service in services %}
-        {% include "partials/service_card.html" %}
-    {% endfor %}
-    <a href="{% url 'services:list' %}">See all services</a>
+<section class="section">
+    <div class="container">
+        <div class="section-head section-head--split reveal">
+            <div>
+                <p class="eyebrow">What we do</p>
+                <h2>Everything your business needs to be found online</h2>
+                <p class="lead">Each service works on its own — but they compound when they run together around one goal.</p>
+            </div>
+            <a class="btn btn--ghost" href="{% url 'services:list' %}">See all services <span class="btn__arrow">&rarr;</span></a>
+        </div>
+
+        <div class="grid grid--3 reveal-group">
+            {% for service in services %}{% include "partials/service_card.html" %}{% endfor %}
+        </div>
+    </div>
 </section>
 {% endif %}
 
+{# ------------------------------------------------- Website types (branch) #}
+<section class="section section--tight">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Website Development · Kenya</p>
+            <h2>Your website should match how you actually sell</h2>
+            <p class="lead">
+                A photographer, an electronics shop and a hotel do not need the same website.
+                We build the type that fits your business — each one SEO, AEO and GEO ready
+                for Kenyan search.
+            </p>
+        </div>
+
+        {% include "partials/website_type_mockups.html" %}
+
+        <div class="btn-row" style="margin-top:2rem">
+            <a class="btn btn--primary" href="{% url 'core:web_development' %}">Explore website development</a>
+            <a class="btn btn--secondary" href="{% url 'contact:contact' %}">Get a quote</a>
+        </div>
+    </div>
+</section>
+
+{# --------------------------------------------------------------- Packages #}
 {% if packages %}
-<section>
-    <h2>Growth packages</h2>
-    {% for package in packages %}
-        {% include "partials/package_card.html" %}
-    {% endfor %}
-    <a href="{% url 'packages:list' %}">Compare packages</a>
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Growth packages</p>
+            <h2>Ongoing growth, priced up front</h2>
+            <p class="lead">Monthly packages for businesses that want steady visibility instead of one-off pushes.</p>
+        </div>
+
+        <div class="grid grid--3 reveal-group">
+            {% for package in packages %}{% include "partials/package_card.html" %}{% endfor %}
+        </div>
+
+        <div class="btn-row" style="margin-top:2rem">
+            <a class="btn btn--ghost" href="{% url 'packages:list' %}">Compare packages in full <span class="btn__arrow">&rarr;</span></a>
+        </div>
+    </div>
 </section>
 {% endif %}
 
+{# --------------------------------------------------- One-time website CTA #}
 {% if website_package %}
-<section>
-    <h2>{{ website_package.name }}</h2>
-    <p>{{ website_package.short_description }}</p>
-    <p>{% if website_package.price_is_from %}from {% endif %}KES {{ website_package.price|floatformat:0 }}</p>
-    <a href="{% url 'core:web_development' %}">Get Your Website</a>
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">{{ website_package.name }}</p>
+            <h2>{% if website_package.price_is_from %}Websites from {% else %}Websites at {% endif %}KES {{ website_package.price|floatformat:0|intcomma }}</h2>
+            {% if website_package.short_description %}<p>{{ website_package.short_description }}</p>{% endif %}
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'core:web_development' %}">Get your website</a>
+                {% if site_settings %}
+                <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </section>
 {% endif %}
 
+{# ---------------------------------------------------------------- Process #}
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">How it works</p>
+            <h2>A simple path from first call to results</h2>
+        </div>
+
+        <ol class="steps reveal-group">
+            <li class="step">
+                <h3>Free audit</h3>
+                <p>We look at your current website, search presence and Google profile, then tell you plainly what is costing you customers.</p>
+            </li>
+            <li class="step">
+                <h3>Clear proposal</h3>
+                <p>You get the scope, the timeline and the price in writing before anything starts. No surprise invoices.</p>
+            </li>
+            <li class="step">
+                <h3>Build &amp; launch</h3>
+                <p>We build, you review, we refine. Everything ships search-ready rather than optimised as an afterthought.</p>
+            </li>
+            <li class="step">
+                <h3>Grow &amp; report</h3>
+                <p>On a monthly package, we keep improving and show you what changed. You always know what you are paying for.</p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+{# ----------------------------------------------------------- Testimonials #}
+{# Empty-state rule: these sections disappear rather than showing invented proof. #}
 {% if testimonials %}
-<section>
-    <h2>What clients say</h2>
-    {% for testimonial in testimonials %}
-    <blockquote>
-        <p>{{ testimonial.quote }}</p>
-        <cite>{{ testimonial.client_name }}{% if testimonial.business %}, {{ testimonial.business }}{% endif %}</cite>
-    </blockquote>
-    {% endfor %}
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">In their words</p>
+            <h2>What clients say</h2>
+        </div>
+        <div class="grid grid--3 reveal-group">
+            {% for testimonial in testimonials %}
+            <figure class="card card--flat">
+                <blockquote><p class="muted">&ldquo;{{ testimonial.quote }}&rdquo;</p></blockquote>
+                <figcaption class="card__meta">
+                    <strong>{{ testimonial.client_name }}</strong>{% if testimonial.business %}<br>{{ testimonial.business }}{% endif %}
+                </figcaption>
+            </figure>
+            {% endfor %}
+        </div>
+    </div>
 </section>
 {% endif %}
 
+{# ------------------------------------------------------------ Case studies #}
 {% if case_studies %}
-<section>
-    <h2>Recent work</h2>
-    {% for case_study in case_studies %}
-    <article>
-        <h3>{{ case_study.client_label }}</h3>
-        <p>{{ case_study.result }}</p>
-    </article>
-    {% endfor %}
-    <a href="{% url 'core:case_studies' %}">See all case studies</a>
+<section class="section">
+    <div class="container">
+        <div class="section-head section-head--split reveal">
+            <div>
+                <p class="eyebrow">Recent work</p>
+                <h2>Results we can show</h2>
+            </div>
+            <a class="btn btn--ghost" href="{% url 'core:case_studies' %}">All case studies <span class="btn__arrow">&rarr;</span></a>
+        </div>
+        <div class="grid grid--3 reveal-group">
+            {% for case_study in case_studies %}
+            <article class="card">
+                {% if case_study.industry %}<p class="dim">{{ case_study.industry }}</p>{% endif %}
+                <h3>{{ case_study.client_label }}</h3>
+                <p class="muted">{{ case_study.result }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
 </section>
 {% endif %}
 
+{# --------------------------------------------------------------- Insights #}
 {% if recent_posts %}
-<section>
-    <h2>Insights</h2>
-    {% for post in recent_posts %}
-        {% include "partials/post_card.html" %}
-    {% endfor %}
-    <a href="{% url 'blog:list' %}">Read the blog</a>
+<section class="section">
+    <div class="container">
+        <div class="section-head section-head--split reveal">
+            <div>
+                <p class="eyebrow">Insights</p>
+                <h2>Practical guidance, written for Kenyan businesses</h2>
+            </div>
+            <a class="btn btn--ghost" href="{% url 'blog:list' %}">Read the blog <span class="btn__arrow">&rarr;</span></a>
+        </div>
+        <div class="grid grid--3 reveal-group">
+            {% for post in recent_posts %}{% include "partials/post_card.html" %}{% endfor %}
+        </div>
+    </div>
 </section>
 {% endif %}
 
-<section>
-    <h2>Ready to grow?</h2>
-    <a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+{# -------------------------------------------------------------------- FAQ #}
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Common questions</p>
+            <h2>Straight answers before you call</h2>
+        </div>
+
+        <div class="faq reveal">
+            <details class="faq__item">
+                <summary>How much does a website cost in Kenya?</summary>
+                <div>
+                    <p>VEE Agency builds websites from KES 30,000. That base covers a professional,
+                    mobile-friendly, SEO-ready site. More complex builds — e-commerce stores or hotel
+                    booking systems — are quoted individually because the scope is larger.</p>
+                </div>
+            </details>
+
+            <details class="faq__item">
+                <summary>Which areas in Kenya do you serve?</summary>
+                <div>
+                    <p>We are based in Syokimau, Machakos County, and work closely with businesses in
+                    Nairobi, Machakos, Kajiado and Kiambu. Work is delivered remotely across all 47
+                    counties, so your location is not a barrier.</p>
+                </div>
+            </details>
+
+            <details class="faq__item">
+                <summary>What is included in a monthly growth package?</summary>
+                <div>
+                    <p>Monthly packages start at KES 15,000 and combine the services a business needs to
+                    stay visible — search optimisation, Google Business Profile management, social media
+                    and reporting. Each package lists exactly what it includes on the
+                    <a href="{% url 'packages:list' %}">Packages page</a>.</p>
+                </div>
+            </details>
+
+            <details class="faq__item">
+                <summary>What type of website does my business need?</summary>
+                <div>
+                    <p>It depends on what the site has to do. A portfolio site suits professionals who need
+                    to show work and be contacted easily. An e-commerce site suits businesses selling
+                    products online. A booking site suits hotels, salons and venues taking reservations.
+                    We recommend the right type during your free audit.</p>
+                </div>
+            </details>
+        </div>
+    </div>
 </section>
+
+{# ------------------------------------------------------------- Final CTA #}
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Ready when you are</p>
+            <h2>Let's find what's holding your business back online</h2>
+            <p>
+                Tell us about your business and we'll come back with a clear, honest read on your website,
+                search visibility and Google presence — free, and with no obligation to hire us.
+            </p>
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                {% if site_settings %}
+                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

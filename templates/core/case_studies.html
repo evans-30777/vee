@@ -1,18 +1,68 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Case Studies</h1>
-{% if case_studies %}
-    {% for case_study in case_studies %}
-    <article>
-        <h2>{{ case_study.client_label }}</h2>
-        {% if case_study.industry %}<p>{{ case_study.industry }}</p>{% endif %}
-        <h3>Challenge</h3><p>{{ case_study.challenge }}</p>
-        <h3>What we did</h3><p>{{ case_study.solution }}</p>
-        <h3>Result</h3><p>{{ case_study.result }}</p>
-    </article>
-    {% endfor %}
-{% else %}
-    <p>Case studies are on the way. In the meantime, tell us about your business and we'll show you what's possible.</p>
-{% endif %}
-<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+<section class="page-head">
+    <div class="container">
+        <p class="eyebrow">Case studies</p>
+        <h1>Real projects, real results</h1>
+        <p class="lead">
+            Work VEE Agency has delivered for businesses in Nairobi, Machakos, Kajiado,
+            Kiambu and across Kenya — published only with the client's agreement.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if case_studies %}
+        <div class="grid grid--2 reveal-group">
+            {% for case_study in case_studies %}
+            <article class="card">
+                {% if case_study.industry %}<p class="eyebrow">{{ case_study.industry }}</p>{% endif %}
+                <h2 style="font-size:clamp(1.3rem,1.1rem+.9vw,1.7rem)">{{ case_study.client_label }}</h2>
+
+                <div class="stack" style="margin-top:.75rem">
+                    <div>
+                        <h3 style="font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">Challenge</h3>
+                        <p class="muted">{{ case_study.challenge }}</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">What we did</h3>
+                        <p class="muted">{{ case_study.solution }}</p>
+                    </div>
+                    <div>
+                        <h3 style="font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)">Result</h3>
+                        <p class="muted">{{ case_study.result }}</p>
+                    </div>
+                </div>
+
+                {% if case_study.metrics %}
+                <ul class="tag-list" style="margin-top:1rem">
+                    {% for label, value in case_study.metrics.items %}
+                    <li class="tag"><strong>{{ value }}</strong>&nbsp;{{ label }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-note">
+            We publish case studies only once a client has approved the details, so this page
+            stays empty rather than filled with numbers we can't stand behind.
+            Tell us about your business and we'll show you what's realistically possible.
+        </p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Your turn</p>
+            <h2>Let's build something worth writing up</h2>
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+        </div>
+    </div>
+</section>
 {% endblock %}

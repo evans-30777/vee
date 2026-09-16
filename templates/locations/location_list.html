@@ -1,8 +1,49 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Areas We Serve</h1>
-<p>We work closely with businesses in these counties, and serve clients across Kenya remotely.</p>
-{% for location in locations %}
-<article><h2><a href="{{ location.get_absolute_url }}">{{ location.county }}</a></h2><p>{{ location.intro|truncatewords:30 }}</p></article>
-{% endfor %}
+<section class="page-head">
+    <div class="container">
+        <p class="eyebrow">Areas we serve</p>
+        <h1>Digital growth, close to home</h1>
+        <p class="lead">
+            We work closely with businesses in these counties — and deliver remotely to
+            clients in every one of Kenya's 47 counties.
+        </p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if locations %}
+        <div class="grid grid--3 reveal-group">
+            {% for location in locations %}
+            <article class="card">
+                <span class="card__icon" aria-hidden="true">{{ location.county|slice:":1" }}</span>
+                <h2 style="font-size:clamp(1.25rem,1.1rem+.8vw,1.6rem)">
+                    <a class="card__link" href="{{ location.get_absolute_url }}">{{ location.county }}</a>
+                </h2>
+                <p class="muted">{{ location.intro|truncatewords:28 }}</p>
+                <p class="card__meta"><span class="card__price">View {{ location.county }}</span> <span class="btn__arrow" aria-hidden="true">&rarr;</span></p>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-note">
+            Location pages are being published. Wherever you are in Kenya, get in touch —
+            we work with clients in every county.
+        </p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Anywhere in Kenya</p>
+            <h2>Not on the list? That's not a problem</h2>
+            <p>Everything we do is delivered remotely as standard. Your county has never been the deciding factor.</p>
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+        </div>
+    </div>
+</section>
 {% endblock %}

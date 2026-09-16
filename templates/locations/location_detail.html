@@ -1,12 +1,92 @@
 {% extends "base.html" %}
+
+{% block schema_extra %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "VEE Agency — {{ location.county|escapejs }}",
+    "description": "{{ location.intro|truncatewords:30|escapejs }}",
+    "url": "{{ canonical_url }}",
+    "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Syokimau",
+        "addressRegion": "Machakos County",
+        "addressCountry": "KE"
+    },
+    "areaServed": {"@type": "AdministrativeArea", "name": "{{ location.county|escapejs }}, Kenya"}{% if site_settings %},
+    "telephone": "{{ site_settings.phone_calls }}",
+    "email": "{{ site_settings.email }}"{% endif %}
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<h1>{{ location.hero_headline }}</h1>
-<div>{{ location.intro|linebreaks }}</div>
-{% if location.body %}<div>{{ location.body|linebreaks }}</div>{% endif %}
+<section class="page-head">
+    <div class="container">
+        <ol class="breadcrumbs">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li><a href="{% url 'locations:list' %}">Areas We Serve</a></li>
+            <li aria-current="page">{{ location.county }}</li>
+        </ol>
+        <p class="eyebrow">{{ location.county }} · Kenya</p>
+        <h1>{{ location.hero_headline }}</h1>
+        <div class="btn-row">
+            <a class="btn btn--primary" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+            {% if site_settings %}
+            <a class="btn btn--secondary" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container split">
+        <div class="prose">
+            {{ location.intro|linebreaks }}
+            {% if location.body %}{{ location.body|linebreaks }}{% endif %}
+        </div>
+
+        <aside class="panel">
+            <h2>Working with {{ location.county }} businesses</h2>
+            <ul class="checklist">
+                <li>Websites from KES 30,000</li>
+                <li>Local SEO tuned for {{ location.county }} searches</li>
+                <li>Google Business Profile setup &amp; management</li>
+                <li>Growth packages from KES 15,000/month</li>
+            </ul>
+            {% if site_settings %}
+            <div class="contact-methods" style="margin-top:1.5rem">
+                <a href="tel:{{ site_settings.phone_calls_e164 }}"><strong>Call</strong> <span class="muted">{{ site_settings.phone_calls }}</span></a>
+                <a href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener"><strong>WhatsApp</strong> <span class="muted">{{ site_settings.whatsapp_number }}</span></a>
+            </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
 {% if featured_services %}
-<h2>Services for businesses in {{ location.county }}</h2>
-{% for service in featured_services %}{% include "partials/service_card.html" %}{% endfor %}
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Services</p>
+            <h2>Services for businesses in {{ location.county }}</h2>
+        </div>
+        <div class="grid grid--3 reveal-group">
+            {% for service in featured_services %}{% include "partials/service_card.html" %}{% endfor %}
+        </div>
+    </div>
+</section>
 {% endif %}
-<p>We also serve clients across Kenya remotely.</p>
-<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">{{ location.county }} &amp; beyond</p>
+            <h2>Let's grow your {{ location.county }} business online</h2>
+            <p>We also serve clients across every county in Kenya remotely — start with a free audit and see where you stand.</p>
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+        </div>
+    </div>
+</section>
 {% endblock %}

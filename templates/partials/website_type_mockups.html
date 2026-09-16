@@ -1,18 +1,126 @@
 {% comment %}
 Static example layouts for the three website types confirmed at launch.
-These are illustrative only and must never be presented as real client work.
+These are illustrative CSS wireframes only — no client data, no screenshots,
+and they must never be presented as real client work.
 {% endcomment %}
-<div class="website-type-mockups">
-    <article data-mockup="portfolio">
-        <h3>Portfolio Website</h3>
-        <p>For professionals and creatives who need to show their work and be easy to contact.</p>
+<div class="mockups reveal-group">
+
+    {# ------------------------------------------------------------ Portfolio #}
+    <article class="mockup">
+        <div class="mockup__chrome" aria-hidden="true">
+            <span class="mockup__dot"></span><span class="mockup__dot"></span><span class="mockup__dot"></span>
+            <span class="mockup__url">portfolio</span>
+        </div>
+        <div class="mockup__screen" role="img" aria-label="Example portfolio website layout: header, large introduction area, and a grid of work samples.">
+            <div class="mockup__row mockup__row--2" aria-hidden="true">
+                <span class="mockup__bar mockup__bar--third"></span>
+                <span class="mockup__bar mockup__bar--half" style="justify-self:end"></span>
+            </div>
+            <div class="mockup__block mockup__block--hero" aria-hidden="true">
+                <span class="mockup__bar mockup__bar--wide mockup__bar--half"></span>
+                <span class="mockup__bar mockup__bar--third"></span>
+                <span class="mockup__bar mockup__bar--brand mockup__bar--third"></span>
+            </div>
+            <div class="mockup__row mockup__row--3" aria-hidden="true">
+                <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span></span>
+                <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span></span>
+                <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span></span>
+            </div>
+        </div>
+        <div class="mockup__body">
+            <h3>Portfolio Website Design — Kenya</h3>
+            <p>For photographers, consultants, creatives and professionals who need their work to speak first and their contact details to be one tap away.</p>
+            <ul class="mockup__features">
+                <li>Work gallery</li>
+                <li>About &amp; credibility</li>
+                <li>Enquiry form</li>
+                <li>Click-to-WhatsApp</li>
+            </ul>
+        </div>
     </article>
-    <article data-mockup="ecommerce">
-        <h3>E-commerce Website</h3>
-        <p>For businesses selling products online, with product pages, cart and checkout.</p>
+
+    {# ----------------------------------------------------------- E-commerce #}
+    <article class="mockup">
+        <div class="mockup__chrome" aria-hidden="true">
+            <span class="mockup__dot"></span><span class="mockup__dot"></span><span class="mockup__dot"></span>
+            <span class="mockup__url">shop</span>
+        </div>
+        <div class="mockup__screen" role="img" aria-label="Example e-commerce website layout: header with cart, promotional banner, filter sidebar and a product grid.">
+            <div class="mockup__row mockup__row--2" aria-hidden="true">
+                <span class="mockup__bar mockup__bar--third"></span>
+                <span class="mockup__bar mockup__bar--brand mockup__bar--third" style="justify-self:end"></span>
+            </div>
+            <div class="mockup__block mockup__block--hero" aria-hidden="true">
+                <span class="mockup__bar mockup__bar--wide mockup__bar--half"></span>
+                <span class="mockup__bar mockup__bar--brand mockup__bar--third"></span>
+            </div>
+            <div class="mockup__row mockup__row--sidebar" aria-hidden="true">
+                <span class="mockup__tile">
+                    <span class="mockup__bar"></span>
+                    <span class="mockup__bar mockup__bar--half"></span>
+                    <span class="mockup__bar mockup__bar--half"></span>
+                </span>
+                <span class="mockup__row mockup__row--2">
+                    <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+                    <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+                    <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+                    <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+                </span>
+            </div>
+        </div>
+        <div class="mockup__body">
+            <h3>E-commerce Website Design — Kenya</h3>
+            <p>For shops selling electronics, fashion, furniture or anything else online — product pages, cart and checkout built to survive real traffic.</p>
+            <ul class="mockup__features">
+                <li>Product catalogue</li>
+                <li>Cart &amp; checkout</li>
+                <li>Search &amp; filters</li>
+                <li>Order notifications</li>
+            </ul>
+        </div>
     </article>
-    <article data-mockup="booking">
-        <h3>Booking &amp; Hospitality Website</h3>
-        <p>For hotels, salons and venues that need enquiries and reservations handled online.</p>
+
+    {# ------------------------------------------------------ Booking / hotel #}
+    <article class="mockup">
+        <div class="mockup__chrome" aria-hidden="true">
+            <span class="mockup__dot"></span><span class="mockup__dot"></span><span class="mockup__dot"></span>
+            <span class="mockup__url">bookings</span>
+        </div>
+        <div class="mockup__screen" role="img" aria-label="Example booking website layout: header, banner with a date and availability bar, and a row of room cards.">
+            <div class="mockup__row mockup__row--2" aria-hidden="true">
+                <span class="mockup__bar mockup__bar--third"></span>
+                <span class="mockup__bar mockup__bar--half" style="justify-self:end"></span>
+            </div>
+            <div class="mockup__block mockup__block--hero" aria-hidden="true">
+                <span class="mockup__bar mockup__bar--wide mockup__bar--half"></span>
+                <span class="mockup__row mockup__row--4">
+                    <span class="mockup__bar"></span>
+                    <span class="mockup__bar"></span>
+                    <span class="mockup__bar"></span>
+                    <span class="mockup__bar mockup__bar--brand"></span>
+                </span>
+            </div>
+            <div class="mockup__row mockup__row--3" aria-hidden="true">
+                <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+                <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+                <span class="mockup__tile"><span class="mockup__bar mockup__bar--half"></span><span class="mockup__bar mockup__bar--brand mockup__bar--third"></span></span>
+            </div>
+        </div>
+        <div class="mockup__body">
+            <h3>Booking &amp; Hospitality Website Design — Kenya</h3>
+            <p>For hotels, lodges, salons and venues that lose business to missed calls — availability, enquiries and reservations handled on the site.</p>
+            <ul class="mockup__features">
+                <li>Rooms &amp; services</li>
+                <li>Availability enquiry</li>
+                <li>Booking integration</li>
+                <li>Location &amp; directions</li>
+            </ul>
+        </div>
     </article>
 </div>
+
+<p class="mockups__note">
+    These are example layouts created by VEE Agency to show how each type of website is
+    structured. They are illustrations, not screenshots of client websites. Your site is
+    designed around your own brand, content and goals.
+</p>

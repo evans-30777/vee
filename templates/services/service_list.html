@@ -1,7 +1,43 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Our Services</h1>
-<p>Connected digital services for businesses in Nairobi, Machakos, Kajiado, Kiambu and across Kenya.</p>
-{% for service in services %}{% include "partials/service_card.html" %}{% endfor %}
-<a href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+<section class="page-head">
+    <div class="container">
+        <p class="eyebrow">Services</p>
+        <h1>Digital services that work together</h1>
+        <p class="lead">
+            Connected digital services for businesses in Nairobi, Machakos, Kajiado, Kiambu
+            and across Kenya — built around getting you found, trusted and chosen.
+        </p>
+        <div class="btn-row">
+            <a class="btn btn--primary" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+            {% if site_settings %}
+            <a class="btn btn--secondary" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if services %}
+        <div class="grid grid--3 reveal-group">
+            {% for service in services %}{% include "partials/service_card.html" %}{% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-note">Our services are being published. In the meantime, get in touch and we'll talk through what your business needs.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Not sure where to start?</p>
+            <h2>Start with a free audit</h2>
+            <p>We'll look at your website, search visibility and Google presence, then tell you which of these services would actually move the needle for your business.</p>
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+        </div>
+    </div>
+</section>
 {% endblock %}

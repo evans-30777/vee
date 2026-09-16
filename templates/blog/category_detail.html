@@ -1,12 +1,33 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>{{ category.name }}</h1>
-{% if category.description %}<p>{{ category.description }}</p>{% endif %}
-{% if page_obj %}
-    {% for post in page_obj %}{% include "partials/post_card.html" %}{% endfor %}
-    {% include "partials/pagination.html" %}
-{% else %}
-    <p>No posts in this category yet.</p>
-{% endif %}
-<a href="{% url 'blog:list' %}">All insights</a>
+<section class="page-head">
+    <div class="container">
+        <ol class="breadcrumbs">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li><a href="{% url 'blog:list' %}">Blog</a></li>
+            <li aria-current="page">{{ category.name }}</li>
+        </ol>
+        <p class="eyebrow">Category</p>
+        <h1>{{ category.name }}</h1>
+        {% if category.description %}<p class="lead">{{ category.description }}</p>{% endif %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% if page_obj %}
+        <div class="grid grid--3 reveal-group">
+            {% for post in page_obj %}{% include "partials/post_card.html" %}{% endfor %}
+        </div>
+        {% include "partials/pagination.html" %}
+        {% else %}
+        <p class="empty-note">No posts in this category yet — check back soon.</p>
+        {% endif %}
+
+        <div class="btn-row" style="margin-top:2.5rem">
+            <a class="btn btn--ghost" href="{% url 'blog:list' %}">&larr; All insights</a>
+        </div>
+    </div>
+</section>
 {% endblock %}
