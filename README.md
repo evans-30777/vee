@@ -91,17 +91,15 @@ Never commit `.env`.
 
 ## Deployment to HostAfrica
 
-The exact control-panel steps depend on the HostAfrica plan and are confirmed during deployment. The application-level checklist:
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for the full stage-by-stage guide.
 
-1. Set production environment variables.
-2. Provision PostgreSQL and set `POSTGRES_*`.
-3. `python manage.py migrate`
-4. `python manage.py collectstatic --noinput`
-5. Serve via Gunicorn with `DJANGO_SETTINGS_MODULE=veeagency.settings.prod`.
-6. Configure HTTPS for the domain (production settings force SSL redirect and HSTS).
-7. Create the superuser and the Site settings record.
-8. Verify the enquiry form end-to-end, including email delivery.
-9. Submit `/sitemap.xml` in Google Search Console.
+Two things to know before you start:
+
+- `manage.py` defaults to *development* settings, so every command on the server
+  needs `--settings=veeagency.settings.prod` or it will use SQLite instead of
+  PostgreSQL.
+- Install SSL before pointing traffic at the site — production forces an HTTPS
+  redirect and sends HSTS.
 
 ### Enquiry resilience
 
