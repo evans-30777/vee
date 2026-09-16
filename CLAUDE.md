@@ -69,6 +69,17 @@ Apply these skills from `vee_claude_skills/` directory:
 - Build order for this project: backend fully implemented and verified first (models, admin, forms, URLs) before frontend/template/styling work begins.
 - SEO/AEO/GEO local targeting is not limited to the Locations app — it must be applied site-wide: every service page, the website-type mockup showcase (e.g. "E-commerce Website Design — Kenya" style headings, not generic labels), meta tags, Open Graph/social-sharing tags, and schema markup all carry location-aware language (Nairobi, Machakos, Kajiado, Kiambu, Kenya) so the site surfaces for local + AI-driven search regardless of which page a visitor lands on.
 
+## Next Batch — Agreed, Not Yet Built
+
+Deliberately deferred. Do not treat these as oversights, and do not build them
+outside an agreed batch.
+
+- **`POSTGRES_SSLMODE` setting (blocks go-live).** `prod.py` passes no `sslmode`,
+  and Aiven rejects unencrypted connections, so the first connection attempt will
+  fail as things stand. Add it to the `DATABASES["default"]["OPTIONS"]` dict, read
+  from the environment and defaulting to `require`, so a local PostgreSQL instance
+  is still usable. Owner approved 2026-09-16; scheduled for the next batch.
+
 ## Never Do This
 
 - Do not fabricate testimonials, client logos, case-study results, or statistics
