@@ -3,6 +3,9 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
+from django.utils.functional import cached_property
+
+from apps.blog.rendering import render_markdown, table_of_contents
 from apps.core.imaging import optimise_image_field
 from apps.core.models import FEATURE_IMAGE_MAX, TimeStampedModel
 
@@ -42,7 +45,12 @@ class BlogPost(TimeStampedModel):
         blank=True,
         help_text="Direct answer shown in the Quick Answer box, for AEO/featured snippets.",
     )
-    body = models.TextField()
+    body = models.TextField(
+        help_text=(
+            "Markdown. Use ## for subheadings, - for bullets, **bold**, and "
+            "[text](/services/) to link to other pages on the site."
+        )
+    )
     featured_image = models.ImageField(upload_to="blog/", blank=True)
     featured_image_alt = models.CharField(max_length=200, blank=True)
     author = models.ForeignKey(
@@ -72,6 +80,26 @@ class BlogPost(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("blog:detail", kwargs={"slug": self.slug})
+
+    @cached_property
+    def body_html(self):
+        """The body as sanitised HTML.
+
+        Rendered per request rather than stored: posts are read far more often
+        than written, but the render is cheap and storing it would mean a
+        migration every time the allowed-tag list changes.
+        """
+        return render_markdown(self.body)
+
+    @cached_property
+    def contents(self):
+        return table_of_contents(self.body_html)
+
+    @cached_property
+    def reading_minutes(self):
+        """Rounded up, minimum one. 200 words a minute is the usual estimate."""
+        words = len(self.body.split())
+        return max(1, round(words / 200))
 
     def save(self, *args, **kwargs):
         if self.is_published and self.published_at is None:

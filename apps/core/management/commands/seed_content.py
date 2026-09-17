@@ -503,7 +503,7 @@ class Command(BaseCommand):
 
                     Here is what actually moves the price.
 
-                    What the site has to do
+                    ## What the site has to do
 
                     A site that explains your business and collects enquiries is a fundamentally
                     smaller build than one that takes payments or manages bookings. E-commerce
@@ -511,25 +511,26 @@ class Command(BaseCommand):
                     booking system needs availability logic. Those are not extra pages, they are
                     extra systems.
 
-                    Whether the content exists
+                    ## Whether the content exists
 
                     Many quotes assume you will supply text and images. If you do not have them,
                     someone has to create them, and that is real work. Being honest about this up
                     front avoids the most common cause of a project stalling halfway.
 
-                    Whether search was considered
+                    ## Whether search was considered
 
-                    A site built first and optimised later usually needs rebuilding to rank.
+                    A site built first and optimised later usually needs rebuilding to rank. Our
+                    [website development](/web-development/) work builds the structure in from day one.
                     Structure, headings, speed and metadata are cheaper to get right during the
                     build than to retrofit afterwards.
 
-                    What happens after launch
+                    ## What happens after launch
 
                     A website is not furniture. Content goes stale, links break and speed drifts.
                     Ask whether the quote includes any support, or whether you are on your own
                     from launch day.
 
-                    A reasonable expectation
+                    ## A reasonable expectation
 
                     For a professional, mobile-friendly, search-ready business website, KES 30,000
                     is a realistic starting point. Substantially cheaper usually means a template
@@ -574,30 +575,30 @@ class Command(BaseCommand):
 
                     There are four usual causes.
 
-                    You do not have a profile
+                    ## You do not have a profile
 
-                    The most common one. A Google Business Profile is free and separate from
-                    having a website. Without it you are largely invisible in local search.
+                    The most common one. A [Google Business Profile](/services/seo-optimization/) is free and separate
+                    from having a website. Without it you are largely invisible in local search.
 
-                    It exists but was never verified
+                    ## It exists but was never verified
 
                     Unverified profiles are heavily limited in what Google will show. Verification
                     usually involves a postcard, a phone call or a video, depending on the
                     business type.
 
-                    It is incomplete
+                    ## It is incomplete
 
                     Google favours profiles that answer a searcher's question without them having
                     to click. Missing hours, no category, no photos and no description all work
                     against you.
 
-                    It is complete but dormant
+                    ## It is complete but dormant
 
                     A profile that has not been touched in a year signals a business that may not
                     be operating. Posts, fresh photos and replies to reviews all indicate an
                     active business.
 
-                    What to do first
+                    ## What to do first
 
                     Search for your own business on Google Maps, on a phone, while not logged in
                     as the owner. What you see is roughly what a customer sees. Start with
@@ -644,24 +645,26 @@ class Command(BaseCommand):
                     summaries, from a voice assistant, or from an AI tool they asked directly.
                     In each case, something has to decide which business gets named.
 
-                    What AEO actually involves
+                    ## What AEO actually involves
 
                     Answer Engine Optimization is less exotic than it sounds. It means structuring
                     content so a machine can extract a clean answer from it:
 
-                    Answer the question directly, early, in plain language, instead of building up
-                    to it over five paragraphs. Use headings that state what the section covers.
-                    Mark up FAQs properly so they can be read as questions and answers. Be
-                    specific and factual, because vague marketing copy gives a machine nothing to
-                    quote.
+                    - **Answer the question directly**, early, in plain language, instead of building
+                      up to it over five paragraphs.
+                    - **Use headings that state what the section covers**, so a machine can find the
+                      part that answers the question.
+                    - **Mark up FAQs properly**, so they can be read as questions and answers.
+                    - **Be specific and factual.** Vague marketing copy gives a machine nothing to
+                      quote.
 
-                    Why this matters more for small businesses
+                    ## Why this matters more for small businesses
 
                     Competing with a large company on domain authority is hard. Competing on being
                     the clearest, most specific answer to a local question is much more winnable —
                     a national chain rarely has a good answer for a question about your town.
 
-                    What not to do
+                    ## What not to do
 
                     AEO is not a reason to publish thin articles at volume. Answer engines are
                     built to identify genuinely useful content, and filler is the thing they are

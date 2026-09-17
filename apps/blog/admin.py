@@ -31,7 +31,20 @@ class BlogPostAdmin(admin.ModelAdmin):
                 "description": "Short, direct answer shown at the top of the post. Helps AEO and featured snippets.",
             },
         ),
-        ("Content", {"fields": ("excerpt", "body", "featured_image", "featured_image_alt")}),
+        (
+            "Content",
+            {
+                "fields": ("excerpt", "body", "featured_image", "featured_image_alt"),
+                "description": (
+                    "The body accepts Markdown. Use <code>## Subheading</code> for "
+                    "sections (not <code>#</code> — the title is already the page's "
+                    "h1), <code>- item</code> for bullets, <code>**bold**</code>, and "
+                    "<code>[text](/services/)</code> to link to another page. Linking "
+                    "to your own service and package pages from posts is one of the "
+                    "most useful things you can do for search."
+                ),
+            },
+        ),
         (
             "FAQ",
             {
