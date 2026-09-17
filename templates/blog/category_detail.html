@@ -22,11 +22,32 @@
         </div>
         {% include "partials/pagination.html" %}
         {% else %}
-        <p class="empty-note">No posts in this category yet — check back soon.</p>
+        <p class="empty-note">
+            Nothing published under {{ category.name }} yet. The
+            <a href="{% url 'blog:list' %}">rest of the blog</a> has plenty, and if you have a
+            question on this specifically, <a href="{% url 'contact:contact' %}">just ask us</a> —
+            it may well become the next post.
+        </p>
         {% endif %}
 
         <div class="btn-row" style="margin-top:2.5rem">
             <a class="btn btn--ghost" href="{% url 'blog:list' %}">&larr; All insights</a>
+        </div>
+    </div>
+</section>
+
+<section class="section section--tight">
+    <div class="container">
+        <div class="cta-band reveal">
+            <p class="eyebrow">Free audit</p>
+            <h2>Want to know where your business actually stands?</h2>
+            <p>A straight read on your website, search visibility and Google profile — the three things worth fixing first, free and with no obligation.</p>
+            <div class="btn-row">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Get my free audit</a>
+                {% if site_settings %}
+                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>

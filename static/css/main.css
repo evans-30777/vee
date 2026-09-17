@@ -1543,6 +1543,10 @@ html:not(.js) .carousel__controls { display: none; }
     color: var(--text-muted);
 }
 
+/* Each card is a self-identification moment — "that's my business". Without a
+   CTA the visitor has to scroll back up to act on it. */
+.mockup__cta { margin-top: auto; padding-top: 1rem; align-self: flex-start; }
+
 /* Honesty label — required, never removed. */
 .mockups__note {
     margin-top: 1.25rem;
@@ -1987,6 +1991,17 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     margin-block: 0.9rem 1rem;
     font-size: clamp(2.35rem, 1.6rem + 2.9vw, 3.9rem);
 }
+.page-head__chosen { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem; }
+
+.page-head__price {
+    font-size: clamp(1.15rem, 1rem + 0.8vw, 1.6rem);
+    font-weight: 600;
+    color: var(--brand-ink);
+    letter-spacing: -0.01em;
+}
+
+.page-head__price span { font-weight: 500; color: var(--text-dim); }
+
 .page-head .lead { margin-bottom: 0; }
 .page-head .btn-row { margin-top: 1.85rem; }
 

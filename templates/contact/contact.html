@@ -1,8 +1,31 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block content %}
 <section class="page-head">
     <div class="container">
+        {% if chosen_package %}
+        {% comment %}
+        Arriving from a priced choice and landing on a generic form throws away
+        the decision the visitor just made. Name it back to them instead.
+        {% endcomment %}
+        <p class="eyebrow">You're enquiring about</p>
+        <h1 class="page-head__chosen">
+            {{ chosen_package.name }}
+            <span class="page-head__price">
+                {% if chosen_package.price_is_from %}from {% endif %}KES&nbsp;{{ chosen_package.price|floatformat:0|intcomma }}{% if chosen_package.billing_type == "monthly" %}<span>/month</span>{% endif %}
+            </span>
+        </h1>
+        <p class="lead">
+            {% if chosen_package.short_description %}{{ chosen_package.short_description }}{% endif %}
+            Send us the basics below and we'll confirm it's the right fit before anything
+            starts — including if a cheaper option would do the same job.
+        </p>
+        <p class="dim" style="margin-top:.9rem">
+            Changed your mind? <a href="{% url 'packages:list' %}" style="color:var(--brand-ink)">Compare the packages again</a>
+            or just tell us what you need below.
+        </p>
+        {% else %}
         <p class="eyebrow">Free audit · No obligation</p>
         <h1>Let's see what's <span class="accent">holding you back</span></h1>
         <p class="lead">
@@ -10,6 +33,7 @@
             search presence and Google profile — what's working, what isn't, and the three
             things worth fixing first. Yours to keep, whether or not you hire us.
         </p>
+        {% endif %}
     </div>
 </section>
 
@@ -69,7 +93,7 @@
                 </div>
 
                 <div>
-                    <button class="btn btn--primary btn--lg" type="submit">Send my details &amp; get the audit</button>
+                    <button class="btn btn--primary btn--lg" type="submit">{% if chosen_package %}Send my details &amp; confirm the fit{% else %}Send my details &amp; get the audit{% endif %}</button>
                     <p class="form__assurance">
                         <span class="cell-tick" aria-hidden="true"></span>
                         <span><strong>We reply within one working day.</strong> No obligation, and no

@@ -8,6 +8,7 @@ from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from apps.core.models import NewsletterSubscriber, SiteSettings
+from apps.packages.models import Package
 
 from .models import ContactSubmission
 
@@ -212,3 +213,47 @@ class ThankYouPageTests(TestCase):
     def test_thank_you_is_never_indexed(self):
         response = self.client.get(reverse("contact:thank_you"))
         self.assertContains(response, "noindex")
+
+
+class EnquiryContextTests(TestCase):
+    """Arriving from a priced choice should not land on a generic form."""
+
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+        Package.objects.create(
+            slug="premium", name="Premium Growth", price=45000,
+            billing_type=Package.BillingType.MONTHLY,
+            short_description="The full system.",
+        )
+        Package.objects.create(
+            slug="website", name="Website Development", price=30000,
+            price_is_from=True, billing_type=Package.BillingType.ONE_TIME,
+        )
+
+    def test_choosing_a_plan_names_it_back_on_the_contact_page(self):
+        response = self.client.get(reverse("contact:contact"), {"service": "premium"})
+        self.assertContains(response, "You're enquiring about")
+        self.assertContains(response, "Premium Growth")
+        self.assertContains(response, "45,000")
+
+    def test_a_from_price_is_still_shown_as_a_starting_point(self):
+        response = self.client.get(reverse("contact:contact"), {"service": "website"})
+        self.assertContains(response, "from KES")
+
+    def test_an_unknown_plan_falls_back_to_the_normal_page(self):
+        response = self.client.get(reverse("contact:contact"), {"service": "nonsense"})
+        self.assertNotContains(response, "You're enquiring about")
+        self.assertContains(response, "holding you back")
+
+    def test_a_website_type_prefills_the_message_and_the_service(self):
+        response = self.client.get(reverse("contact:contact"), {"type": "ecommerce"})
+        self.assertContains(response, "e-commerce website")
+        self.assertContains(response, "Website Development")
+
+    def test_an_unknown_website_type_is_ignored(self):
+        response = self.client.get(
+            reverse("contact:contact"), {"type": "<script>alert(1)</script>"}
+        )
+        self.assertNotContains(response, "alert(1)")
+        self.assertContains(response, "holding you back")

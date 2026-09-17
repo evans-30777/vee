@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 
 from apps.core.models import NewsletterSubscriber
 from apps.core.seo import page_meta
+from apps.packages.models import Package
 
 from .forms import ContactForm, NewsletterForm
 from .models import ContactSubmission
@@ -13,6 +14,15 @@ from .services import dispatch_enquiry_notifications
 from .utils import get_client_ip, is_rate_limited
 
 VALID_SERVICES = {choice.value for choice in ContactSubmission.Service}
+
+# Website types the mockup showcase offers. Arriving from one of those cards
+# should carry the choice into the enquiry, so the message lands with context
+# instead of the visitor retyping what they already told us by clicking.
+WEBSITE_TYPES = {
+    "portfolio": "I'm looking for a portfolio website.",
+    "ecommerce": "I'm looking for an e-commerce website to sell products online.",
+    "booking": "I'm looking for a booking website for my business.",
+}
 
 
 def contact(request):
@@ -35,13 +45,28 @@ def contact(request):
             if submission.service:
                 destination = f"{destination}?service={submission.service}"
             return redirect(destination)
+
+        chosen_package = _chosen_package(request.POST.get("service", ""))
     else:
-        # "Choose Plan" links prefill the form; only accept known service values.
+        # "Choose Plan" and the website-type cards prefill the form. Only ever
+        # from a known value: these are echoed back into the page.
         requested_service = request.GET.get("service", "")
-        initial = {"service": requested_service} if requested_service in VALID_SERVICES else {}
+        requested_type = request.GET.get("type", "")
+
+        initial = {}
+        if requested_service in VALID_SERVICES:
+            initial["service"] = requested_service
+        if requested_type in WEBSITE_TYPES:
+            initial["service"] = "website"
+            initial["message"] = WEBSITE_TYPES[requested_type]
+
         form = ContactForm(initial=initial)
+        chosen_package = _chosen_package(initial.get("service", ""))
 
     context = {
+        # Named on the page so the momentum from choosing a plan is not thrown
+        # away by a generic form.
+        "chosen_package": chosen_package,
         "form": form,
         **page_meta(
             request,
@@ -55,6 +80,12 @@ def contact(request):
         ),
     }
     return render(request, "contact/contact.html", context)
+
+
+def _chosen_package(slug):
+    if slug not in VALID_SERVICES:
+        return None
+    return Package.objects.filter(slug=slug, is_active=True).first()
 
 
 def thank_you(request):
