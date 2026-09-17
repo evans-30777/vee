@@ -14,7 +14,40 @@ test on Render is what ships. The only differences come from the environment.
 
 ## Staging on Render
 
-### Deploying it
+### The live staging service
+
+| | |
+|---|---|
+| **URL** | https://vee-agency-staging.onrender.com |
+| Service | `vee-agency-staging` (`srv-dalqptad0e5s738aseqg`), Frankfurt, free plan |
+| Deploys | Automatically on every push to `main` |
+
+> **Free plan, so there is no persistent disk.** The database and uploaded media
+> live on an ephemeral filesystem and are **wiped on every deploy and restart**.
+> Since auto-deploy is on, any content entered in the admin is lost the next time
+> code is pushed. To keep content between deploys, upgrade the service to
+> `starter` and add a disk mounted at `/var/data`, then set `SQLITE_PATH` to
+> `/var/data/db.sqlite3` and `MEDIA_ROOT` to `/var/data/media`.
+>
+> The free plan also spins the service down when idle, so the first request after
+> a quiet period takes about a minute.
+
+### Creating the admin account
+
+The free plan has no shell, so `createsuperuser` cannot be run interactively.
+Instead, set these in the Render dashboard under **Environment**, then redeploy —
+`render-build.sh` picks them up and creates the account:
+
+```
+DJANGO_SUPERUSER_USERNAME
+DJANGO_SUPERUSER_EMAIL
+DJANGO_SUPERUSER_PASSWORD
+```
+
+Use a strong password: `/admin/` is reachable from the public internet. Remove
+`DJANGO_SUPERUSER_PASSWORD` once the account exists.
+
+### Deploying it from scratch
 
 1. In Render, **New → Blueprint**, and point it at this repository. It reads
    `render.yaml`; there is nothing to configure by hand.
@@ -33,12 +66,8 @@ The database starts empty, so parts of the site will be missing until you fill
 it in — that is the empty-state rule working, not a fault. The WhatsApp button
 and contact details stay hidden until Site settings exists.
 
-```bash
-# In the Render shell for the service:
-python manage.py createsuperuser
-```
-
-Then log in at `/admin/` and create the **Site settings** record first.
+Create the admin account as described above, then log in at `/admin/` and create
+the **Site settings** record first.
 
 ### What staging mode changes
 
@@ -54,14 +83,6 @@ Then log in at `/admin/` and create the **Site settings** record first.
 
 Canonical URLs also point at the staging host rather than the live domain, so a
 staging page never claims a live URL as its canonical.
-
-### The disk matters
-
-`render.yaml` requests a 1GB persistent disk at `/var/data`, holding both the
-SQLite database and uploaded media. **Without it Render's filesystem is
-ephemeral** and every deploy would wipe your content and images. A persistent
-disk needs a paid instance type; on the free plan expect to lose the database on
-each deploy and restart.
 
 ### Staging is not a rehearsal for the HostAfrica specifics
 
