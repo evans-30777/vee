@@ -7,32 +7,39 @@
    ========================================================================== */
 
 :root {
-    /* Surfaces */
-    --bg: #0A0A0A;
-    --surface: #111111;
-    --surface-2: #171717;
-    --surface-3: #1F1F1F;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.14);
-    --border-brand: rgba(230, 74, 26, 0.45);
+    color-scheme: light;
 
-    /* Brand — sampled from initial assets/VEE AGENCY LOGO.png */
+    /* Surfaces. Off-white rather than pure #FFF: a pure-white page under a
+       bright screen is the other half of the eye-strain problem. */
+    --bg: #FBFAF9;
+    --surface: #FFFFFF;
+    --surface-2: #F4F2F0;
+    --surface-3: #EAE7E4;
+    --border: rgba(23, 20, 18, 0.10);
+    --border-strong: rgba(23, 20, 18, 0.18);
+    --border-brand: rgba(200, 62, 20, 0.45);
+
+    /* Brand — sampled from initial assets/VEE AGENCY LOGO.png.
+       --brand-ink is a darkened orange used wherever the brand colour carries
+       text or a thin line, because #E64A1A on white is only 3.3:1. */
     --brand: #E64A1A;
-    --brand-hover: #FF6333;
+    --brand-ink: #B83A12;      /* brand as text on light: 5.5:1 */
+    --brand-btn: #C83E14;      /* brand as a button fill: white on it is 5.05:1 */
+    --brand-btn-hover: #A83310;
     --brand-deep: #880000;
-    --brand-soft: rgba(230, 74, 26, 0.12);
-    --brand-glow: rgba(230, 74, 26, 0.30);
+    --brand-soft: rgba(230, 74, 26, 0.10);
+    --brand-glow: rgba(230, 74, 26, 0.28);
 
-    /* Text — all AA against --bg */
-    --text: #FFFFFF;
-    --text-muted: #A8A8A8;
-    --text-dim: #7A7A7A;
+    /* Text — all AA or better against --bg */
+    --text: #171412;
+    --text-muted: #57514C;
+    --text-dim: #6E6862;
 
     /* Status */
     --whatsapp: #25D366;
-    --whatsapp-hover: #1FB855;
-    --error: #FF6B6B;
-    --success: #4ADE80;
+    --whatsapp-hover: #1FBF5B;
+    --error: #C2281F;
+    --success: #1B7F44;
 
     /* Layout */
     --container: 1280px;
@@ -46,19 +53,20 @@
     --r-lg: 22px;
     --r-pill: 999px;
 
-    /* Elevation */
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+    /* Elevation — light themes need real shadow to separate surfaces, where a
+       dark theme could lean on borders alone. */
+    --shadow: 0 1px 2px rgba(23, 20, 18, 0.06), 0 2px 8px rgba(23, 20, 18, 0.04);
+    --shadow-lg: 0 18px 40px -16px rgba(23, 20, 18, 0.22), 0 2px 8px rgba(23, 20, 18, 0.06);
 
     /* Motion */
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
     --dur: 0.35s;
 
-    --focus-ring: 0 0 0 3px rgba(230, 74, 26, 0.65);
+    --focus-ring: 0 0 0 3px rgba(184, 58, 18, 0.55);
 
     /* Shared tick mark for "included" lists. */
-    --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E64A1A' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4.2 4.2L19 7'/%3E%3C/svg%3E");
+    --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B83A12' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4.2 4.2L19 7'/%3E%3C/svg%3E");
 
     --header-h: 74px;
 
@@ -98,8 +106,8 @@ body::before {
     z-index: -1;
     pointer-events: none;
     background:
-        radial-gradient(60rem 40rem at 78% -8%, rgba(230, 74, 26, 0.10), transparent 62%),
-        radial-gradient(48rem 36rem at 4% 8%, rgba(136, 0, 0, 0.12), transparent 60%);
+        radial-gradient(60rem 40rem at 78% -8%, rgba(230, 74, 26, 0.07), transparent 62%),
+        radial-gradient(48rem 36rem at 4% 8%, rgba(136, 0, 0, 0.05), transparent 60%);
 }
 
 img, svg, video { display: block; max-width: 100%; height: auto; }
@@ -147,7 +155,7 @@ p { text-wrap: pretty; }
     font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--brand);
+    color: var(--brand-ink);
 }
 
 .eyebrow::before {
@@ -167,11 +175,11 @@ p { text-wrap: pretty; }
 .muted { color: var(--text-muted); }
 .dim { color: var(--text-dim); font-size: 0.9rem; }
 
-.text-brand { color: var(--brand); }
+.text-brand { color: var(--brand-ink); }
 
 /* Gradient accent for a single emphasised phrase in a headline. */
 .accent {
-    background: linear-gradient(100deg, var(--brand) 10%, #FF8A5B 90%);
+    background: linear-gradient(100deg, var(--brand-ink) 5%, #E04A18 95%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -221,7 +229,7 @@ p { text-wrap: pretty; }
     top: -100%;
     z-index: 200;
     padding: 0.75rem 1.25rem;
-    background: var(--brand);
+    background: var(--brand-btn);
     color: #fff;
     font-weight: 600;
     border-radius: var(--r-sm);
@@ -236,16 +244,16 @@ p { text-wrap: pretty; }
     z-index: 101;
     padding: 0.5rem var(--pad-x);
     background: repeating-linear-gradient(
-        45deg, #3A1B00, #3A1B00 12px, #2E1500 12px, #2E1500 24px
+        45deg, #FFF1E6, #FFF1E6 12px, #FFE7D6 12px, #FFE7D6 24px
     );
     border-bottom: 1px solid var(--border-brand);
-    color: #FFD9C7;
+    color: #7A3410;
     font-size: 0.82rem;
     text-align: center;
 }
 
 .staging-flag strong {
-    color: var(--brand);
+    color: var(--brand-ink);
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
@@ -287,24 +295,24 @@ p { text-wrap: pretty; }
 .btn:active { transform: translateY(0); }
 
 .btn--primary {
-    background: var(--brand);
+    background: var(--brand-btn);
     color: #FFFFFF;
     box-shadow: 0 8px 26px -10px var(--brand-glow);
 }
 
 .btn--primary:hover {
-    background: var(--brand-hover);
+    background: var(--brand-btn-hover);
     box-shadow: 0 14px 34px -10px var(--brand-glow);
 }
 
 .btn--secondary {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(23, 20, 18, 0.035);
     border-color: var(--border-strong);
     color: var(--text);
 }
 
 .btn--secondary:hover {
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(23, 20, 18, 0.07);
     border-color: var(--border-brand);
 }
 
@@ -318,7 +326,7 @@ p { text-wrap: pretty; }
 .btn--ghost {
     padding-inline: 0;
     min-height: 0;
-    color: var(--brand);
+    color: var(--brand-ink);
     border-radius: var(--r-sm);
 }
 
@@ -349,6 +357,7 @@ p { text-wrap: pretty; }
     background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
     transition: transform var(--dur) var(--ease),
                 border-color var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease);
@@ -362,7 +371,7 @@ p { text-wrap: pretty; }
 }
 
 .card h3 a { transition: color var(--dur) var(--ease); }
-.card:hover h3 a { color: var(--brand); }
+.card:hover h3 a { color: var(--brand-ink); }
 
 /* Whole-card click target that keeps the real link accessible. */
 .card__link::after {
@@ -382,7 +391,7 @@ p { text-wrap: pretty; }
 .card__price {
     font-family: var(--font-display);
     font-weight: 600;
-    color: var(--brand);
+    color: var(--brand-ink);
 }
 
 .card__icon {
@@ -394,13 +403,11 @@ p { text-wrap: pretty; }
     border-radius: var(--r-sm);
     background: var(--brand-soft);
     border: 1px solid var(--border-brand);
-    color: var(--brand);
-    font-family: var(--font-display);
-    font-weight: 700;
-    /* Sized for a short token like "SEO" or "AEO", not a single letter. */
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
+    color: var(--brand-ink);
+    flex-shrink: 0;
 }
+
+.card__icon-svg { width: 1.4rem; height: 1.4rem; }
 
 .card--flat { background: var(--surface); }
 
@@ -411,7 +418,7 @@ p { text-wrap: pretty; }
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10, 10, 10, 0.72);
+    background: rgba(251, 250, 249, 0.80);
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
     border-bottom: 1px solid transparent;
@@ -420,7 +427,7 @@ p { text-wrap: pretty; }
 }
 
 .header.is-scrolled {
-    background: rgba(10, 10, 10, 0.9);
+    background: rgba(251, 250, 249, 0.94);
     border-bottom-color: var(--border);
 }
 
@@ -572,7 +579,7 @@ p { text-wrap: pretty; }
 }
 
 .mobile-nav__links a:hover,
-.mobile-nav__links a[aria-current="page"] { color: var(--brand); padding-left: 0.5rem; }
+.mobile-nav__links a[aria-current="page"] { color: var(--brand-ink); padding-left: 0.5rem; }
 
 .mobile-nav__actions { display: grid; gap: 0.75rem; }
 
@@ -583,7 +590,7 @@ p { text-wrap: pretty; }
     color: var(--text-muted);
 }
 
-.mobile-nav__contact a:hover { color: var(--brand); }
+.mobile-nav__contact a:hover { color: var(--brand-ink); }
 
 body.nav-open { overflow: hidden; }
 
@@ -723,9 +730,9 @@ html:not(.js) .carousel__controls { display: none; }
     align-self: flex-start;
     padding: 0.3rem 0.8rem;
     border-radius: var(--r-pill);
-    background: rgba(10, 10, 10, 0.6);
-    border: 1px solid var(--border-brand);
-    color: var(--brand);
+    background: rgba(10, 10, 10, 0.55);
+    border: 1px solid rgba(230, 74, 26, 0.5);
+    color: #FF8A5B;
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 600;
@@ -733,14 +740,17 @@ html:not(.js) .carousel__controls { display: none; }
     text-transform: uppercase;
 }
 
+/* The slide sits on its own dark composition, so its text is light regardless
+   of the page theme. These cannot inherit the page tokens. */
 .slide h2, .slide h3 {
     font-size: clamp(1.45rem, 1.1rem + 1.6vw, 2.1rem);
     max-width: 18ch;
+    color: #FFFFFF;
 }
 
 .slide p {
     max-width: 44ch;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.78);
     font-size: 0.95rem;
 }
 
@@ -778,8 +788,112 @@ html:not(.js) .carousel__controls { display: none; }
 
 .carousel__arrow:hover {
     border-color: var(--border-brand);
-    color: var(--brand);
+    color: var(--brand-ink);
     background: var(--brand-soft);
+}
+
+/* 8b. Services showcase
+   Nvidia-style: one service at a time, sliding. Built on native scroll-snap so
+   it works by swipe or scroll with no JavaScript; the buttons and auto-advance
+   are enhancements.
+   ========================================================================== */
+
+.showcase { position: relative; }
+
+.showcase__viewport {
+    display: flex;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    /* Align the first card with the page container, and let the last one scroll
+       fully into place. */
+    padding: 0.5rem var(--pad-x) 1.25rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.showcase__viewport::-webkit-scrollbar { display: none; }
+.showcase__viewport:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--r-lg); }
+
+.showcase__item {
+    flex: 0 0 min(100%, 34rem);
+    scroll-snap-align: center;
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    background: linear-gradient(140deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.showcase__item:hover,
+.showcase__item:focus-within {
+    border-color: var(--border-brand);
+    box-shadow: var(--shadow-lg);
+}
+
+.showcase__icon {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    flex-shrink: 0;
+    border-radius: var(--r);
+    background: var(--brand-soft);
+    border: 1px solid var(--border-brand);
+    color: var(--brand-ink);
+}
+
+.showcase__icon .card__icon-svg { width: 1.6rem; height: 1.6rem; }
+
+.showcase__body { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
+
+.showcase__count {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--brand-ink);
+}
+
+.showcase__count span { color: var(--text-dim); }
+
+.showcase__tagline { color: var(--text-dim); font-size: 0.9rem; }
+
+.showcase__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.showcase__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.showcase__dots { display: flex; gap: 0.5rem; margin-right: auto; flex-wrap: wrap; }
+
+.showcase__dot {
+    width: 1.75rem;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-strong);
+    transition: background-color var(--dur) var(--ease), width var(--dur) var(--ease);
+}
+
+.showcase__dot[aria-selected="true"] { background: var(--brand-btn); width: 2.75rem; }
+
+@media (max-width: 560px) {
+    .showcase__item { flex-direction: column; }
 }
 
 /* 9. Marquee / logo-free trust strip
@@ -787,7 +901,7 @@ html:not(.js) .carousel__controls { display: none; }
 
 .strip {
     border-block: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.015);
+    background: rgba(23, 20, 18, 0.025);
     padding-block: clamp(1.75rem, 3vw, 2.5rem);
 }
 
@@ -799,7 +913,7 @@ html:not(.js) .carousel__controls { display: none; }
 
 .strip__item h3 {
     font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
-    color: var(--brand);
+    color: var(--brand-ink);
     margin-bottom: 0.2rem;
 }
 
@@ -821,7 +935,7 @@ html:not(.js) .carousel__controls { display: none; }
     font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--brand);
+    color: var(--brand-ink);
     opacity: 0.85;
 }
 
@@ -851,6 +965,7 @@ html:not(.js) .carousel__controls { display: none; }
     background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
     transition: transform var(--dur) var(--ease),
                 border-color var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease);
@@ -875,7 +990,7 @@ html:not(.js) .carousel__controls { display: none; }
     left: clamp(1.6rem, 2.5vw, 2.1rem);
     padding: 0.28rem 0.8rem;
     border-radius: var(--r-pill);
-    background: var(--brand);
+    background: var(--brand-btn);
     color: #fff;
     font-family: var(--font-display);
     font-size: 0.7rem;
@@ -940,6 +1055,83 @@ html:not(.js) .carousel__controls { display: none; }
 
 .package .btn { margin-top: auto; }
 
+/* 11b. Package highlight (home page)
+   A compact version of the package card. The full inclusions live on the
+   packages page, so this only carries enough to make the comparison.
+   ========================================================================== */
+
+.highlight {
+    /* position: relative is load-bearing — the badge is absolutely positioned
+       and would otherwise escape to the nearest positioned ancestor. */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(1.4rem, 2.5vw, 1.85rem);
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    transition: transform var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                box-shadow var(--dur) var(--ease);
+}
+
+.highlight:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-brand);
+    box-shadow: var(--shadow-lg);
+}
+
+.highlight.is-highlighted {
+    border-color: var(--border-brand);
+    background:
+        radial-gradient(90% 55% at 50% 0%, rgba(230, 74, 26, 0.10), transparent 70%),
+        linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+}
+
+.highlight__points { display: grid; gap: 0.5rem; font-size: 0.9rem; }
+
+.highlight__points li {
+    display: grid;
+    grid-template-columns: 1.05rem 1fr;
+    gap: 0.55rem;
+    align-items: start;
+    color: var(--text-muted);
+}
+
+.highlight__points li::before {
+    content: "";
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.22rem;
+    border-radius: 50%;
+    background-color: var(--brand-soft);
+    border: 1px solid var(--border-brand);
+    background-image: var(--tick);
+    background-size: 64% 64%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.highlight__more {
+    color: var(--brand-ink);
+    font-weight: 500;
+}
+
+/* No tick on the "+N more" line: it is a pointer to the packages page, not an
+   inclusion in its own right. */
+.highlight__more::before {
+    background: none !important;
+    border-color: transparent !important;
+}
+
+.highlight .btn { margin-top: auto; }
+
+@media (hover: none) {
+    .highlight:hover { transform: none; }
+}
+
 /* 12. Website-type mockups
    ========================================================================== */
 
@@ -951,6 +1143,7 @@ html:not(.js) .carousel__controls { display: none; }
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
     overflow: hidden;
     transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
@@ -970,14 +1163,15 @@ html:not(.js) .carousel__controls { display: none; }
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: var(--border-strong);
+    background: #C9C3BD;
 }
 
 .mockup__url {
     margin-left: 0.5rem;
     padding: 0.15rem 0.6rem;
     border-radius: var(--r-pill);
-    background: rgba(0, 0, 0, 0.35);
+    background: #FFFFFF;
+    border: 1px solid var(--border);
     font-size: 0.7rem;
     color: var(--text-dim);
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
@@ -989,13 +1183,13 @@ html:not(.js) .carousel__controls { display: none; }
     display: grid;
     gap: 6px;
     padding: 12px;
-    background: #0C0C0C;
+    background: #F7F5F3;
     aspect-ratio: 16 / 11;
     grid-auto-rows: minmax(0, auto);
 }
 
 .mockup__bar {
-    background: var(--surface-3);
+    background: #D9D4CF;
     border-radius: 4px;
     height: 10px;
 }
@@ -1006,7 +1200,7 @@ html:not(.js) .carousel__controls { display: none; }
 .mockup__bar--third { width: 34%; }
 
 .mockup__block {
-    background: linear-gradient(140deg, var(--surface-3), var(--surface-2));
+    background: linear-gradient(140deg, #E6E2DE, #EFECE9);
     border-radius: 6px;
     min-height: 40px;
 }
@@ -1014,8 +1208,8 @@ html:not(.js) .carousel__controls { display: none; }
 .mockup__block--hero {
     min-height: 78px;
     background:
-        radial-gradient(60% 80% at 75% 30%, rgba(230, 74, 26, 0.35), transparent 70%),
-        linear-gradient(140deg, var(--surface-3), #0E0E0E);
+        radial-gradient(60% 80% at 75% 30%, rgba(230, 74, 26, 0.22), transparent 70%),
+        linear-gradient(140deg, #E9E5E1, #DCD7D2);
     display: grid;
     align-content: center;
     gap: 6px;
@@ -1029,7 +1223,7 @@ html:not(.js) .carousel__controls { display: none; }
 .mockup__row--sidebar { grid-template-columns: 1fr 2fr; }
 
 .mockup__tile {
-    background: linear-gradient(140deg, var(--surface-3), var(--surface-2));
+    background: linear-gradient(140deg, #E6E2DE, #EFECE9);
     border-radius: 5px;
     min-height: 46px;
     display: grid;
@@ -1060,7 +1254,7 @@ html:not(.js) .carousel__controls { display: none; }
 .mockup__features li {
     padding: 0.25rem 0.65rem;
     border-radius: var(--r-pill);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(23, 20, 18, 0.04);
     border: 1px solid var(--border);
     font-size: 0.775rem;
     color: var(--text-muted);
@@ -1159,7 +1353,7 @@ html:not(.js) .carousel__controls { display: none; }
     padding: 0.9rem 1.1rem;
     border: 1px solid var(--error);
     border-radius: var(--r);
-    background: rgba(255, 107, 107, 0.08);
+    background: rgba(194, 40, 31, 0.07);
     color: var(--error);
     font-size: 0.9rem;
 }
@@ -1180,7 +1374,7 @@ html:not(.js) .carousel__controls { display: none; }
     font-size: 0.925rem;
 }
 
-.messages li.success { border-color: rgba(74, 222, 128, 0.4); color: var(--success); }
+.messages li.success { border-color: rgba(27, 127, 68, 0.45); color: var(--success); }
 .messages li.error { border-color: var(--error); color: var(--error); }
 
 /* 14. Prose (blog body, legal pages)
@@ -1196,10 +1390,10 @@ html:not(.js) .carousel__controls { display: none; }
 }
 
 .prose h3 { margin-top: 2rem; }
-.prose p, .prose li { color: #D6D6D6; }
+.prose p, .prose li { color: #2E2A27; }
 
 .prose a {
-    color: var(--brand);
+    color: var(--brand-ink);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -1250,8 +1444,8 @@ html:not(.js) .carousel__controls { display: none; }
     background: radial-gradient(90% 100% at 0% 0%, rgba(230, 74, 26, 0.10), transparent 70%), var(--surface);
 }
 
-.quick-answer h2 { font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--brand); }
-.quick-answer p { color: #E4E4E4; }
+.quick-answer h2 { font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--brand-ink); }
+.quick-answer p { color: #2E2A27; }
 
 .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
@@ -1259,7 +1453,7 @@ html:not(.js) .carousel__controls { display: none; }
     padding: 0.32rem 0.85rem;
     border-radius: var(--r-pill);
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(23, 20, 18, 0.035);
     font-size: 0.82rem;
     color: var(--text-muted);
     transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
@@ -1298,7 +1492,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
     content: "+";
     flex-shrink: 0;
     font-size: 1.3rem;
-    color: var(--brand);
+    color: var(--brand-ink);
     transition: transform var(--dur) var(--ease);
 }
 
@@ -1371,7 +1565,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
     color: var(--text-dim);
 }
 
-.breadcrumbs a:hover { color: var(--brand); }
+.breadcrumbs a:hover { color: var(--brand-ink); }
 .breadcrumbs li:not(:last-child)::after { content: " /"; color: var(--text-dim); }
 
 /* Two-column body used by contact and service detail. */
@@ -1431,7 +1625,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
     padding: 0.8rem 1rem;
     border: 1px solid var(--border);
     border-radius: var(--r);
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(23, 20, 18, 0.025);
     font-size: 0.95rem;
     transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
 }
@@ -1455,7 +1649,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
     /* No top margin: every page's final section already carries bottom padding,
        and stacking the two left a dead band above the footer. */
     border-top: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent);
+    background: linear-gradient(180deg, rgba(23, 20, 18, 0.025), transparent);
 }
 
 .footer__top {
@@ -1480,7 +1674,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
 
 .footer__links { display: grid; gap: 0.6rem; font-size: 0.925rem; }
 .footer__links a { color: var(--text-muted); transition: color var(--dur) var(--ease); }
-.footer__links a:hover { color: var(--brand); }
+.footer__links a:hover { color: var(--brand-ink); }
 
 .footer__contact { display: grid; gap: 0.6rem; font-size: 0.925rem; }
 
@@ -1492,7 +1686,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
     transition: color var(--dur) var(--ease);
 }
 
-.footer__contact a:hover { color: var(--brand); }
+.footer__contact a:hover { color: var(--brand-ink); }
 
 .footer__social { display: flex; gap: 0.6rem; margin-top: 1.15rem; }
 
@@ -1511,7 +1705,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
 
 .footer__social a:hover {
     border-color: var(--border-brand);
-    color: var(--brand);
+    color: var(--brand-ink);
     background: var(--brand-soft);
 }
 
@@ -1554,11 +1748,13 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
 }
 
 .footer__legal { display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; }
-.footer__legal a:hover { color: var(--brand); }
+.footer__legal a:hover { color: var(--brand-ink); }
 
 /* 19. Floating controls
    ========================================================================== */
 
+/* Two separate corners. They were previously stacked in one column, which put
+   the back-to-top button right on top of the WhatsApp button. */
 .floats {
     position: fixed;
     right: clamp(0.9rem, 3vw, 1.75rem);
@@ -1568,7 +1764,12 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
     flex-direction: column;
     gap: 0.65rem;
     align-items: flex-end;
-    /* Stacking in one column is what prevents controls from overlapping. */
+}
+
+.floats--left {
+    right: auto;
+    left: clamp(0.9rem, 3vw, 1.75rem);
+    align-items: flex-start;
 }
 
 .float-btn {
@@ -1643,7 +1844,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
 }
 
 .cookie-banner__text a {
-    color: var(--brand);
+    color: var(--brand-ink);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -1662,7 +1863,8 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand); }
    The offset is the banner's measured height, published by JS as a custom
    property — a fixed value cannot work, because the banner grows as its text
    wraps and its buttons stack on narrow screens. */
-body.cookie-banner-open .floats {
+body.cookie-banner-open .floats,
+body.cookie-banner-open .floats--left {
     bottom: calc(clamp(0.9rem, 3vw, 1.75rem) + var(--cookie-banner-height, 0px) + 0.75rem);
 }
 
@@ -1675,7 +1877,7 @@ body.cookie-banner-open .floats {
     transition: color var(--dur) var(--ease);
 }
 
-.footer__cookie-settings:hover { color: var(--brand); }
+.footer__cookie-settings:hover { color: var(--brand-ink); }
 
 @media (max-width: 560px) {
     .cookie-banner__actions { width: 100%; }

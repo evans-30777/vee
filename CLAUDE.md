@@ -74,7 +74,20 @@ Apply these skills from `vee_claude_skills/` directory:
 - Brand assets: real logo at `initial assets/logo.png` (dark red + orange V mark, confirms master spec colors). `nvidia inspiration/` = motion/layout reference only (hero, menu, footer feel) — not a literal template. Other files in `initial assets/` are marked "context only, do not use directly" per `initial assets/instructions.txt` — do not embed those flyer images/colors (blue scheme) into the live site.
 - Social links (Facebook, Instagram): build the field/icon slot now; leave empty until the owner provides real URLs. Per Empty-State Rule, do not render an icon with no URL.
 - Design mandate: this is a conversion-focused sales site, not a portfolio piece for VEE itself. Every section must build enough trust that a cold visitor is ready to enquire before they ever call.
-- Theme: dark-mode only at launch (per `02_DESIGN_SYSTEM_MOTION_ACCESSIBILITY.md`). A real light-mode + toggle is Phase 2 — do not build a half-finished toggle at launch.
+- Theme: **light** (owner decision, 2026-09-17, superseding the earlier dark-only
+  launch plan and `02_DESIGN_SYSTEM_MOTION_ACCESSIBILITY.md` §1-2, which specify a
+  dark base). Reason given: the dark palette was hard on the eyes. There is still
+  **no toggle** — one theme, as before, just the light one. A dark/light switch
+  remains Phase 2.
+  - Base `#FBFAF9` (off-white, not pure white, which is its own source of glare).
+  - `--brand` `#E64A1A` is for fills and decoration only. As **text** on light it is
+    3.8:1 and fails AA, so text uses `--brand-ink` `#B83A12` (5.5:1) and buttons use
+    `--brand-btn` `#C83E14` (white on it is 5.05:1).
+  - The WhatsApp button keeps brand green `#25D366` with dark `#062814` text (8:1).
+    White on green fails.
+  - Two areas stay dark on purpose: the hero carousel slides (they read as media
+    panels) and nothing else. Their text is hard-coded light and must not be
+    switched to page tokens.
 - Website Development page must include a static mockup showcase: 3 example layouts (Portfolio, E-commerce, Booking/Hospitality) — visual only, no backend/models, clearly labeled as example layouts (never presented as real client work, per the never-fabricate-proof rule).
 - Build order for this project: backend fully implemented and verified first (models, admin, forms, URLs) before frontend/template/styling work begins.
 - SEO/AEO/GEO local targeting is not limited to the Locations app — it must be applied site-wide: every service page, the website-type mockup showcase (e.g. "E-commerce Website Design — Kenya" style headings, not generic labels), meta tags, Open Graph/social-sharing tags, and schema markup all carry location-aware language (Nairobi, Machakos, Kajiado, Kiambu, Kenya) so the site surfaces for local + AI-driven search regardless of which page a visitor lands on.

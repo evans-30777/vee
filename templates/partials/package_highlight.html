@@ -1,0 +1,32 @@
+{% load humanize %}
+{% comment %}
+Compact package card for the home page. The full inclusions live on the
+packages page — repeating them here made the home page a rate-card poster and
+gave visitors no reason to click through.
+{% endcomment %}
+<article class="highlight{% if package.is_highlighted %} is-highlighted{% endif %}">
+    {% if package.is_highlighted %}<span class="package__badge">Most popular</span>{% endif %}
+
+    <h3>{{ package.name }}</h3>
+
+    <div class="package__price">
+        <span class="package__amount">KES&nbsp;{{ package.price|floatformat:0|intcomma }}</span>
+        {% if package.billing_type == "monthly" %}<span class="package__period">/month</span>{% endif %}
+        {% if package.reference_price %}<span class="package__was">KES {{ package.reference_price|floatformat:0|intcomma }}</span>{% endif %}
+    </div>
+
+    {% if package.short_description %}<p class="muted">{{ package.short_description }}</p>{% endif %}
+
+    {% if package.features %}
+    <ul class="highlight__points">
+        {# Just the headline points — the rest are on the packages page. #}
+        {% for feature in package.features|slice:":3" %}<li>{{ feature }}</li>{% endfor %}
+        {% if package.features|length > 3 %}
+        <li class="highlight__more">+{{ package.features|length|add:"-3" }} more included</li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+    <a class="btn {% if package.is_highlighted %}btn--primary{% else %}btn--secondary{% endif %} btn--block btn--sm"
+       href="{% url 'packages:list' %}">See what's included</a>
+</article>

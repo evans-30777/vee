@@ -172,9 +172,52 @@
             </div>
             <a class="btn btn--ghost" href="{% url 'services:list' %}">See all services <span class="btn__arrow">&rarr;</span></a>
         </div>
+    </div>
 
-        <div class="grid grid--3 reveal-group">
-            {% for service in services %}{% include "partials/service_card.html" %}{% endfor %}
+    {% comment %}
+    One service at a time rather than a grid: the grid duplicated the services
+    page and crowded the home page. Built on native scroll-snap, so it can be
+    swiped or scrolled with no JavaScript at all; the buttons and auto-advance
+    are enhancements on top.
+    {% endcomment %}
+    <div class="showcase" data-showcase>
+        <div class="showcase__viewport" data-showcase-viewport
+             tabindex="0" role="group" aria-label="Services, scrollable">
+            {% for service in services %}
+            <article class="showcase__item" data-showcase-item>
+                <span class="showcase__icon">{% include "partials/service_icon.html" %}</span>
+                <div class="showcase__body">
+                    <p class="showcase__count">{{ forloop.counter|stringformat:"02d" }} <span>/ {{ services|length|stringformat:"02d" }}</span></p>
+                    <h3>{{ service.name }}</h3>
+                    {% if service.tagline %}<p class="showcase__tagline">{{ service.tagline }}</p>{% endif %}
+                    <p class="muted">{{ service.short_description }}</p>
+                    <p class="showcase__foot">
+                        {% if service.starting_price %}
+                        <span class="card__price">From KES {{ service.starting_price|floatformat:0|intcomma }}</span>
+                        {% endif %}
+                        <a class="btn btn--ghost" href="{{ service.get_absolute_url }}">
+                            Explore <span class="btn__arrow">&rarr;</span>
+                        </a>
+                    </p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="container showcase__controls" data-showcase-controls hidden>
+            <div class="showcase__dots" role="tablist" aria-label="Choose service">
+                {% for service in services %}
+                <button class="showcase__dot" data-showcase-dot type="button" role="tab"
+                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                        aria-label="{{ service.name }}"></button>
+                {% endfor %}
+            </div>
+            <button class="carousel__arrow" data-showcase-prev type="button" aria-label="Previous service">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="carousel__arrow" data-showcase-next type="button" aria-label="Next service">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
         </div>
     </div>
 </section>
@@ -212,8 +255,9 @@
             <p class="lead">Monthly packages for businesses that want steady visibility instead of one-off pushes.</p>
         </div>
 
+        {# Highlights only. The full inclusions are on the packages page. #}
         <div class="grid grid--3 reveal-group">
-            {% for package in packages %}{% include "partials/package_card.html" %}{% endfor %}
+            {% for package in packages %}{% include "partials/package_highlight.html" %}{% endfor %}
         </div>
 
         <div class="btn-row" style="margin-top:2rem">

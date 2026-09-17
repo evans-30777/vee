@@ -203,6 +203,99 @@
         start();
     }
 
+    /* ------------------------------------------------------------- Showcase */
+
+    function initShowcase(showcase) {
+        var viewport = showcase.querySelector("[data-showcase-viewport]");
+        var items = Array.prototype.slice.call(showcase.querySelectorAll("[data-showcase-item]"));
+        var controls = showcase.querySelector("[data-showcase-controls]");
+        var dots = Array.prototype.slice.call(showcase.querySelectorAll("[data-showcase-dot]"));
+        var prev = showcase.querySelector("[data-showcase-prev]");
+        var next = showcase.querySelector("[data-showcase-next]");
+        if (!viewport || items.length < 2) return;
+
+        // The controls are hidden in markup: without JS they would do nothing,
+        // while the scroll-snap track itself still works by swipe.
+        if (controls) controls.hidden = false;
+
+        var index = 0;
+        var timer = null;
+        var INTERVAL = 5000;
+
+        function scrollToIndex(i) {
+            index = (i + items.length) % items.length;
+            var target = items[index];
+            // Centre the item, matching scroll-snap-align: center.
+            var left = target.offsetLeft - (viewport.clientWidth - target.clientWidth) / 2;
+            viewport.scrollTo({
+                left: Math.max(0, left),
+                behavior: reduceMotion ? "auto" : "smooth"
+            });
+            paint();
+        }
+
+        function paint() {
+            dots.forEach(function (dot, i) {
+                dot.setAttribute("aria-selected", i === index ? "true" : "false");
+                dot.setAttribute("tabindex", i === index ? "0" : "-1");
+            });
+        }
+
+        // Keep the dots honest when the user swipes or scrolls by hand.
+        var scrollTick = false;
+        viewport.addEventListener("scroll", function () {
+            if (scrollTick) return;
+            scrollTick = true;
+            window.requestAnimationFrame(function () {
+                var centre = viewport.scrollLeft + viewport.clientWidth / 2;
+                var closest = 0;
+                var best = Infinity;
+                items.forEach(function (item, i) {
+                    var distance = Math.abs(item.offsetLeft + item.clientWidth / 2 - centre);
+                    if (distance < best) { best = distance; closest = i; }
+                });
+                if (closest !== index) { index = closest; paint(); }
+                scrollTick = false;
+            });
+        }, { passive: true });
+
+        function stop() {
+            if (timer) { window.clearInterval(timer); timer = null; }
+        }
+
+        function start() {
+            if (reduceMotion) return;
+            stop();
+            timer = window.setInterval(function () { scrollToIndex(index + 1); }, INTERVAL);
+        }
+
+        dots.forEach(function (dot, i) {
+            dot.addEventListener("click", function () { scrollToIndex(i); start(); });
+        });
+        if (prev) prev.addEventListener("click", function () { scrollToIndex(index - 1); start(); });
+        if (next) next.addEventListener("click", function () { scrollToIndex(index + 1); start(); });
+
+        viewport.addEventListener("keydown", function (event) {
+            if (event.key === "ArrowLeft") { event.preventDefault(); scrollToIndex(index - 1); start(); }
+            if (event.key === "ArrowRight") { event.preventDefault(); scrollToIndex(index + 1); start(); }
+        });
+
+        // Never fight the user, and never animate a tab nobody is looking at.
+        showcase.addEventListener("mouseenter", stop);
+        showcase.addEventListener("mouseleave", start);
+        showcase.addEventListener("focusin", stop);
+        showcase.addEventListener("focusout", function (event) {
+            if (!showcase.contains(event.relatedTarget)) start();
+        });
+        viewport.addEventListener("pointerdown", stop);
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) stop(); else start();
+        });
+
+        paint();
+        start();
+    }
+
     /* ------------------------------------------------------------ Scroll reveal */
 
     function initReveals() {
@@ -488,6 +581,11 @@
         Array.prototype.forEach.call(
             document.querySelectorAll("[data-carousel]"),
             initCarousel
+        );
+
+        Array.prototype.forEach.call(
+            document.querySelectorAll("[data-showcase]"),
+            initShowcase
         );
     }
 
