@@ -1,51 +1,130 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% comment %}
+Structured rather than set as two columns of prose. The content was fine; it
+was arriving as undifferentiated paragraphs with the right half of the screen
+empty, which is what made the page feel unfinished.
+{% endcomment %}
 <section class="page-head">
     <div class="container">
-        <p class="eyebrow">About</p>
-        <h1>One partner. <span class="accent">Straight answers.</span></h1>
-        <p class="lead">
-            VEE Agency helps businesses get found, build trust and grow online through
-            connected digital services — not isolated marketing activities that never add up.
-        </p>
+        <div class="page-head__grid">
+            <div>
+                <p class="eyebrow">About</p>
+                <h1>One partner. <span class="accent">Straight answers.</span></h1>
+                <p class="lead">
+                    VEE Agency helps businesses get found, build trust and grow online through
+                    connected digital services — not isolated marketing activities that never
+                    add up.
+                </p>
+                <div class="btn-row">
+                    <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">See where I stand</a>
+                    {% if site_settings %}
+                    <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if site_settings %}
+            <aside class="page-head__aside">
+                <p class="eyebrow">Who you're dealing with</p>
+                <p class="page-head__figure">One <small>person, start to finish</small></p>
+                <ul class="checklist">
+                    <li>Based in {{ site_settings.location_label }}</li>
+                    <li>Working across every county in Kenya</li>
+                    <li>No account managers, no handovers</li>
+                </ul>
+            </aside>
+            {% endif %}
+        </div>
     </div>
 </section>
 
+{# ------------------------------------------------------- The problem, then us #}
+<section class="section section--tinted">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="section-index"><b>01</b> <span>How we work</span></p>
+            <h2>Most businesses don't have a marketing problem</h2>
+        </div>
+
+        <div class="compare reveal-group">
+            <article class="compare__side">
+                <p class="compare__label">What usually happens</p>
+                <p>
+                    A website nobody finds. A Google listing nobody updated. Social pages that
+                    went quiet months ago.
+                </p>
+                <p>
+                    Each piece gets handled separately, by different people, and none of it
+                    pulls in the same direction. The spend adds up; the results don't.
+                </p>
+            </article>
+
+            <article class="compare__side compare__side--ours">
+                <p class="compare__label">How we do it</p>
+                <p>
+                    We start with what your business actually needs to achieve, then build the
+                    website, search visibility, Google presence and campaigns as one connected
+                    system.
+                </p>
+                <p>
+                    The work compounds instead of competing — which is why it is sold as
+                    packages rather than one-off pushes.
+                </p>
+            </article>
+        </div>
+    </div>
+</section>
+
+{# ------------------------------------------------------------ What to expect #}
 <section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="section-index"><b>02</b> <span>What you can expect</span></p>
+            <h2>Four things, every time</h2>
+        </div>
+
+        <div class="reasons reveal-group">
+            <article class="reason">
+                <h3>Direct contact</h3>
+                <p>You deal with the person doing the work. No account managers, no handoffs, no being passed around.</p>
+            </article>
+            <article class="reason">
+                <h3>Prices up front</h3>
+                <p>Scope and cost in writing before anything starts. No surprise invoices, and no meter running while you think.</p>
+            </article>
+            <article class="reason">
+                <h3>Honest assessments</h3>
+                <p>If something won't work for your business, we say so — including when the answer is that you don't need us yet.</p>
+            </article>
+            <article class="reason">
+                <h3>Work you own</h3>
+                <p>Your website, your domain, your Google and social accounts — registered in your name. Leaving is always possible.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+{# --------------------------------------------------------------- Where we work #}
+{% if site_settings %}
+<section class="section section--tight">
     <div class="container split">
         <div class="prose">
-            <h2 style="margin-top:0">How we work</h2>
-            <p>
-                Most Kenyan businesses don't have a marketing problem. They have a
-                <strong>visibility</strong> problem: a website nobody finds, a Google listing
-                nobody updated, and social pages that went quiet months ago. Each piece gets
-                handled separately, by different people, and none of it pulls in the same direction.
-            </p>
-            <p>
-                VEE Agency works the other way round. We start with what your business actually
-                needs to achieve, then build the website, search visibility, Google presence and
-                campaigns as one connected system — so the work compounds instead of competing.
-            </p>
-
-            <h2>What you can expect</h2>
-            <ul>
-                <li><strong>Direct contact.</strong> You deal with the person doing the work — no account managers, no handoffs, no being passed around.</li>
-                <li><strong>Prices up front.</strong> Scope and cost in writing before anything starts.</li>
-                <li><strong>Honest assessments.</strong> If something won't work for your business, we say so — including when the answer is that you don't need us yet.</li>
-                <li><strong>Work you own.</strong> Your website, your accounts, your data. Always.</li>
-            </ul>
-
-            <h2>Where we work</h2>
-            {% if site_settings %}
+            <p class="section-index"><b>03</b> <span>Where we work</span></p>
+            <h2 style="margin-top:0">Being outside Nairobi has never been a limitation</h2>
             <p>
                 VEE Agency is based in {{ site_settings.location_label }}, working closely with
                 businesses in
                 {% for county in site_settings.service_counties %}{{ county }}{% if not forloop.last %}, {% endif %}{% endfor %}.
-                Everything we do is delivered remotely as standard, so we work with clients in
-                every county in Kenya — being outside Nairobi has never been a limitation.
+                Everything is delivered remotely as standard, so we work with clients in every
+                county in Kenya.
             </p>
-            {% endif %}
+            <p>
+                <a class="btn btn--ghost" href="{% url 'locations:list' %}">
+                    See the areas we serve <span class="btn__arrow">&rarr;</span>
+                </a>
+            </p>
         </div>
 
         <aside class="panel">
@@ -59,14 +138,12 @@
                 <li>Digital ad campaigns</li>
             </ul>
             <div class="stack" style="margin-top:1.5rem">
-                <a class="btn btn--primary btn--block" href="{% url 'contact:contact' %}">See where I stand</a>
-                {% if site_settings %}
-                <a class="btn btn--whatsapp btn--block" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
-                {% endif %}
+                <a class="btn btn--primary btn--block" href="{% url 'packages:list' %}">Compare the packages</a>
             </div>
         </aside>
     </div>
 </section>
+{% endif %}
 
 {# Empty-state rule: no case studies means no section, not placeholder proof. #}
 {% if case_studies %}

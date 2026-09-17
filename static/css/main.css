@@ -450,6 +450,46 @@ p { text-wrap: pretty; }
 
 .card__icon-svg { width: 1.4rem; height: 1.4rem; }
 
+/* Service cards: the name leads, the price and the way in sit on one baseline
+   at the foot so a row of them scans cleanly. */
+.card--service { gap: 0.5rem; }
+
+.card--service .card__tagline {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--brand-ink);
+}
+
+.card--service .card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}
+
+.card__go {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-control);
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease),
+                border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.card--service:hover .card__go {
+    background: var(--brand-btn);
+    border-color: var(--brand-btn);
+    color: #FFFFFF;
+    transform: translateX(3px);
+}
+
 .card--flat { background: var(--surface); }
 
 /* 7. Header
@@ -1181,6 +1221,49 @@ html:not(.js) .hero__slide { opacity: 1; visibility: visible; }
     line-height: 1.35;
     letter-spacing: -0.015em;
 }
+
+/* 8d-ii. Before / after contrast
+   Two panels side by side, so "what usually happens" and "how we do it" read as
+   an argument rather than four paragraphs in a row.
+   ========================================================================== */
+
+.compare {
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (min-width: 820px) {
+    .compare { grid-template-columns: repeat(2, 1fr); }
+}
+
+.compare__side {
+    display: grid;
+    align-content: start;
+    gap: 0.9rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.compare__side p { color: var(--text-muted); }
+
+.compare__label {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim) !important;
+}
+
+.compare__side--ours {
+    background: linear-gradient(160deg, rgba(230, 74, 26, 0.07), var(--surface) 60%);
+    border-color: var(--border-brand);
+}
+
+.compare__side--ours .compare__label { color: var(--brand-ink) !important; }
+.compare__side--ours p { color: var(--text); }
 
 /* 8e. Growth system
    ========================================================================== */
@@ -2372,8 +2455,18 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     margin-bottom: 1rem;
 }
 
-.footer__links { display: grid; gap: 0.6rem; font-size: 0.925rem; }
-.footer__links a { color: var(--text-muted); transition: color var(--dur) var(--ease); }
+.footer__links { display: grid; gap: 0.2rem; font-size: 0.925rem; }
+
+/* Padded to a real tap target. These measured 18px tall — below the 24px
+   minimum, and they are exactly the links someone taps on a phone. */
+.footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding-block: 0.2rem;
+    color: var(--text-muted);
+    transition: color var(--dur) var(--ease);
+}
 .footer__links a:hover { color: var(--brand-ink); }
 
 .footer__contact { display: grid; gap: 0.6rem; font-size: 0.925rem; }
@@ -2382,6 +2475,9 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    /* A real tap target: these measured 18px tall. */
+    min-height: 26px;
+    padding-block: 0.15rem;
     color: var(--text-muted);
     transition: color var(--dur) var(--ease);
 }
@@ -2448,6 +2544,14 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
 }
 
 .footer__legal { display: flex; flex-wrap: wrap; gap: 0.6rem 1.25rem; }
+
+.footer__legal a,
+.footer__cookie-settings {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+}
+
 .footer__legal a:hover { color: var(--brand-ink); }
 
 /* 19. Floating controls
@@ -2765,6 +2869,26 @@ html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 3
 
     /* box-shadow is dropped entirely; the outline underneath is what survives. */
     :focus-visible { outline: 3px solid Highlight; outline-offset: 2px; }
+}
+
+/* 23c. Small-screen legibility floor
+   Placed last on purpose. These override component rules defined earlier in
+   the sheet, and at equal specificity the later rule wins — the first attempt
+   sat next to the hero and was quietly beaten by every later definition.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+    .eyebrow { font-size: 0.82rem; }
+    .section-index { font-size: 0.8rem; }
+    .section-index b { font-size: 0.85rem; }
+    .compare__label { font-size: 0.8rem; }
+    .mockup__url { font-size: 0.75rem; }
+    .mockup__features li { font-size: 0.82rem; }
+    .showcase__count { font-size: 0.8rem; }
+    .table__note { font-size: 0.82rem; }
+    .dim { font-size: 0.875rem; }
+    .system__num { font-size: 0.85rem; }
+    .mockup__url { font-size: 0.78rem; }
 }
 
 /* 24. Print

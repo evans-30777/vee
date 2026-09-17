@@ -1,11 +1,17 @@
 {% load humanize %}
-<article class="card">
+<article class="card card--service">
     <span class="card__icon">{% include "partials/service_icon.html" %}</span>
     <h3><a class="card__link" href="{{ service.get_absolute_url }}">{{ service.name }}</a></h3>
-    {% if service.tagline %}<p class="dim">{{ service.tagline }}</p>{% endif %}
+    {% if service.tagline %}<p class="card__tagline">{{ service.tagline }}</p>{% endif %}
     <p class="muted">{{ service.short_description }}</p>
     <p class="card__meta">
-        {% if service.starting_price %}<span class="card__price">From KES {{ service.starting_price|floatformat:0|intcomma }}</span>{% else %}<span class="card__price">Learn more</span>{% endif %}
-        <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+        {% if service.starting_price %}
+        <span class="card__price">From KES {{ service.starting_price|floatformat:0|intcomma }}</span>
+        {% else %}
+        <span class="card__price">Quoted for you</span>
+        {% endif %}
+        <span class="card__go" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+        </span>
     </p>
 </article>

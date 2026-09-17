@@ -532,3 +532,52 @@ class TemplateSyntaxLeakTests(TestCase):
             "Django's {# #} comment is single-line only. Use {% comment %} for "
             f"anything longer. Found: {offenders}",
         )
+
+
+class StylesheetIntegrityTests(TestCase):
+    """A stylesheet with an unbalanced brace silently discards the rest of itself.
+
+    An unclosed rule swallowed everything after it, so a whole block of
+    small-screen overrides was parsed as part of a broken selector and never
+    applied. Nothing failed loudly — the page just kept the old sizes.
+    """
+
+    def _css(self):
+        from pathlib import Path
+        return Path(settings.BASE_DIR, "static", "css", "main.css").read_text()
+
+    def _without_comments(self):
+        import re
+        return re.sub(r"/\*.*?\*/", "", self._css(), flags=re.S)
+
+    def test_braces_balance(self):
+        body = self._without_comments()
+        opens, closes = body.count("{"), body.count("}")
+        self.assertEqual(
+            opens, closes,
+            f"main.css has {opens} opening and {closes} closing braces — "
+            f"everything after the unclosed rule is being discarded.",
+        )
+
+    def test_no_rule_closes_before_it_opens(self):
+        depth = 0
+        for line_number, line in enumerate(self._without_comments().splitlines(), 1):
+            for char in line:
+                if char == "{":
+                    depth += 1
+                elif char == "}":
+                    depth -= 1
+                    if depth < 0:
+                        self.fail(f"main.css line {line_number}: stray closing brace")
+
+    def test_every_custom_property_used_is_defined(self):
+        import re
+
+        css = self._css()
+        defined = set(re.findall(r"^\s*(--[a-zA-Z0-9-]+)\s*:", css, re.M))
+        used = set(re.findall(r"var\(\s*(--[a-zA-Z0-9-]+)", css))
+        # These are supplied at runtime (inline styles, or set by main.js) and
+        # every use of them carries a fallback.
+        runtime = {"--vx", "--vy", "--vc", "--cookie-banner-height"}
+        missing = sorted(used - defined - runtime)
+        self.assertEqual(missing, [], f"used but never defined: {missing}")

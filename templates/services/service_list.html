@@ -3,16 +3,32 @@
 {% block content %}
 <section class="page-head">
     <div class="container">
-        <p class="eyebrow">Services</p>
-        <h1>Digital services that work together</h1>
-        <p class="lead">
-            Connected digital services for businesses in Nairobi, Machakos, Kajiado, Kiambu
-            and across Kenya — built around getting you found, trusted and chosen.
-        </p>
-        <div class="btn-row">
-            <a class="btn btn--primary" href="{% url 'contact:contact' %}">Find out which of these you need</a>
-            {% if site_settings %}
-            <a class="btn btn--secondary" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+        <div class="page-head__grid">
+            <div>
+                <p class="eyebrow">Services</p>
+                <h1>Digital services that work together</h1>
+                <p class="lead">
+                    Connected digital services for businesses in Nairobi, Machakos, Kajiado,
+                    Kiambu and across Kenya — built around getting you found, trusted and chosen.
+                </p>
+                <div class="btn-row">
+                    <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Find out which of these you need</a>
+                    {% if site_settings %}
+                    <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if services %}
+            <aside class="page-head__aside">
+                <p class="eyebrow">Where to start</p>
+                <p class="page-head__figure">{{ services|length }} <small>services, one system</small></p>
+                <ul class="checklist">
+                    <li>Each one works on its own</li>
+                    <li>Together they compound</li>
+                    <li>The audit says which you actually need</li>
+                </ul>
+            </aside>
             {% endif %}
         </div>
     </div>
