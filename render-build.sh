@@ -17,3 +17,16 @@ if [ -n "${MEDIA_ROOT:-}" ]; then mkdir -p "$MEDIA_ROOT"; fi
 # here, and without it every page raises at render time.
 python manage.py collectstatic --no-input
 python manage.py migrate
+
+# Optional superuser bootstrap.
+#
+# Render's free tier provides no shell, so there is otherwise no way to create
+# the first admin account. Set DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL
+# and DJANGO_SUPERUSER_PASSWORD in the Render dashboard (never in this repo) and
+# the account is created on the next build.
+#
+# `|| true` because this reruns on every build and errors once the user exists;
+# an existing account is the expected case, not a build failure.
+if [ -n "${DJANGO_SUPERUSER_USERNAME:-}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+    python manage.py createsuperuser --noinput || true
+fi
