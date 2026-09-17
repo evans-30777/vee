@@ -1,6 +1,7 @@
 {% load humanize %}
 <article class="card">
-    <span class="card__icon" aria-hidden="true">{{ service.name|slice:":1" }}</span>
+    {# Falls back to the initial when no icon token is set, so a service added in Admin still renders. #}
+    <span class="card__icon" aria-hidden="true">{% if service.icon %}{{ service.icon }}{% else %}{{ service.name|slice:":1" }}{% endif %}</span>
     <h3><a class="card__link" href="{{ service.get_absolute_url }}">{{ service.name }}</a></h3>
     {% if service.tagline %}<p class="dim">{{ service.tagline }}</p>{% endif %}
     <p class="muted">{{ service.short_description }}</p>

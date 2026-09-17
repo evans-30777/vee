@@ -18,6 +18,16 @@ if [ -n "${MEDIA_ROOT:-}" ]; then mkdir -p "$MEDIA_ROOT"; fi
 python manage.py collectstatic --no-input
 python manage.py migrate
 
+# Optional content seeding.
+#
+# Staging has no persistent disk, so the database is rebuilt on every deploy.
+# This repopulates it from the master spec so there is always something to
+# review. Gated on SEED_CONTENT so it can never run against production, and the
+# command itself leaves existing records alone unless passed --update.
+if [ "${SEED_CONTENT:-}" = "true" ]; then
+    python manage.py seed_content --with-posts
+fi
+
 # Optional superuser bootstrap.
 #
 # Render's free tier provides no shell, so there is otherwise no way to create

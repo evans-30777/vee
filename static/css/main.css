@@ -397,6 +397,9 @@ p { text-wrap: pretty; }
     color: var(--brand);
     font-family: var(--font-display);
     font-weight: 700;
+    /* Sized for a short token like "SEO" or "AEO", not a single letter. */
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
 }
 
 .card--flat { background: var(--surface); }
