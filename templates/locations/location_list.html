@@ -18,7 +18,7 @@
         <div class="grid grid--3 reveal-group">
             {% for location in locations %}
             <article class="card">
-                <span class="card__icon" aria-hidden="true">{{ location.county|slice:":1" }}</span>
+                <span class="card__icon"><svg class="card__icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21s7-5.3 7-11a7 7 0 1 0-14 0c0 5.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
                 <h2 style="font-size:clamp(1.25rem,1.1rem+.8vw,1.6rem)">
                     <a class="card__link" href="{{ location.get_absolute_url }}">{{ location.county }}</a>
                 </h2>

@@ -123,9 +123,20 @@
         });
 
         // The overlay is a mobile affordance; a resize to desktop must reset it.
-        window.matchMedia("(min-width: 1060px)").addEventListener("change", function (event) {
-            if (event.matches) close(false);
-        });
+        // Must match the nav breakpoint in main.css.
+        var desktop = window.matchMedia("(min-width: 1180px)");
+        if (desktop.addEventListener) {
+            desktop.addEventListener("change", function (event) {
+                if (event.matches) close(false);
+            });
+        } else if (desktop.addListener) {
+            // Safari 13 and earlier. Unguarded, this threw and took every
+            // behaviour registered after it down with it — including cookie
+            // consent, so analytics never loaded on those browsers.
+            desktop.addListener(function (event) {
+                if (event.matches) close(false);
+            });
+        }
     }
 
     /* --------------------------------------------------- Autoplay pause control */

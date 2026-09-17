@@ -498,7 +498,11 @@ p { text-wrap: pretty; }
 .nav a {
     position: relative;
     display: inline-block;
-    padding: 0.5rem 0.8rem;
+    /* Without nowrap, "Web Development" and "Areas We Serve" broke over two or
+       three lines at every width below 1280 and left the header three times
+       its proper height. */
+    white-space: nowrap;
+    padding: 0.5rem 0.7rem;
     font-size: 0.925rem;
     font-weight: 500;
     color: var(--text-muted);
@@ -511,8 +515,8 @@ p { text-wrap: pretty; }
 .nav a::after {
     content: "";
     position: absolute;
-    left: 0.8rem;
-    right: 0.8rem;
+    left: 0.7rem;
+    right: 0.7rem;
     bottom: 0.25rem;
     height: 2px;
     border-radius: 2px;
@@ -2505,7 +2509,11 @@ html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 3
     .step::after { display: none; }
 }
 
-@media (min-width: 1060px) {
+/* 1180, not 1060: with eight items the header row genuinely needs that much,
+   and below it the overflow reappears. The mobile overlay carries the same
+   eight links, so nothing is lost by handing over earlier.
+   Keep in step with the matchMedia query in main.js. */
+@media (min-width: 1180px) {
     .nav { display: flex; }
     .header__actions { display: flex; }
     .menu-toggle { display: none; }

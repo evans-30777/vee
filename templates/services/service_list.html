@@ -21,6 +21,8 @@
 <section class="section">
     <div class="container">
         {% if services %}
+        {# Card headings are h3; without this the page jumps h1 -> h3. #}
+        <h2 class="visually-hidden">All services</h2>
         <div class="grid grid--3 reveal-group">
             {% for service in services %}{% include "partials/service_card.html" %}{% endfor %}
         </div>

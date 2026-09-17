@@ -14,6 +14,8 @@
             <a href="{% url 'core:web_development' %}"{% if un == 'web_development' %} aria-current="page"{% endif %}>Web Development</a>
             <a href="{% url 'core:about' %}"{% if un == 'about' %} aria-current="page"{% endif %}>About</a>
             <a href="{% url 'blog:list' %}"{% if ns == 'blog' %} aria-current="page"{% endif %}>Blog</a>
+            {# Was mobile-only, which hid the local landing pages on the device most research happens on. #}
+            <a href="{% url 'locations:list' %}"{% if ns == 'locations' %} aria-current="page"{% endif %}>Areas We Serve</a>
             <a href="{% url 'contact:contact' %}"{% if ns == 'contact' %} aria-current="page"{% endif %}>Contact</a>
         </nav>
 

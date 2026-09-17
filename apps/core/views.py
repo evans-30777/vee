@@ -27,7 +27,9 @@ LEGAL_PAGES = {
 
 def home(request):
     context = {
-        "services": Service.objects.filter(is_active=True)[:6],
+        # All of them. The slice hid Digital Ads Management — a service the
+        # Growth System section on this same page argues for by name.
+        "services": Service.objects.filter(is_active=True),
         "packages": Package.objects.filter(
             is_active=True, billing_type=Package.BillingType.MONTHLY
         ),

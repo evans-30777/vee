@@ -37,7 +37,7 @@
             Kiambu and across Kenya.
         </p>
         <div class="btn-row">
-            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get Your Website</a>
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get a quote for my website</a>
             {% if site_settings %}
             <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question</a>
             {% endif %}
@@ -102,17 +102,17 @@
 
         <div class="grid grid--3 reveal-group">
             <article class="card">
-                <span class="card__icon" aria-hidden="true">S</span>
+                <span class="card__icon"><svg class="card__icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5 16 16"/><path d="M8 12.5l2-2.5 2 1.8 2.5-3.3"/></svg></span>
                 <h3>SEO — traditional search</h3>
                 <p class="muted">Clean structure, fast loading, proper headings, local keywords and a working sitemap, so Google can index and rank every page.</p>
             </article>
             <article class="card">
-                <span class="card__icon" aria-hidden="true">A</span>
+                <span class="card__icon"><svg class="card__icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.5 12.5a7.5 7.5 0 0 1-10.9 6.7L4 20.5l1.3-5.4A7.5 7.5 0 1 1 20.5 12.5Z"/><path d="M12.2 8.2l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9.9-2.2Z"/></svg></span>
                 <h3>AEO — answer engines</h3>
                 <p class="muted">Direct answers and FAQ schema so your business gets quoted in featured snippets and voice results, not buried on page two.</p>
             </article>
             <article class="card">
-                <span class="card__icon" aria-hidden="true">G</span>
+                <span class="card__icon"><svg class="card__icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="7" y="7" width="10" height="10" rx="2.5"/><path d="M10 4V2M14 4V2M10 22v-2M14 22v-2M4 10H2M4 14H2M22 10h-2M22 14h-2"/><path d="M10.5 10.5h3v3h-3z"/></svg></span>
                 <h3>GEO — AI search</h3>
                 <p class="muted">Clear, factual, well-structured content that AI assistants can read and cite when someone asks them to recommend a business like yours.</p>
             </article>
@@ -171,7 +171,7 @@
             <h2>Tell us what your business needs to do online</h2>
             <p>Send us the basics and we'll come back with the right type of website, a clear scope and a firm price — before you commit to anything.</p>
             <div class="btn-row">
-                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get Your Website</a>
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get a quote for my website</a>
                 {% if site_settings %}
                 <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
                 {% endif %}

@@ -27,6 +27,8 @@
 <section class="section">
     <div class="container">
         {% if page_obj %}
+        {# Card headings are h3; without this the page jumps h1 -> h3. #}
+        <h2 class="visually-hidden">Latest articles</h2>
         <div class="grid grid--3 reveal-group">
             {% for post in page_obj %}{% include "partials/post_card.html" %}{% endfor %}
         </div>
