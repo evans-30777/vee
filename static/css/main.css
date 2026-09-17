@@ -1657,13 +1657,33 @@ html:not(.js) .carousel__controls { display: none; }
 }
 
 .form__errors {
-    padding: 0.9rem 1.1rem;
+    display: grid;
+    gap: 0.5rem;
+    padding: 1rem 1.15rem;
     border: 1px solid var(--error);
+    border-left-width: 3px;
     border-radius: var(--r);
     background: rgba(194, 40, 31, 0.07);
     color: var(--error);
     font-size: 0.9rem;
 }
+
+.form__errors:focus-visible { box-shadow: var(--focus-ring); }
+
+.form__errors ul { display: grid; gap: 0.3rem; padding-left: 1.1rem; }
+.form__errors li { list-style: disc; }
+
+.form__errors a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Marks a field the browser itself has judged invalid, only after the visitor
+   has interacted with it — so an untouched required field is not scolded. */
+.field input:user-invalid,
+.field select:user-invalid,
+.field textarea:user-invalid { border-color: var(--error); }
 
 .messages {
     display: grid;

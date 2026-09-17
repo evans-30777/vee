@@ -70,6 +70,36 @@ class ContactFormTests(TestCase):
         self.assertEqual(ContactSubmission.objects.count(), 0)
         self.assertContains(response, "Jane Mwangi")
 
+    def test_a_failed_submit_gets_a_focusable_error_summary(self):
+        """Without it the page reloads at the hero and nothing says why."""
+        response = self.client.post(
+            reverse("contact:contact"),
+            {**VALID_PAYLOAD, "name": "", "email": "nope", "message": ""},
+        )
+        self.assertContains(response, "data-error-summary")
+        self.assertContains(response, "3 things need fixing")
+        self.assertContains(response, 'role="alert"')
+        # Each entry jumps straight to the field it is about.
+        self.assertContains(response, 'href="#id_name"')
+        self.assertContains(response, 'href="#id_email"')
+        self.assertContains(response, 'href="#id_message"')
+
+    def test_one_error_is_phrased_as_one(self):
+        response = self.client.post(
+            reverse("contact:contact"), {**VALID_PAYLOAD, "email": "nope"}
+        )
+        self.assertContains(response, "One thing needs fixing")
+
+    def test_the_browser_is_allowed_to_validate_the_form(self):
+        """`novalidate` removed a free instant check and bought a round trip."""
+        response = self.client.get(reverse("contact:contact"))
+        self.assertNotContains(response, "novalidate")
+        self.assertContains(response, "data-validate")
+
+    def test_a_valid_submission_shows_no_summary(self):
+        response = self.client.post(reverse("contact:contact"), VALID_PAYLOAD)
+        self.assertEqual(response.status_code, 302)
+
     def test_honeypot_blocks_bot_submission(self):
         payload = {**VALID_PAYLOAD, "website": "http://spam.example.com"}
         response = self.client.post(reverse("contact:contact"), payload)

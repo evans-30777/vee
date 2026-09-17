@@ -625,6 +625,120 @@
         else if (stored !== "declined") show();
     }
 
+    /* ------------------------------------------------------ Form validation */
+
+    function initFormValidation() {
+        var forms = document.querySelectorAll("form[data-validate]");
+        if (!forms.length) return;
+
+        Array.prototype.forEach.call(forms, function (form) {
+            // Constraint validation is already in the markup — required, type
+            //="email". The browser will enforce it; this only replaces the
+            // native bubble, which is inconsistent across browsers and vanishes
+            // the moment you look away.
+            var invalidThisSubmit = [];
+
+            function messageFor(field) {
+                if (field.validity.valueMissing) {
+                    return field.type === "email"
+                        ? "We need an email address to reply to you."
+                        : "This one is needed.";
+                }
+                if (field.validity.typeMismatch && field.type === "email") {
+                    return "That doesn't look like an email address — check for a typo.";
+                }
+                return field.validationMessage || "Please check this.";
+            }
+
+            function errorNode(field) {
+                var wrapper = field.closest(".field");
+                if (!wrapper) return null;
+                var node = wrapper.querySelector("[data-live-error]");
+                if (!node) {
+                    node = document.createElement("p");
+                    node.className = "field__error";
+                    node.setAttribute("data-live-error", "");
+                    node.id = field.id + "_live_error";
+                    wrapper.appendChild(node);
+                }
+                return node;
+            }
+
+            function showError(field) {
+                var wrapper = field.closest(".field");
+                var node = errorNode(field);
+                if (wrapper) wrapper.classList.add("field--invalid");
+                field.setAttribute("aria-invalid", "true");
+                if (node) {
+                    node.textContent = messageFor(field);
+                    // Point the field at its message without losing whatever it
+                    // was already described by (hint text, a server error).
+                    var described = (field.getAttribute("aria-describedby") || "").split(/\s+/);
+                    if (described.indexOf(node.id) === -1) {
+                        described.push(node.id);
+                        field.setAttribute("aria-describedby", described.join(" ").trim());
+                    }
+                }
+            }
+
+            function clearError(field) {
+                var wrapper = field.closest(".field");
+                var node = wrapper && wrapper.querySelector("[data-live-error]");
+                if (wrapper) wrapper.classList.remove("field--invalid");
+                field.removeAttribute("aria-invalid");
+                if (node) node.textContent = "";
+            }
+
+            // `invalid` does not bubble, so it is captured rather than delegated.
+            //
+            // The focus move has to happen here, not on `submit`: when
+            // constraint validation fails the browser never fires `submit` at
+            // all, so a handler there would never run. `invalid` fires once per
+            // field in document order, so the first one of a batch is the first
+            // problem on the page.
+            form.addEventListener("invalid", function (event) {
+                event.preventDefault();       // suppress the native bubble
+                var field = event.target;
+                showError(field);
+
+                if (invalidThisSubmit.length === 0) {
+                    // Deferred so every field in this attempt has been marked
+                    // before the page moves.
+                    window.setTimeout(function () {
+                        field.focus();
+                        if (field.scrollIntoView) {
+                            field.scrollIntoView({
+                                block: "center",
+                                behavior: reduceMotion ? "auto" : "smooth"
+                            });
+                        }
+                        invalidThisSubmit = [];
+                    }, 0);
+                }
+                invalidThisSubmit.push(field);
+            }, true);
+
+            // Clear as soon as it is fixed, rather than making them submit again
+            // to find out.
+            form.addEventListener("input", function (event) {
+                var field = event.target;
+                if (field.checkValidity && field.checkValidity()) clearError(field);
+            });
+            form.addEventListener("change", function (event) {
+                var field = event.target;
+                if (field.checkValidity && field.checkValidity()) clearError(field);
+            });
+        });
+    }
+
+    /* A failed server-side submit reloads to the top of the page, where nothing
+     * says anything went wrong. Move the cursor to the summary instead. */
+    function focusErrorSummary() {
+        var summary = document.querySelector("[data-error-summary]");
+        if (!summary) return;
+        summary.focus();
+    }
+
     /* ------------------------------------------------- Conversion tracking */
 
     function initConversionTracking() {
@@ -685,6 +799,8 @@
         initReveals();
         initBackToTop();
         initNewsletter();
+        initFormValidation();
+        focusErrorSummary();
         initCookieConsent();
         initConversionTracking();
 
