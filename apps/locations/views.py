@@ -1,6 +1,8 @@
+from django.urls import reverse
+from django.utils.text import Truncator
 from django.shortcuts import get_object_or_404, render
 
-from apps.core.seo import page_meta
+from apps.core.seo import breadcrumbs, page_meta
 
 from .models import LocationPage
 
@@ -29,8 +31,15 @@ def location_detail(request, slug):
         **page_meta(
             request,
             title=location.meta_title or f"Digital Marketing & Web Design in {location.county} — VEE Agency",
-            description=location.meta_description or location.intro[:300],
+            # Capped near Google's cut rather than at the field limit: a
+            # description truncated mid-sentence loses the reason to click.
+            description=location.meta_description or Truncator(location.intro).chars(155),
             page_class="location-detail",
+        ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            ("Areas We Serve", reverse("locations:list")),
+            (location.county, None),
         ),
     }
     return render(request, "locations/location_detail.html", context)

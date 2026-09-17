@@ -440,14 +440,18 @@ class Command(BaseCommand):
             SiteSettings.objects.create()
             self.stdout.write("Created Site settings")
 
-        for data in SERVICES:
-            upsert(Service, "slug", data.pop("slug"), data)
-
-        for data in PACKAGES:
-            upsert(Package, "slug", data.pop("slug"), data)
-
-        for data in LOCATIONS:
-            upsert(LocationPage, "slug", data.pop("slug"), data)
+        # Copied, not popped. These are module-level constants: popping from
+        # them emptied the definitions in place, so a second run in the same
+        # process seeded rows with no slug at all — an IntegrityError on the
+        # unique column, or a silently broken row. One run per process hid it.
+        for model, definitions in (
+            (Service, SERVICES),
+            (Package, PACKAGES),
+            (LocationPage, LOCATIONS),
+        ):
+            for definition in definitions:
+                fields = dict(definition)
+                upsert(model, "slug", fields.pop("slug"), fields)
 
         for name, slug, description in CATEGORIES:
             upsert(Category, "slug", slug, {"name": name, "description": description})

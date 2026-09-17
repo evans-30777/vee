@@ -67,6 +67,12 @@
     {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
+        {% comment %}
+        One @id, repeated on every page. Without it each page declares a
+        separate, unlinked business — eleven fragments instead of one entity
+        for Google to consolidate.
+        {% endcomment %}
+        "@id": "{{ organisation_id }}",
         "name": "VEE Agency",
         "description": "Digital growth agency helping businesses in Nairobi, Machakos, Kajiado, Kiambu and across Kenya get found, build trust and grow online.",
         "url": "{{ canonical_url }}",
@@ -87,6 +93,7 @@
     }
     </script>
     {% endblock %}
+    {% include "partials/breadcrumb_schema.html" %}
     {% block schema_extra %}{% endblock %}
 
     {% block head_extra %}{% endblock %}

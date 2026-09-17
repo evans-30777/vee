@@ -1,0 +1,21 @@
+{% comment %}
+BreadcrumbList for pages that render a visible breadcrumb trail. Without it the
+trail is decoration; with it, search results show the path instead of a raw URL.
+
+Expects `breadcrumbs`: a list of {"name": ..., "url": ...}, last item's url
+optional (it is the current page).
+{% endcomment %}
+{% if breadcrumbs %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{% for crumb in breadcrumbs %}{
+        "@type": "ListItem",
+        "position": {{ forloop.counter }},
+        "name": "{{ crumb.name|escapejs }}"{% if crumb.url %},
+        "item": "{{ crumb.url }}"{% endif %}
+    }{% if not forloop.last %},{% endif %}{% endfor %}]
+}
+</script>
+{% endif %}

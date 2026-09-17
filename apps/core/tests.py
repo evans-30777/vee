@@ -1,8 +1,14 @@
+import html
+import json
+import re
+
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.template.loader import render_to_string
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from apps.accounts.models import User
 from apps.packages.models import Package
 from apps.services.models import Service
 
@@ -263,3 +269,147 @@ class PublicPageTests(TestCase):
         self.assertEqual(robots.status_code, 200)
         self.assertContains(robots, "Sitemap:")
         self.assertContains(robots, "Disallow: /admin/")
+
+
+class StructuredDataTests(TestCase):
+    """Schema and metadata are easy to break silently and never notice.
+
+    Every one of these was a real finding: descriptions running past Google's
+    cut, a business entity declared separately on each page with no @id, and
+    breadcrumb trails rendered as decoration with no markup behind them.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+        # The seeder needs an author or it skips the posts entirely, which
+        # would quietly turn the blog assertions below into 404 checks.
+        User.objects.create_superuser(
+            username="evans", email="hello@veeagency.co.ke", password="x",
+            first_name="Evans",
+        )
+        call_command("seed_content", "--with-posts", verbosity=0)
+
+    def _pages(self):
+        return [
+            reverse("core:home"),
+            reverse("core:about"),
+            reverse("core:web_development"),
+            reverse("services:list"),
+            reverse("packages:list"),
+            reverse("blog:list"),
+            reverse("locations:list"),
+            reverse("contact:contact"),
+            reverse("core:privacy"),
+            "/services/seo-optimization/",
+            "/locations/nairobi/",
+            "/blog/website-cost-kenya/",
+        ]
+
+    def test_every_json_ld_block_parses(self):
+        for path in self._pages():
+            body = self.client.get(path).content.decode()
+            blocks = re.findall(
+                r'<script type="application/ld\+json">(.*?)</script>', body, re.S
+            )
+            self.assertTrue(blocks, f"{path} has no structured data")
+            for block in blocks:
+                try:
+                    json.loads(block)
+                except json.JSONDecodeError as error:
+                    self.fail(f"{path}: invalid JSON-LD — {error}")
+
+    def test_no_page_declares_the_business_twice(self):
+        """Each page declaring its own unlinked copy fragments the entity."""
+        for path in self._pages():
+            body = self.client.get(path).content.decode()
+            types = [
+                json.loads(block).get("@type")
+                for block in re.findall(
+                    r'<script type="application/ld\+json">(.*?)</script>', body, re.S
+                )
+            ]
+            self.assertLessEqual(
+                types.count("ProfessionalService"), 1,
+                f"{path} declares the business more than once",
+            )
+
+    def test_the_business_entity_carries_a_stable_id(self):
+        body = self.client.get(reverse("core:home")).content.decode()
+        self.assertIn("#organization", body)
+
+    def test_meta_descriptions_fit_in_a_search_result(self):
+        """Past ~160 characters Google truncates, losing the reason to click."""
+        for path in self._pages():
+            body = self.client.get(path).content.decode()
+            match = re.search(r'<meta name="description" content="(.*?)"', body, re.S)
+            self.assertIsNotNone(match, f"{path} has no description")
+            description = html.unescape(match.group(1))
+            self.assertLessEqual(
+                len(description), 160,
+                f"{path}: description is {len(description)} characters",
+            )
+            self.assertGreater(len(description), 50, f"{path}: description is too thin")
+
+    def test_titles_fit_in_a_search_result(self):
+        for path in self._pages():
+            body = self.client.get(path).content.decode()
+            title = html.unescape(re.search(r"<title>(.*?)</title>", body, re.S).group(1))
+            self.assertLessEqual(len(title), 60, f"{path}: title is {len(title)} characters")
+
+    def test_pages_with_a_visible_trail_publish_breadcrumb_markup(self):
+        for path in ["/services/seo-optimization/", "/locations/nairobi/",
+                     "/blog/website-cost-kenya/", reverse("core:web_development"),
+                     reverse("core:privacy")]:
+            body = self.client.get(path).content.decode()
+            self.assertIn("BreadcrumbList", body, f"{path} has no breadcrumb markup")
+
+    def test_every_page_offers_a_sharing_image(self):
+        """A link with no image renders as a grey box on WhatsApp."""
+        for path in self._pages():
+            body = self.client.get(path).content.decode()
+            match = re.search(r'<meta property="og:image" content="(.*?)"', body)
+            self.assertIsNotNone(match, f"{path} has no og:image")
+            self.assertTrue(
+                match.group(1).startswith("http"),
+                f"{path}: og:image is relative, which crawlers drop",
+            )
+
+    def test_a_from_price_is_never_published_as_exact(self):
+        body = self.client.get("/services/seo-optimization/").content.decode()
+        self.assertIn("minPrice", body)
+
+
+class SeedCommandTests(TestCase):
+    """The seeder used to empty its own definitions as it read them.
+
+    `data.pop("slug")` on module-level constants mutated them in place, so a
+    second run in the same process seeded rows with no slug — an IntegrityError
+    on the unique column. Running it exactly once per process in the Render
+    build is what kept it hidden.
+    """
+
+    def test_running_twice_in_one_process_is_safe(self):
+        call_command("seed_content", verbosity=0)
+        first = Package.objects.count()
+        call_command("seed_content", verbosity=0)
+        self.assertEqual(Package.objects.count(), first)
+        self.assertFalse(
+            Package.objects.filter(slug="").exists(),
+            "a package was seeded without a slug",
+        )
+
+    def test_the_definitions_survive_being_read(self):
+        from apps.core.management.commands.seed_content import (
+            LOCATIONS, PACKAGES, SERVICES,
+        )
+
+        call_command("seed_content", verbosity=0)
+        for name, definitions in (
+            ("SERVICES", SERVICES), ("PACKAGES", PACKAGES), ("LOCATIONS", LOCATIONS)
+        ):
+            for definition in definitions:
+                self.assertIn(
+                    "slug", definition,
+                    f"{name} lost its slug key — the seeder mutated its own constants",
+                )

@@ -1,5 +1,24 @@
 {% extends "base.html" %}
 
+{% block schema_extra %}
+{% comment %}
+Who is saying this matters for a blog that gives costing advice. Without a
+Person entity the byline is just text.
+{% endcomment %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "{{ author.display_name|escapejs }}",
+    "url": "{{ canonical_url }}"{% if author.job_title %},
+    "jobTitle": "{{ author.job_title|escapejs }}"{% endif %}{% if author.bio %},
+    "description": "{{ author.bio|truncatewords:40|escapejs }}"{% endif %},
+    "worksFor": {"@id": "{{ organisation_id }}"}{% if author.facebook or author.instagram %},
+    "sameAs": [{% if author.facebook %}"{{ author.facebook }}"{% endif %}{% if author.facebook and author.instagram %}, {% endif %}{% if author.instagram %}"{{ author.instagram }}"{% endif %}]{% endif %}
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <section class="page-head">
     <div class="container">

@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render
 
 from apps.blog.models import BlogPost
@@ -8,7 +9,7 @@ from apps.packages.models import Package
 from apps.services.models import Service
 
 from .models import CaseStudy, Testimonial
-from .seo import page_meta
+from .seo import breadcrumbs, page_meta
 
 # Title and the date each document was last substantively revised.
 #
@@ -41,9 +42,8 @@ def home(request):
             request,
             title="VEE Agency — Digital Growth for Kenyan Businesses",
             description=(
-                "VEE Agency helps businesses in Nairobi, Machakos, Kajiado, Kiambu "
-                "and across Kenya get found and grow online through websites, SEO & AEO, "
-                "Google Business Profile, social media and digital ads."
+                "Websites, SEO & AEO, Google Business Profile and ads for businesses "
+                "in Nairobi, Machakos, Kajiado, Kiambu and across Kenya. Free audit first."
             ),
             page_class="home",
         ),
@@ -97,11 +97,14 @@ def web_development(request):
             request,
             title="Website Design & Development in Kenya — VEE Agency",
             description=(
-                "Custom website design and development from KES 30,000 — e-commerce, "
-                "portfolio and booking websites built SEO, AEO and GEO ready for "
-                "businesses in Nairobi, Machakos, Kajiado, Kiambu and across Kenya."
+                "Websites from KES 30,000 for Kenyan businesses — e-commerce, portfolio "
+                "and booking sites, built mobile-first and search-ready. Free audit first."
             ),
             page_class="web-development",
+        ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            ("Web Development", None),
         ),
     }
     return render(request, "core/web_development.html", context)
@@ -118,6 +121,10 @@ def legal_page(request, doc):
             title=f"{title} — VEE Agency",
             description=f"{title} for VEE Agency, a digital growth agency based in Kenya.",
             page_class="legal",
+        ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            (title, None),
         ),
     }
     return render(request, f"core/legal/{doc}.html", context)

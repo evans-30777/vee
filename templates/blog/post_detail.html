@@ -11,9 +11,22 @@
     "description": "{{ post.excerpt|escapejs }}",
     "datePublished": "{{ post.published_at|date:'c' }}",
     "dateModified": "{{ post.updated_at|date:'c' }}",
-    "author": {"@type": "Person", "name": "{{ post.author.display_name|escapejs }}"},
-    "publisher": {"@type": "Organization", "name": "VEE Agency"},
-    "mainEntityOfPage": "{{ canonical_url }}"
+    "inLanguage": "en-KE",
+    "wordCount": {{ post.body.split|length }},
+    {% comment %}
+    Article rich results want an image. Falls back to the site card rather than
+    omitting it, which is the difference between a result with a thumbnail and
+    one without.
+    {% endcomment %}
+    "image": "{% firstof meta.image default_social_image_url %}",
+    "author": {
+        "@type": "Person",
+        "name": "{{ post.author.display_name|escapejs }}",
+        "url": "{{ author_url }}"{% if post.author.job_title %},
+        "jobTitle": "{{ post.author.job_title|escapejs }}"{% endif %}
+    },
+    "publisher": {"@id": "{{ organisation_id }}"},
+    "mainEntityOfPage": {"@type": "WebPage", "@id": "{{ canonical_url }}"}
 }
 </script>
 {% if post.faqs %}

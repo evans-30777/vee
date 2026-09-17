@@ -2,21 +2,20 @@
 
 {% block schema_extra %}
 <script type="application/ld+json">
+{% comment %}
+A Service offered in this county, not a second business. Declaring another
+ProfessionalService per county split one business into five unlinked entities;
+this points back at the one in base.html instead.
+{% endcomment %}
 {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "name": "VEE Agency — {{ location.county|escapejs }}",
+    "@type": "Service",
+    "name": "Digital marketing & web design in {{ location.county|escapejs }}",
     "description": "{{ location.intro|truncatewords:30|escapejs }}",
+    "serviceType": "Digital growth services",
     "url": "{{ canonical_url }}",
-    "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Syokimau",
-        "addressRegion": "Machakos County",
-        "addressCountry": "KE"
-    },
-    "areaServed": {"@type": "AdministrativeArea", "name": "{{ location.county|escapejs }}, Kenya"}{% if site_settings %},
-    "telephone": "{{ site_settings.phone_calls }}",
-    "email": "{{ site_settings.email }}"{% endif %}
+    "provider": {"@id": "{{ organisation_id }}"},
+    "areaServed": {"@type": "AdministrativeArea", "name": "{{ location.county|escapejs }}, Kenya"}
 }
 </script>
 {% endblock %}

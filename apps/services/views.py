@@ -1,6 +1,7 @@
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render
 
-from apps.core.seo import page_meta
+from apps.core.seo import breadcrumbs, page_meta
 
 from .models import Service
 
@@ -12,9 +13,8 @@ def service_list(request):
             request,
             title="Digital Marketing & Web Services in Kenya — VEE Agency",
             description=(
-                "SEO & AEO, Google Business Profile optimisation, social media management, "
-                "digital ads, competitor analysis and website services for businesses in "
-                "Nairobi, Machakos, Kajiado, Kiambu and across Kenya."
+                "SEO & AEO, Google Business Profile, social media, ads and competitor "
+                "analysis for businesses across Kenya. Prices up front, free audit first."
             ),
             page_class="services",
         ),
@@ -32,6 +32,11 @@ def service_detail(request, slug):
             title=service.meta_title or f"{service.name} in Kenya — VEE Agency",
             description=service.meta_description or service.short_description[:300],
             page_class="service-detail",
+        ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            ("Services", reverse("services:list")),
+            (service.name, None),
         ),
     }
     return render(request, "services/service_detail.html", context)

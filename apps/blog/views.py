@@ -1,8 +1,10 @@
 from django.core.paginator import Paginator
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render
+from django.utils.text import Truncator
 
 from apps.accounts.models import User
-from apps.core.seo import page_meta
+from apps.core.seo import absolute_url, breadcrumbs, page_meta
 
 from .models import BlogPost, Category
 
@@ -31,11 +33,10 @@ def post_list(request):
         "categories": _navigable_categories(),
         **page_meta(
             request,
-            title="Insights on SEO, Websites & Digital Growth in Kenya — VEE Agency",
+            title="SEO, Websites & Digital Growth in Kenya — VEE Agency",
             description=(
-                "Practical articles on SEO & AEO, websites, Google Business Profile, "
-                "social media and digital ads for businesses in Nairobi, Machakos, "
-                "Kajiado, Kiambu and across Kenya."
+                "Practical guidance on SEO, websites, Google Business Profile and ads, "
+                "written for business owners in Kenya. No jargon, no filler."
             ),
             page_class="blog",
         ),
@@ -58,6 +59,11 @@ def category_detail(request, slug):
             page_class="blog-category",
             noindex=not posts.exists(),
         ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            ("Blog", reverse("blog:list")),
+            (category.name, None),
+        ),
     }
     return render(request, "blog/category_detail.html", context)
 
@@ -76,6 +82,15 @@ def post_detail(request, slug):
             page_class="blog-post",
             image=post.featured_image.url if post.featured_image else None,
         ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            ("Blog", reverse("blog:list")),
+            (post.title, None),
+        ),
+        # Links the byline to a real Person entity rather than leaving it text.
+        "author_url": absolute_url(
+            reverse("blog:author", kwargs={"username": post.author.username})
+        ),
     }
     return render(request, "blog/post_detail.html", context)
 
@@ -87,9 +102,20 @@ def author_detail(request, username):
         "page_obj": _paginate(request, BlogPost.published.filter(author=author)),
         **page_meta(
             request,
-            title=f"{author.display_name} — VEE Agency",
-            description=author.bio[:300] or f"Articles written by {author.display_name} at VEE Agency.",
+            title=f"{author.display_name} — Author at VEE Agency",
+            description=(
+                Truncator(author.bio).chars(155)
+                or (
+                    f"Articles by {author.display_name} on SEO, websites and digital "
+                    f"growth for businesses in Kenya."
+                )
+            ),
             page_class="blog-author",
+        ),
+        "breadcrumbs": breadcrumbs(
+            ("Home", reverse("core:home")),
+            ("Blog", reverse("blog:list")),
+            (author.display_name, None),
         ),
     }
     return render(request, "blog/author_detail.html", context)

@@ -29,6 +29,20 @@ STATIC_PAGE_PRIORITY = {
 class StaticViewSitemap(Sitemap):
     changefreq = "monthly"
 
+    def lastmod(self, item):
+        """Newest content change, so a crawler can tell whether to bother.
+
+        These pages have no row of their own, so the best available signal is
+        the most recent edit to anything they display.
+        """
+        stamps = [
+            Service.objects.order_by("-updated_at").values_list("updated_at", flat=True).first(),
+            LocationPage.objects.order_by("-updated_at").values_list("updated_at", flat=True).first(),
+            BlogPost.published.order_by("-updated_at").values_list("updated_at", flat=True).first(),
+        ]
+        stamps = [stamp for stamp in stamps if stamp]
+        return max(stamps) if stamps else None
+
     def items(self):
         pages = list(STATIC_PAGE_PRIORITY)
         # Case studies are only worth submitting once there is one to show.

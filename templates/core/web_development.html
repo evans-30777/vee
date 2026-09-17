@@ -10,16 +10,7 @@
     "description": "Custom website design and development for Kenyan businesses — portfolio, e-commerce and booking websites built SEO, AEO and GEO ready.",
     "serviceType": "Website design and development",
     "url": "{{ canonical_url }}",
-    "provider": {
-        "@type": "ProfessionalService",
-        "name": "VEE Agency",
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Syokimau",
-            "addressRegion": "Machakos County",
-            "addressCountry": "KE"
-        }
-    },
+    "provider": {"@id": "{{ organisation_id }}"},
     "areaServed": [{% for county in site_settings.service_counties %}{"@type": "AdministrativeArea", "name": "{{ county }}"}, {% endfor %}{"@type": "Country", "name": "Kenya"}]{% if website_package %},
     "offers": {
         "@type": "Offer",

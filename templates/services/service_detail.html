@@ -10,21 +10,22 @@
     "description": "{{ service.short_description|escapejs }}",
     "serviceType": "{{ service.name|escapejs }}",
     "url": "{{ canonical_url }}",
-    "provider": {
-        "@type": "ProfessionalService",
-        "name": "VEE Agency",
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Syokimau",
-            "addressRegion": "Machakos County",
-            "addressCountry": "KE"
-        }
-    },
+    "provider": {"@id": "{{ organisation_id }}"},
     "areaServed": [{% for county in site_settings.service_counties %}{"@type": "AdministrativeArea", "name": "{{ county }}"}, {% endfor %}{"@type": "Country", "name": "Kenya"}]{% if service.starting_price %},
+    {% comment %}
+    The page shows this as "Starting from", so it is published as a minimum.
+    A bare `price` would claim an exactness we do not offer.
+    {% endcomment %}
     "offers": {
         "@type": "Offer",
-        "price": "{{ service.starting_price|floatformat:0 }}",
-        "priceCurrency": "KES"
+        "priceCurrency": "KES",
+        "availability": "https://schema.org/InStock",
+        "url": "{{ canonical_url }}",
+        "priceSpecification": {
+            "@type": "PriceSpecification",
+            "priceCurrency": "KES",
+            "minPrice": "{{ service.starting_price|floatformat:0 }}"
+        }
     }{% endif %}
 }
 </script>

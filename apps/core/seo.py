@@ -41,3 +41,16 @@ def page_meta(request, *, title, description, page_class="", noindex=False, imag
         # A staging deployment is never indexable, whatever the view asked for.
         "noindex": noindex or settings.SITE_IS_STAGING,
     }
+
+
+def breadcrumbs(*items):
+    """Build a breadcrumb trail for both the visible list and its schema.
+
+    Each item is (name, url_or_None). The last item is the current page and
+    normally has no url. URLs are absolutised, because BreadcrumbList items
+    are read without page context.
+    """
+    return [
+        {"name": name, "url": absolute_url(url) if url else ""}
+        for name, url in items
+    ]
