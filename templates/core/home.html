@@ -118,8 +118,10 @@
             </div>
 
             <div class="carousel__controls">
-                {# Plain buttons, not tabs: the slides are role="group" with no tabpanel,
-   so a tablist described a relationship that did not exist. #}
+                {% comment %}
+                Plain buttons, not tabs: the slides are role="group" with no
+                tabpanel, so a tablist described a relationship that did not exist.
+                {% endcomment %}
                 <div class="carousel__dots" aria-label="Choose slide">
                     <button class="carousel__dot" data-dot type="button" aria-current="true" aria-label="Web Development"></button>
                     <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="SEO and AEO"></button>

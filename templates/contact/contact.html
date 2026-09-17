@@ -84,9 +84,11 @@
                 <div class="form__row">
                     <div class="field{% if form.phone.errors %} field--invalid{% endif %}">
                         <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-                        {# aria-describedby is appended, not replaced: Django already
-                           points it at the error list, and the hint has to join that
-                           rather than overwrite it. #}
+                        {% comment %}
+                        aria-describedby is appended, not replaced: Django already
+                        points it at the error list, and the hint has to join that
+                        rather than overwrite it.
+                        {% endcomment %}
                         {{ form.phone }}
                         <span class="field__help" id="{{ form.phone.id_for_label }}_help">Optional — but it's the fastest way to reach you.</span>
                         {{ form.phone.errors }}

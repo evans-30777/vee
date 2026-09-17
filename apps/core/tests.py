@@ -2,6 +2,7 @@ import html
 import json
 import re
 
+from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
@@ -462,3 +463,69 @@ class SiteSettingsCacheTests(TestCase):
         self.assertIsNone(SiteSettings.load())
         SiteSettings.objects.create(tagline="Now it exists.")
         self.assertIsNotNone(SiteSettings.load())
+
+
+class TemplateSyntaxLeakTests(TestCase):
+    """No template syntax may reach the page.
+
+    Django's `{# #}` comment is single-line only: written across two lines it
+    is not a comment at all and renders as literal text. Three of them shipped
+    — on the home, contact and blog post pages — and visitors saw the raw
+    comment. Nothing in the test suite noticed, because every check was about
+    structure, not about what the words on the page actually said.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+        User.objects.create_superuser(
+            username="evans", email="hello@veeagency.co.ke", password="x",
+            first_name="Evans",
+        )
+        call_command("seed_content", "--with-posts", verbosity=0)
+
+    def _all_pages(self):
+        return [
+            reverse("core:home"), reverse("core:about"), reverse("core:case_studies"),
+            reverse("core:web_development"), reverse("services:list"),
+            reverse("packages:list"), reverse("blog:list"), reverse("locations:list"),
+            reverse("contact:contact"), reverse("contact:thank_you"),
+            reverse("core:privacy"), reverse("core:terms"), reverse("core:cookies"),
+            reverse("core:disclaimer"),
+            "/services/seo-optimization/", "/locations/nairobi/",
+            "/blog/website-cost-kenya/", "/blog/category/seo-aeo/",
+            "/blog/author/evans/",
+        ]
+
+    def test_no_unrendered_template_syntax_on_any_page(self):
+        for path in self._all_pages():
+            body = self.client.get(path).content.decode()
+            visible = body.split("<body", 1)[1] if "<body" in body else body
+            for token, what in (("{#", "an unclosed {# #} comment"),
+                                ("#}", "the end of a {# #} comment"),
+                                ("{%", "a template tag"),
+                                ("{{", "a template variable")):
+                self.assertNotIn(
+                    token, visible,
+                    f"{path} renders {what} as visible text — look for a "
+                    f"{{# #}} comment written across more than one line.",
+                )
+
+    def test_the_source_has_no_multi_line_hash_comments(self):
+        """Catches the mistake at its source, not just where it surfaced."""
+        import re
+        from pathlib import Path
+
+        offenders = []
+        for template in Path(settings.BASE_DIR, "templates").rglob("*.html"):
+            text = template.read_text()
+            for match in re.finditer(r"\{#", text):
+                end = text.find("\n", match.start())
+                line = text[match.start():end if end != -1 else len(text)]
+                if "#}" not in line:
+                    offenders.append(f"{template.name}:{text[:match.start()].count(chr(10)) + 1}")
+        self.assertEqual(
+            offenders, [],
+            "Django's {# #} comment is single-line only. Use {% comment %} for "
+            f"anything longer. Found: {offenders}",
+        )
