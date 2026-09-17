@@ -18,13 +18,20 @@
     {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
     <meta property="og:locale" content="en_KE">
     <meta property="og:site_name" content="VEE Agency">
-    {% if meta.image %}<meta property="og:image" content="{{ meta.image }}">
-    {% elif site_settings.default_social_image %}<meta property="og:image" content="{{ site_settings.default_social_image.url }}">{% endif %}
+    {% comment %}
+    Sharing card. Every page gets one: the page's own image if it has one, then
+    the image set in Admin, then the built-in brand card. A link with no image
+    renders as a bare grey box on WhatsApp, which is where most referrals here
+    travel, so there is no case where leaving it out is right.
+    {% endcomment %}
+    {% firstof meta.image default_social_image_url as social_image %}
+    <meta property="og:image" content="{{ social_image }}">
+    <meta property="og:image:alt" content="VEE Agency — digital growth for businesses across Kenya">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ meta.title|default:'VEE Agency' }}">
     <meta name="twitter:description" content="{{ meta.description|default:'' }}">
-    {% if meta.image %}<meta name="twitter:image" content="{{ meta.image }}">
-    {% elif site_settings.default_social_image %}<meta name="twitter:image" content="{{ site_settings.default_social_image.url }}">{% endif %}
+    <meta name="twitter:image" content="{{ social_image }}">
+    <meta name="twitter:image:alt" content="VEE Agency — digital growth for businesses across Kenya">
 
     {# Local/geo signals for search and answer engines. #}
     <meta name="geo.region" content="KE-16">
@@ -39,9 +46,14 @@
     <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32">
     <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+    {% comment %}
+    Fonts are served from this origin, so there is no preconnect to a font CDN
+    and no third-party request before consent. Preloaded because the stylesheet
+    only discovers them once it has parsed, which would otherwise cost a round
+    trip and show fallback text first.
+    {% endcomment %}
+    <link rel="preload" href="{% static 'fonts/inter-latin-var.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'fonts/space-grotesk-latin-var.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
     {% block schema %}

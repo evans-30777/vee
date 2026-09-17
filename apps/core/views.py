@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.shortcuts import get_object_or_404, render
 
 from apps.blog.models import BlogPost
@@ -8,11 +10,17 @@ from apps.services.models import Service
 from .models import CaseStudy, Testimonial
 from .seo import page_meta
 
+# Title and the date each document was last substantively revised.
+#
+# The date is recorded here rather than rendered from `now`, which would make
+# every legal page claim to have been updated today, on every page load. The
+# Privacy Policy tells the reader this date shows when the document last
+# changed, so it has to be true. Update the date when you change the wording.
 LEGAL_PAGES = {
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "cookies": "Cookie Policy",
-    "disclaimer": "Disclaimer",
+    "privacy": ("Privacy Policy", date(2026, 9, 17)),
+    "terms": ("Terms of Service", date(2026, 9, 17)),
+    "cookies": ("Cookie Policy", date(2026, 9, 17)),
+    "disclaimer": ("Disclaimer", date(2026, 9, 17)),
 }
 
 
@@ -60,8 +68,9 @@ def about(request):
 
 
 def case_studies(request):
+    published = CaseStudy.objects.filter(is_active=True)
     context = {
-        "case_studies": CaseStudy.objects.filter(is_active=True),
+        "case_studies": published,
         **page_meta(
             request,
             title="Case Studies — VEE Agency",
@@ -70,6 +79,9 @@ def case_studies(request):
                 "in Nairobi, Machakos, Kajiado, Kiambu and across Kenya."
             ),
             page_class="case-studies",
+            # Nothing to show yet means nothing worth indexing. The page stays
+            # reachable, but it is not offered to search as thin content.
+            noindex=not published.exists(),
         ),
     }
     return render(request, "core/case_studies.html", context)
@@ -96,10 +108,11 @@ def web_development(request):
 
 
 def legal_page(request, doc):
-    title = LEGAL_PAGES[doc]
+    title, updated_at = LEGAL_PAGES[doc]
     context = {
         "doc": doc,
         "doc_title": title,
+        "doc_updated_at": updated_at,
         **page_meta(
             request,
             title=f"{title} — VEE Agency",

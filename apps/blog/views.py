@@ -13,10 +13,22 @@ def _paginate(request, queryset):
     return Paginator(queryset, POSTS_PER_PAGE).get_page(request.GET.get("page"))
 
 
+def _navigable_categories():
+    """Categories that actually contain something.
+
+    An empty category is a dead end: the reader clicks a tag and is told to
+    check back later. It is also a thin page for search, so it is neither
+    linked nor submitted until it has a post in it.
+    """
+    return Category.objects.filter(
+        is_active=True, posts__in=BlogPost.published.all()
+    ).distinct()
+
+
 def post_list(request):
     context = {
         "page_obj": _paginate(request, BlogPost.published.all()),
-        "categories": Category.objects.filter(is_active=True),
+        "categories": _navigable_categories(),
         **page_meta(
             request,
             title="Insights on SEO, Websites & Digital Growth in Kenya — VEE Agency",
@@ -33,16 +45,18 @@ def post_list(request):
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug, is_active=True)
+    posts = BlogPost.published.filter(categories=category)
     context = {
         "category": category,
-        "page_obj": _paginate(request, BlogPost.published.filter(categories=category)),
-        "categories": Category.objects.filter(is_active=True),
+        "page_obj": _paginate(request, posts),
+        "categories": _navigable_categories(),
         **page_meta(
             request,
             title=f"{category.name} — VEE Agency Insights",
             description=category.description
             or f"Articles on {category.name} for businesses in Kenya, from VEE Agency.",
             page_class="blog-category",
+            noindex=not posts.exists(),
         ),
     }
     return render(request, "blog/category_detail.html", context)

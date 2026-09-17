@@ -1,8 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.templatetags.static import static
 from django.utils.text import slugify
 
 from .imaging import optimise_image_field
+from .seo import DEFAULT_SOCIAL_IMAGE
 
 # Ceilings per image role. A social image only ever renders at Open Graph size,
 # and a client logo only ever renders small, so neither needs more.
@@ -106,6 +108,20 @@ class SiteSettings(TimeStampedModel):
     @property
     def whatsapp_url(self):
         return f"https://wa.me/{self.whatsapp_number}"
+
+    @property
+    def social_image_url(self):
+        """Absolute URL of the sharing card, falling back to the brand default.
+
+        Absolute because Open Graph and Twitter fetch the image server-side with
+        no page context, so a relative path is silently dropped and the share
+        renders as a bare link.
+        """
+        from .seo import absolute_url
+
+        if self.default_social_image:
+            return absolute_url(self.default_social_image.url)
+        return absolute_url(static(DEFAULT_SOCIAL_IMAGE))
 
     @property
     def sets_optional_cookies(self):

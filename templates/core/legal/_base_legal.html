@@ -9,7 +9,7 @@
         </ol>
         <p class="eyebrow">Legal</p>
         <h1>{{ doc_title }}</h1>
-        <p class="dim">Last updated: {% now "j F Y" %}</p>
+        <p class="dim">Last updated: <time datetime="{{ doc_updated_at|date:'Y-m-d' }}">{{ doc_updated_at|date:"j F Y" }}</time></p>
     </div>
 </section>
 

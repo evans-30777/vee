@@ -3,8 +3,10 @@ Shown only when something actually sets a non-essential cookie. With no
 analytics configured the site sets essential cookies only, and asking for
 consent it does not need would be misleading.
 
-The analytics IDs are published here as configuration, not as trackers — no
-third-party script is present in the page until the visitor accepts.
+The measurement IDs are published here as configuration, not as trackers — no
+third-party script is present in the page until the visitor accepts. The wording
+names advertising explicitly when the Pixel is configured: consent has to be
+informed, and the Pixel is retargeting infrastructure, not analytics.
 {% endcomment %}
 {% if site_settings.sets_optional_cookies %}
 <script type="application/json" id="analytics-config">
@@ -25,16 +27,20 @@ third-party script is present in the page until the visitor accepts.
         <div>
             <h2 class="cookie-banner__title" id="cookie-banner-title">Cookies on this site</h2>
             <p class="cookie-banner__text" id="cookie-banner-text">
-                We use essential cookies to make this site work. We'd also like to use
-                analytics cookies to understand which pages people find useful. You can
-                decline and everything will keep working.
+                Essential cookies keep this site working. We'd also like to set
+                {% if site_settings.ga4_measurement_id and site_settings.meta_pixel_id %}analytics
+                and advertising cookies — to see which pages are useful, and to measure and
+                target our ads on Facebook and Instagram.{% elif site_settings.meta_pixel_id %}advertising
+                cookies — to measure and target our ads on Facebook and Instagram.{% else %}analytics
+                cookies, to see which pages people find useful.{% endif %}
+                You can decline and everything keeps working exactly the same.
                 <a href="{% url 'core:cookies' %}">Read our Cookie Policy</a>.
             </p>
         </div>
         <div class="cookie-banner__actions">
             {# Decline is presented exactly as prominently as accept: consent has to be a real choice. #}
             <button class="btn btn--secondary btn--sm" type="button" data-cookie-decline>Decline</button>
-            <button class="btn btn--primary btn--sm" type="button" data-cookie-accept>Accept analytics</button>
+            <button class="btn btn--primary btn--sm" type="button" data-cookie-accept>Accept</button>
         </div>
     </div>
 </div>

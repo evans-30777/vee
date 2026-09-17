@@ -6,17 +6,60 @@
 <p>Cookies are small text files stored on your device by your browser. They let a website remember things between pages and visits.</p>
 
 <h2>Cookies we use</h2>
-<p><strong>Essential cookies.</strong> These are required for the website to work — for example, to keep your session secure and to protect forms against cross-site request forgery. They cannot be switched off.</p>
-<p><strong>Analytics cookies.</strong> Where analytics are enabled, these help us understand which pages people visit so we can improve the site. They are not used to identify you personally, and they are <strong>only set if you accept them</strong>.</p>
+
+<h3>Essential cookies</h3>
+<p>These are required for the website to work. They cannot be switched off, and they are set whether or not you accept anything.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Cookies used on this site">
+<table class="table">
+    <thead>
+        <tr><th>Name</th><th>Set by</th><th>Purpose</th><th>Expires</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>csrftoken</code></td><td>This website</td><td>Protects the enquiry and newsletter forms against cross-site request forgery.</td><td>1 year</td></tr>
+        <tr><td><code>sessionid</code></td><td>This website</td><td>Keeps an administrator signed in. Only set if you log in to the site's admin area.</td><td>2 weeks</td></tr>
+        <tr><td><code>vee-cookie-consent</code></td><td>This website</td><td>Remembers your cookie choice so you are not asked again. Stored in your browser's local storage, not sent to our server.</td><td>Until you clear it</td></tr>
+    </tbody>
+</table>
+</div>
+
+{% if site_settings.sets_optional_cookies %}
+<h3>Optional cookies</h3>
+<p><strong>These are only set if you accept them.</strong> Nothing below is loaded until you choose, and declining costs you no functionality.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Cookies used on this site">
+<table class="table">
+    <thead>
+        <tr><th>Name</th><th>Set by</th><th>Purpose</th><th>Expires</th></tr>
+    </thead>
+    <tbody>
+        {% if site_settings.ga4_measurement_id %}
+        <tr><td><code>_ga</code></td><td>Google Analytics</td><td>Distinguishes visitors so we can see which pages are used.</td><td>2 years</td></tr>
+        <tr><td><code>_ga_*</code></td><td>Google Analytics</td><td>Keeps the state of a visit for the same purpose.</td><td>2 years</td></tr>
+        {% endif %}
+        {% if site_settings.meta_pixel_id %}
+        <tr><td><code>_fbp</code></td><td>Meta (Facebook)</td><td><strong>Advertising.</strong> Measures our adverts and lets us show them to people who have visited this site.</td><td>3 months</td></tr>
+        <tr><td><code>_fbc</code></td><td>Meta (Facebook)</td><td><strong>Advertising.</strong> Records that you arrived from one of our adverts.</td><td>3 months</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+</div>
+{% if site_settings.meta_pixel_id %}
+<p>The Meta Pixel is advertising technology, not analytics. Accepting it means Meta can be told that you visited this site, and we can use that to measure and target adverts on Facebook and Instagram. If that is not something you want, decline — the site behaves identically either way.</p>
+{% endif %}
+{% else %}
+<h3>Optional cookies</h3>
+<p>This site currently sets <strong>no optional cookies at all</strong>. No analytics or advertising tools are running, so you will not see a consent banner — asking for permission we do not need would be misleading. If that changes, the banner will appear and this page will be updated first.</p>
+{% endif %}
 
 <h2>Your choice</h2>
-<p>If this site is using analytics, you will see a banner asking whether you accept them the first time you visit. Nothing beyond the essential cookies described above is loaded until you choose — and declining is always available alongside accepting, never buried.</p>
-<p>If you decline, the site works exactly as it does otherwise. You lose no functionality.</p>
-<p>You can change your mind at any time using the <strong>Cookie settings</strong> link in the footer. Withdrawing consent stops any further analytics loading and clears the analytics cookies already stored in your browser.</p>
+<p>Where optional cookies are in use, you are asked before anything is loaded. Declining is offered exactly as prominently as accepting, and pressing Escape declines rather than dismissing the question.</p>
+<p>You can change your mind at any time using the <strong>Cookie settings</strong> link in the footer. Withdrawing consent stops any further loading and clears the optional cookies already stored in your browser. Anything already sent to Google or Meta before you withdrew cannot be recalled by us — you would need to contact them directly.</p>
 
-<h2>Managing cookies</h2>
-<p>You can also block or delete cookies through your browser settings. Blocking essential cookies may stop parts of this website working, including the enquiry form.</p>
+<h2>Other third-party connections</h2>
+<p>Fonts and all other assets on this site are served from our own server. This site makes no third-party requests at all unless you have accepted optional cookies.</p>
+
+<h2>Managing cookies in your browser</h2>
+<p>You can block or delete cookies through your browser settings. Blocking essential cookies may stop parts of this website working, including the enquiry form.</p>
 
 <h2>Changes</h2>
-<p>If we add new cookies, we will update this page.</p>
+<p>If we add new cookies, we will update this page before they are used. The date at the top shows when this page last changed.</p>
 {% endblock %}
