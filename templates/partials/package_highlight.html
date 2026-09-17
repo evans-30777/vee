@@ -12,7 +12,6 @@ gave visitors no reason to click through.
     <div class="package__price">
         <span class="package__amount">KES&nbsp;{{ package.price|floatformat:0|intcomma }}</span>
         {% if package.billing_type == "monthly" %}<span class="package__period">/month</span>{% endif %}
-        {% if package.reference_price %}<span class="package__was">KES {{ package.reference_price|floatformat:0|intcomma }}</span>{% endif %}
     </div>
 
     {% if package.short_description %}<p class="muted">{{ package.short_description }}</p>{% endif %}

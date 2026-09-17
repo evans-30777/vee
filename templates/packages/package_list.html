@@ -1,4 +1,79 @@
 {% extends "base.html" %}
+{% load humanize %}
+
+{% block schema_extra %}
+{% comment %}
+Pricing is the reason this page exists, so it is published as structured data:
+without it, neither Google nor an AI assistant answering "what does digital
+marketing cost in Kenya" can read the numbers off the page.
+{% endcomment %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    "name": "VEE Agency packages and pricing",
+    "url": "{{ canonical_url }}",
+    "provider": {"@id": "{{ organisation_id }}"},
+    "itemListElement": [
+        {% for package in monthly_packages %}{
+            "@type": "Offer",
+            "name": "{{ package.name|escapejs }}",
+            "description": "{{ package.short_description|escapejs }}",
+            "price": "{{ package.price|floatformat:0 }}",
+            "priceCurrency": "KES",
+            "availability": "https://schema.org/InStock",
+            "url": "{{ canonical_url }}",
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "price": "{{ package.price|floatformat:0 }}",
+                "priceCurrency": "KES",
+                "billingDuration": 1,
+                "billingIncrement": 1,
+                "unitCode": "MON"
+            },
+            "itemOffered": {
+                "@type": "Service",
+                "name": "{{ package.name|escapejs }}",
+                "serviceType": "Digital growth retainer",
+                "areaServed": {"@type": "Country", "name": "Kenya"}
+            }
+        }{% if not forloop.last or one_time_packages %},{% endif %}{% endfor %}
+        {% for package in one_time_packages %}{
+            "@type": "Offer",
+            "name": "{{ package.name|escapejs }}",
+            "description": "{{ package.short_description|escapejs }}",
+            "priceCurrency": "KES",
+            "availability": "https://schema.org/InStock",
+            "url": "{{ canonical_url }}",
+            "priceSpecification": {
+                "@type": "PriceSpecification",
+                "priceCurrency": "KES",
+                {% if package.price_is_from %}"minPrice": "{{ package.price|floatformat:0 }}"{% else %}"price": "{{ package.price|floatformat:0 }}"{% endif %}
+            },
+            "itemOffered": {
+                "@type": "Service",
+                "name": "{{ package.name|escapejs }}",
+                "serviceType": "Website design and development",
+                "areaServed": {"@type": "Country", "name": "Kenya"}
+            }
+        }{% if not forloop.last %},{% endif %}{% endfor %}
+    ]
+}
+</script>
+{% if pricing_faqs %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{% for faq in pricing_faqs %}{
+        "@type": "Question",
+        "name": "{{ faq.question|escapejs }}",
+        "acceptedAnswer": {"@type": "Answer", "text": "{{ faq.answer|escapejs }}"}
+    }{% if not forloop.last %},{% endif %}{% endfor %}]
+}
+</script>
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <section class="page-head">
@@ -31,6 +106,77 @@
         </p>
     </div>
 </section>
+
+{% if comparison %}
+{% comment %}
+The cards say what each package is; only this says what changes between them.
+Several rows are upgrades of the same capability rather than extra items, which
+is why this is a matrix and not three lists. See apps/packages/comparison.py.
+{% endcomment %}
+<section class="section section--tinted">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Side by side</p>
+            <h2>What changes as you move up</h2>
+            <p class="lead">
+                Each package includes everything in the one before it. The difference is
+                how much ground it covers — and how hard it competes.
+            </p>
+        </div>
+
+        <p class="table-hint" aria-hidden="true">Scroll the table sideways to compare &rarr;</p>
+
+        <div class="table-wrap reveal" tabindex="0" role="region" aria-label="Package comparison">
+            <table class="table table--compare">
+                <caption class="visually-hidden">
+                    Features included in each monthly growth package, cheapest first.
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">What you get</th>
+                        {% for package in comparison.columns %}
+                        <th scope="col"{% if package.is_highlighted %} class="is-highlighted"{% endif %}>
+                            {{ package.name }}
+                            <span class="table__price">KES&nbsp;{{ package.price|floatformat:0|intcomma }}<span>/mo</span></span>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in comparison.rows %}
+                    <tr>
+                        <th scope="row">
+                            {{ row.label }}
+                            {% if row.note %}<span class="table__note">{{ row.note }}</span>{% endif %}
+                        </th>
+                        {% for cell in row.cells %}
+                        <td>
+                            {% if cell.included %}
+                                {% if cell.text %}
+                                    <span class="cell-yes"><span class="cell-tick" aria-hidden="true"></span>{{ cell.text }}</span>
+                                {% else %}
+                                    <span class="cell-tick" role="img" aria-label="Included"></span>
+                                {% endif %}
+                            {% else %}
+                                <span class="cell-no" role="img" aria-label="Not included">&ndash;</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btn-row" style="margin-top:1.75rem">
+            <a class="btn btn--primary" href="{% url 'contact:contact' %}">Get a recommendation</a>
+            {% if site_settings %}
+            <a class="btn btn--secondary" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask which fits me</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
 {% endif %}
 
 {% if one_time_packages %}
@@ -53,6 +199,26 @@
 <section class="section">
     <div class="container">
         <p class="empty-note">Packages are being finalised. Get in touch and we'll quote for exactly what your business needs.</p>
+    </div>
+</section>
+{% endif %}
+
+{% if pricing_faqs %}
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">Before you commit</p>
+            <h2>The questions people actually ask</h2>
+        </div>
+
+        <div class="faq reveal">
+            {% for faq in pricing_faqs %}
+            <details class="faq__item">
+                <summary>{{ faq.question }}</summary>
+                <div><p>{{ faq.answer }}</p></div>
+            </details>
+            {% endfor %}
+        </div>
     </div>
 </section>
 {% endif %}

@@ -1620,6 +1620,26 @@ html:not(.js) .carousel__controls { display: none; }
 
 .field__help { font-size: 0.8rem; color: var(--text-dim); }
 
+/* The reassurance line under the submit button. Given real weight rather than
+   help-text grey: it is answering the last hesitation before someone commits. */
+.form__assurance {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+
+.form__assurance .cell-tick { flex-shrink: 0; margin-top: 0.1rem; }
+.form__assurance strong { color: var(--text); }
+.form__assurance a { color: var(--brand-ink); text-decoration: underline; text-underline-offset: 3px; }
+
 .field--invalid input,
 .field--invalid select,
 .field--invalid textarea { border-color: var(--error); }
@@ -1748,6 +1768,89 @@ html:not(.js) .carousel__controls { display: none; }
 .table tbody tr:last-child td { border-bottom: 0; }
 .table tbody tr:hover { background: var(--surface-2); }
 .table code { white-space: nowrap; }
+
+/* Comparison table — what changes between package tiers. Built so a row can
+   be read across on a phone without losing which column is which. */
+.table--compare { min-width: 46rem; }
+
+.table--compare thead th:not(:first-child),
+.table--compare tbody td { text-align: center; }
+
+.table--compare thead th { vertical-align: bottom; }
+
+.table--compare thead th.is-highlighted {
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+    border-bottom-color: var(--border-brand);
+}
+
+.table--compare tbody th {
+    font-family: var(--font-body);
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 14rem;
+}
+
+.table__price {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: var(--text);
+}
+
+.table__price span { font-weight: 500; color: var(--text-dim); }
+
+.table__note {
+    display: block;
+    margin-top: 0.2rem;
+    font-weight: 400;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--text-dim);
+}
+
+/* The tick is the meaning, so it is a shape rather than colour alone. */
+.cell-tick {
+    display: inline-block;
+    width: 1.15rem;
+    height: 1.15rem;
+    vertical-align: -0.2rem;
+    border-radius: 50%;
+    background-color: var(--brand-soft);
+    border: 1px solid var(--border-brand);
+    background-image: var(--tick);
+    background-size: 64% 64%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.cell-yes {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    text-align: left;
+    color: var(--text-muted);
+}
+
+.cell-no { color: var(--text-dim); font-size: 1.1rem; }
+
+/* Only shown where the table actually overflows. Without it a cut-off table
+   reads as broken rather than scrollable. */
+.table-hint {
+    display: none;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+@media (max-width: 800px) {
+    .table-hint { display: block; }
+}
 
 /* The prose column is narrow for reading; a table needs the full measure. */
 .prose .table-wrap { max-width: none; }

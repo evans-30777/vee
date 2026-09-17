@@ -35,7 +35,6 @@ PACKAGES = [
         "name": "Essential Growth",
         "billing_type": "monthly",
         "price": 15000,
-        "reference_price": 18000,
         "short_description": "Get the fundamentals right — found on Google, consistent on social.",
         "ideal_for": "Businesses putting their online presence in order for the first time",
         "features": [
@@ -51,7 +50,6 @@ PACKAGES = [
         "name": "Standard Growth",
         "billing_type": "monthly",
         "price": 25000,
-        "reference_price": 30000,
         "short_description": "Everything in Essential, plus search visibility and paid reach.",
         "ideal_for": "Established businesses ready to compete for search traffic",
         "is_highlighted": True,
@@ -72,7 +70,6 @@ PACKAGES = [
         "name": "Premium Growth",
         "billing_type": "monthly",
         "price": 45000,
-        "reference_price": 55000,
         "short_description": "The full system — search, social, ads and site, managed together.",
         "ideal_for": "Businesses scaling and competing seriously online",
         "features": [
