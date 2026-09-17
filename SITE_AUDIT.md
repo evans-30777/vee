@@ -5,6 +5,78 @@
 **Commit audited:** `21bd6b2`
 **Verdict:** The site is well built and honest. It is not yet a converting machine, and it cannot currently prove whether it converts at all.
 
+
+---
+
+## Remediation status — 17 September 2026
+
+All four phases are implemented, verified and pushed. What follows is the
+original audit, kept as the record of what was found and why.
+
+**Fixed (52 of 56 findings):** every P0, P1, P2 and P3 item except the four
+that need information only the owner has.
+
+**Still open — owner input required:**
+
+| # | Item | What is needed |
+|---|---|---|
+| 11 | Social URLs, bio, headshot | Real Facebook and Instagram URLs, a short bio and a photo. The fields and the schema `sameAs` wiring are built and stay hidden until they are filled. |
+| 10 | Legal review | The Privacy Policy now covers the controller's identity, ODPC complaints, retention, named recipients and cross-border transfer. A lawyer should still read all four documents. |
+| — | Pricing FAQ gaps | Contract length, cancellation terms and setup fees are the three questions buyers ask that the site still cannot answer. Nothing was invented; decide the policy and they can be added. |
+| E-10 | Local signals | Geo coordinates, opening hours and a Google Business Profile link. Take these from the real GBP rather than guessing a pin. |
+
+**Decisions the owner made during remediation (17 September 2026):**
+
+- Package tiers are **cumulative** — each includes the one below it. The
+  comparison table is built on this, and a test enforces it.
+- Struck-through "was" prices are **removed**, from the cards and from the
+  seeder. Actual prices unchanged.
+- The contact page commits to a reply **within one working day**.
+
+**Two findings were corrected during the work:**
+
+- **P-02 said "6 font files".** Wrong — Inter and Space Grotesk are both
+  *variable* fonts, and Google was serving one file per family covering every
+  weight. The real figure was two files. The finding still stood on the
+  third-party-origin and privacy grounds, and self-hosting them is done.
+- **A-10 partly overstated the problem.** Django 5.2 already emitted
+  `aria-invalid` and `aria-describedby` correctly for errors; only the *hint*
+  text was unassociated. Fixed as stated, but error association was never
+  broken.
+
+**Three problems were found while fixing others, none of which were in the
+original audit:**
+
+1. **The newsletter never showed a confirmation.** Its status element is a
+   sibling of the form, not a child, so `form.querySelector` returned null and
+   an early `return` swallowed everything after it. Nobody subscribing had ever
+   seen a success or failure message.
+2. **`seed_content` destroyed its own definitions as it read them**, popping
+   `slug` out of module-level constants. A second run in the same process
+   seeded rows with no slug. Running it once per deploy is the only reason it
+   never bit.
+3. **The desktop nav had no `white-space: nowrap`**, so "Web Development"
+   wrapped onto two or three lines at every width below 1280 — the header sat
+   at triple height on a common laptop width.
+
+**Verification performed after the work:**
+
+- 120 tests pass, three consecutive runs; `check --deploy` clean under
+  production settings.
+- Heading hierarchy re-extracted from all 19 pages: no skipped levels, exactly
+  one `h1` each.
+- Responsive sweep of 156 combinations (12 pages x 13 widths, 320–1920px): no
+  horizontal overflow, no wrapped nav link.
+- Contrast re-measured: every control boundary and focus state ≥3:1, every
+  text pair ≥4.5:1.
+- CSP verified across nine pages: no violations, no console errors, carousels,
+  reveals and fonts all working.
+- Consent re-verified end to end: no tracker request before a decision, none
+  after declining even on a conversion page, both tags on accept, and a
+  conversion queued through the banner still recorded.
+- JavaScript disabled: every reveal visible, no preloader trap, all five hero
+  slides stacked, forms and the comparison table usable.
+
 ---
 
 ## How this audit was done

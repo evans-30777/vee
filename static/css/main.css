@@ -2182,7 +2182,9 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
 .footer__brand .brand { margin-bottom: 1rem; }
 .footer__brand p { color: var(--text-muted); font-size: 0.925rem; }
 
-.footer h3 {
+.footer__heading {
+    /* Semantically h2 — sibling of the page's sections, not a child of the
+       last one — but sized as the small footer label it looks like. */
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.14em;

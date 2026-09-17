@@ -40,7 +40,7 @@
             </div>
 
             <div>
-                <h3>Explore</h3>
+                <h2 class="footer__heading">Explore</h2>
                 <ul class="footer__links">
                     <li><a href="{% url 'services:list' %}">Services</a></li>
                     <li><a href="{% url 'packages:list' %}">Growth Packages</a></li>
@@ -53,7 +53,7 @@
             </div>
 
             <div>
-                <h3>Get in touch</h3>
+                <h2 class="footer__heading">Get in touch</h2>
                 {% if site_settings %}
                 <ul class="footer__contact">
                     <li><a href="tel:{{ site_settings.phone_calls_e164 }}">{{ site_settings.phone_calls }} <span class="dim">(calls)</span></a></li>
@@ -65,7 +65,7 @@
             </div>
 
             <div class="newsletter">
-                <h3>Growth tips</h3>
+                <h2 class="footer__heading">Growth tips</h2>
                 <p class="dim">Practical ways Kenyan businesses win more customers online. No spam — unsubscribe any time.</p>
                 <form class="newsletter__form" method="post" action="{% url 'contact:newsletter_subscribe' %}" data-newsletter>
                     {% csrf_token %}

@@ -92,6 +92,46 @@ Apply these skills from `vee_claude_skills/` directory:
 - Build order for this project: backend fully implemented and verified first (models, admin, forms, URLs) before frontend/template/styling work begins.
 - SEO/AEO/GEO local targeting is not limited to the Locations app — it must be applied site-wide: every service page, the website-type mockup showcase (e.g. "E-commerce Website Design — Kenya" style headings, not generic labels), meta tags, Open Graph/social-sharing tags, and schema markup all carry location-aware language (Nairobi, Machakos, Kajiado, Kiambu, Kenya) so the site surfaces for local + AI-driven search regardless of which page a visitor lands on.
 
+## Site Audit Remediation (2026-09-17)
+
+`SITE_AUDIT.md` holds the full audit and its remediation status. Decisions and
+architecture that came out of it, which later work must not undo:
+
+- **Package tiers are cumulative** — Standard includes Essential, Premium
+  includes Standard (owner, 2026-09-17). The comparison table in
+  `apps/packages/comparison.py` is built on this, and tests enforce both the
+  cumulative rule and that every feature string maps to a row. **Add a feature
+  in Admin and the test fails** — that is deliberate; update the matrix.
+- **No struck-through "was" prices.** Removed from the cards and the seeder
+  (owner, 2026-09-17). A discount that never ends undercuts "Clear prices. No
+  guessing." Actual prices unchanged.
+- **The contact page promises a reply within one working day** (owner,
+  2026-09-17). Keep it or change it — do not let it become untrue.
+- **Blog bodies are Markdown**, rendered and sanitised in
+  `apps/blog/rendering.py`. h1 is not allowed: the post title is the page's h1.
+  Linking from posts to service and package pages is the main internal-linking
+  route the site has.
+- **Fonts are self-hosted** (`static/fonts/`, Latin subset, variable). The
+  Cookie Policy states the site makes no third-party requests before consent —
+  re-adding a font CDN would make that false.
+- **One business entity.** Every schema block references
+  `{{ organisation_id }}` rather than declaring its own ProfessionalService.
+- **Analytics stay consent-gated, and conversions are tracked through
+  `track()`** in `main.js`, which sends nothing until consent has loaded the
+  tags. Re-verify in a browser after any change here.
+- **Legal page dates are real dates** in `apps/core/views.py:LEGAL_PAGES`.
+  Update the date when you change the wording; never render `{% now %}`.
+- **Tests run against a dummy cache** because LocMemCache is not rolled back
+  between tests. `SiteSettingsCacheTests` opts back in to cover the caching.
+- **The desktop nav breakpoint is 1180px**, in both `main.css` and the
+  matchMedia query in `main.js`. Keep them in step.
+
+Still needed from the owner: Facebook and Instagram URLs, bio and headshot;
+a lawyer's review of the four legal documents; a decision on contract length,
+cancellation and setup fees so the pricing FAQ can answer them; and geo
+coordinates, opening hours and a Google Business Profile link from the real
+GBP.
+
 ## Decided Against — Do Not Build
 
 Owner-approved decisions (2026-09-17), not backlog. Do not implement these
@@ -117,7 +157,8 @@ outside an agreed batch.
 
 *Completed and removed from this list: image resize on upload, media backup docs,
 cookie consent banner, consent-gated analytics. `POSTGRES_SSLMODE` was dropped
-outright — it existed only for the Aiven plan that SQLite replaced.*
+outright — it existed only for the Aiven plan that SQLite replaced. The full
+site audit and its remediation are recorded in `SITE_AUDIT.md`.*
 
 ## Analytics & Cookies — How It Works
 
