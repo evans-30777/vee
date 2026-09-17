@@ -128,6 +128,46 @@
         });
     }
 
+    /* --------------------------------------------------- Autoplay pause control */
+
+    /* WCAG 2.2.2 (Level A): anything that moves by itself for more than five
+     * seconds needs a way to stop it. Pausing on hover and focus is good
+     * behaviour but does not satisfy it — the control has to be discoverable
+     * and operable, which means a real button.
+     *
+     * A user pause is sticky: unlike a hover pause it survives the pointer
+     * leaving, because the person asked for it.
+     */
+    function buildPauseControl(container, api) {
+        var button = container.querySelector("[data-autoplay-toggle]");
+        if (!button) return null;
+
+        var userPaused = false;
+
+        function paint() {
+            button.setAttribute("aria-pressed", userPaused ? "true" : "false");
+            button.setAttribute(
+                "aria-label",
+                userPaused ? "Resume automatic sliding" : "Pause automatic sliding"
+            );
+            button.classList.toggle("is-paused", userPaused);
+        }
+
+        button.addEventListener("click", function () {
+            userPaused = !userPaused;
+            if (userPaused) api.stop();
+            else api.start();
+            paint();
+        });
+
+        button.hidden = false;
+        paint();
+
+        return {
+            isUserPaused: function () { return userPaused; }
+        };
+    }
+
     /* ----------------------------------------------------------------- Carousel */
 
     function initCarousel(carousel) {
@@ -163,8 +203,11 @@
             }
         }
 
+        var pause = null;
+
         function start() {
             if (reduceMotion) return;
+            if (pause && pause.isUserPaused()) return;
             stop();
             timer = window.setInterval(function () { show(index + 1); }, INTERVAL);
         }
@@ -173,6 +216,8 @@
             show(i);
             start();
         }
+
+        pause = buildPauseControl(carousel, { start: start, stop: stop });
 
         dots.forEach(function (dot, i) {
             dot.addEventListener("click", function () { goTo(i); });
@@ -263,11 +308,16 @@
             if (timer) { window.clearInterval(timer); timer = null; }
         }
 
+        var pause = null;
+
         function start() {
             if (reduceMotion) return;
+            if (pause && pause.isUserPaused()) return;
             stop();
             timer = window.setInterval(function () { scrollToIndex(index + 1); }, INTERVAL);
         }
+
+        pause = buildPauseControl(showcase, { start: start, stop: stop });
 
         dots.forEach(function (dot, i) {
             dot.addEventListener("click", function () { scrollToIndex(i); start(); });

@@ -800,15 +800,33 @@ html:not(.js) .carousel__controls { display: none; }
 
 .carousel__dots { display: flex; gap: 0.5rem; margin-right: auto; }
 
+/* The visible bar is 4px, but a 4px tap target fails WCAG 2.5.8 (24x24) and is
+   genuinely hard to hit on a phone. The button keeps a full-height hit area and
+   paints the bar with a pseudo-element. */
 .carousel__dot {
+    position: relative;
     width: 2rem;
+    height: 24px;
+    padding: 0;
+    background: none;
+    transition: width var(--dur) var(--ease);
+}
+
+.carousel__dot::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     height: 4px;
     border-radius: 2px;
     background: var(--border-control);
-    transition: background-color var(--dur) var(--ease), width var(--dur) var(--ease);
+    transition: background-color var(--dur) var(--ease);
 }
 
-.carousel__dot[aria-selected="true"] { background: var(--brand-btn); width: 3rem; }
+.carousel__dot[aria-selected="true"] { width: 3rem; }
+.carousel__dot[aria-selected="true"]::after { background: var(--brand-btn); }
 
 .carousel__arrow {
     display: grid;
@@ -821,6 +839,18 @@ html:not(.js) .carousel__controls { display: none; }
     transition: border-color var(--dur) var(--ease),
                 color var(--dur) var(--ease),
                 background-color var(--dur) var(--ease);
+}
+
+/* Autoplay pause. Required by WCAG 2.2.2, so it is a real control rather than a
+   hover behaviour, and it shows which state it is in. */
+.carousel__pause .carousel__play-icon { display: none; }
+.carousel__pause.is-paused .carousel__pause-icon { display: none; }
+.carousel__pause.is-paused .carousel__play-icon { display: block; }
+
+.carousel__pause.is-paused {
+    background: var(--brand-soft);
+    border-color: var(--border-brand);
+    color: var(--brand-ink);
 }
 
 .carousel__arrow:hover {
@@ -919,15 +949,31 @@ html:not(.js) .carousel__controls { display: none; }
 
 .showcase__dots { display: flex; gap: 0.5rem; margin-right: auto; flex-wrap: wrap; }
 
+/* Same reasoning as .carousel__dot: visible bar, hittable control. */
 .showcase__dot {
+    position: relative;
     width: 1.75rem;
+    height: 24px;
+    padding: 0;
+    background: none;
+    transition: width var(--dur) var(--ease);
+}
+
+.showcase__dot::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
     height: 4px;
     border-radius: 2px;
     background: var(--border-control);
-    transition: background-color var(--dur) var(--ease), width var(--dur) var(--ease);
+    transition: background-color var(--dur) var(--ease);
 }
 
-.showcase__dot[aria-selected="true"] { background: var(--brand-btn); width: 2.75rem; }
+.showcase__dot[aria-selected="true"] { width: 2.75rem; }
+.showcase__dot[aria-selected="true"]::after { background: var(--brand-btn); }
 
 @media (max-width: 560px) {
     .showcase__item { flex-direction: column; }
@@ -2365,14 +2411,20 @@ body.cookie-banner-open .floats--left {
     background: var(--bg);
     transition: opacity 0.45s var(--ease), visibility 0.45s;
     /* CSS clears the preloader on its own timer. If main.js never loads, the
-       site still becomes usable — JS only ever dismisses it *earlier*. */
-    animation: preloader-out 0.45s var(--ease) 1.8s forwards;
+       site still becomes usable — JS only ever dismisses it *earlier*.
+       The delay used to be 1.8s, which meant up to 2.25s of covered viewport
+       on every page view, not just the first. */
+    animation: preloader-out 0.4s var(--ease) 0.6s forwards;
 }
 
 .preloader.is-done { opacity: 0; visibility: hidden; }
 
 /* With JS disabled the inline class swap never runs, so skip the splash. */
 html.no-js .preloader { display: none; }
+
+/* Already seen in this tab. A splash on every internal navigation is a cost
+   paid repeatedly for an impression that only lands once. */
+html.preloader-seen .preloader { display: none; }
 
 @keyframes preloader-out {
     to { opacity: 0; visibility: hidden; pointer-events: none; }

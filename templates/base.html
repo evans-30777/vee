@@ -9,8 +9,14 @@
     {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
     {% if noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
-    {# Swap the no-js class before first paint so JS-only styles never flash. #}
-    <script>document.documentElement.className = document.documentElement.className.replace("no-js", "js");</script>
+    {% comment %}
+    Runs before first paint. Swaps the no-js class so JS-only styles never
+    flash, and marks a repeat view in this tab so the splash is skipped
+    entirely rather than shown and then hidden — hiding it later would still
+    cost a visible flash on every internal navigation.
+    {% endcomment %}
+    <script>(function(){var d=document.documentElement;d.className=d.className.replace("no-js","js");
+    try{if(sessionStorage.getItem("vee-seen")){d.className+=" preloader-seen";}else{sessionStorage.setItem("vee-seen","1");}}catch(e){}})();</script>
 
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:title" content="{{ meta.title|default:'VEE Agency' }}">
