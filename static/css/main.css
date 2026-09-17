@@ -99,7 +99,11 @@
     --focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 5px var(--brand-btn);
 
     /* Shared tick mark for "included" lists. */
-    --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B83A12' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4.2 4.2L19 7'/%3E%3C/svg%3E");
+    /* Included markers are green and uncircled (owner, 2026-09-17). The peach
+       circle read as decorative; green reads as "yes" without being explained,
+       and dropping the disc removes the pastel look it came with. */
+    --tick-ink: #15803D;                          /* 4.9:1 on white */
+    --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2315803D' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.8l5 5L19.5 6.6'/%3E%3C/svg%3E");
 
     --header-h: 74px;
 
@@ -642,46 +646,131 @@ body.nav-open .header {
 }
 
 /* 8. Hero
+   Full-bleed media with the copy over it, after the NVIDIA reference. The media
+   panel is the hero — not a thumbnail beside it — so it takes the full width
+   and most of the viewport, and a <video> or <img> can replace the CSS
+   composition without touching anything else.
    ========================================================================== */
 
 .hero {
     position: relative;
-    padding-block: clamp(3.5rem, 7vw, 6rem) clamp(3rem, 6vw, 5rem);
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    min-height: min(88vh, 46rem);
+    padding-block: clamp(3.5rem, 12vh, 7rem) clamp(1.5rem, 4vh, 2.5rem);
+    background: #141110;
     overflow: hidden;
 }
 
-.hero__grid {
-    display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
-    align-items: center;
+.hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
 }
 
-.hero__copy { max-width: 40ch; }
+.hero__slides { position: absolute; inset: 0; }
 
-/* The hero headline sits in a column, not the full page width, so it needs a
-   tighter scale than the global h1. */
-.hero h1 {
-    margin-block: 1rem 1.35rem;
-    font-size: clamp(2.35rem, 1.5rem + 2.7vw, 3.6rem);
+.hero__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.1s var(--ease), visibility 1.1s;
 }
-.hero .lead { margin-bottom: 2rem; }
+
+.hero__slide.is-active { opacity: 1; visibility: visible; }
+
+/* Without JS every slide is shown; the first one wins by stacking order, and
+   nothing is hidden behind a script that never ran. */
+html:not(.js) .hero__slide { opacity: 1; visibility: visible; }
+
+/* Stand-in for real media. A slow drift keeps it from reading as a flat
+   gradient; replaced wholesale the day there is footage. */
+.hero__visual {
+    position: absolute;
+    inset: -10%;
+    display: block;
+    background:
+        radial-gradient(60% 55% at var(--vx, 70%) var(--vy, 25%), var(--vc, rgba(230, 74, 26, 0.5)), transparent 70%),
+        radial-gradient(70% 60% at 10% 90%, rgba(136, 0, 0, 0.55), transparent 65%),
+        linear-gradient(140deg, #241a16 0%, #141110 55%, #0d0b0a 100%);
+    animation: hero-drift 26s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes hero-drift {
+    from { transform: scale(1.04) translate3d(0, 0, 0); }
+    to   { transform: scale(1.12) translate3d(-2%, -1.5%, 0); }
+}
+
+/* The fine grid gives the surface something to catch the light on, so the
+   panel reads as a composition rather than a coloured rectangle. */
+.hero__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 68px 68px;
+    mask-image: radial-gradient(70% 60% at 70% 30%, #000 0%, transparent 75%);
+    opacity: 0.6;
+}
+
+/* Text over media is only legible with something between them. */
+.hero__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(100deg, rgba(12, 10, 9, 0.94) 0%, rgba(12, 10, 9, 0.82) 38%, rgba(12, 10, 9, 0.35) 68%, rgba(12, 10, 9, 0.15) 100%),
+        linear-gradient(0deg, rgba(12, 10, 9, 0.75) 0%, transparent 38%);
+}
+
+.hero__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 6vh, 3.5rem);
+    width: 100%;
+}
+
+/* Same reason as the caption: the last control must not end up underneath the
+   floating action button. */
+.hero__inner .slider-controls { padding-right: 4.5rem; }
+
+@media (max-width: 767px) {
+    /* Back-to-top is hidden on phones, so only the right side needs clearing. */
+    .hero__inner .slider-controls { padding-right: 3.5rem; }
+}
+
+.hero__copy { max-width: 46rem; }
+
+.hero__copy .eyebrow { color: #FF8A5B; }
+
+.hero__copy h1 {
+    margin-block: 0.9rem 1.1rem;
+    color: #FFFFFF;
+    font-size: clamp(2.6rem, 1.5rem + 5vw, 5rem);
+}
+
+.hero__copy .lead {
+    color: rgba(255, 255, 255, 0.82);
+    max-width: 40rem;
+}
+
+.hero__copy .btn-row { margin-top: 2rem; }
 
 .hero__trust {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
-    margin-top: 2.25rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid var(--border);
-    font-size: 0.875rem;
-    color: var(--text-muted);
+    gap: 0.6rem 1.75rem;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.72);
 }
 
-.hero__trust li {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-}
+.hero__trust li { display: flex; align-items: center; gap: 0.5rem; }
 
 .hero__trust li::before {
     content: "";
@@ -692,175 +781,63 @@ body.nav-open .header {
     flex-shrink: 0;
 }
 
-/* Carousel */
-.carousel { position: relative; }
-
-.carousel__viewport {
-    position: relative;
-    border-radius: var(--r-lg);
-    border: 1px solid var(--border);
-    background: var(--surface);
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    /* Reserve height so slides never shift layout as they cross-fade. */
-    min-height: clamp(20rem, 46vw, 30rem);
-}
-
-.carousel__track {
-    display: grid;
-    /* All slides stack in one cell; only the active one is visible. */
-    grid-template-areas: "slide";
-}
-
-.slide {
-    grid-area: slide;
-    position: relative;
-    /* Contain the visual's negative z-index so it paints behind the slide text
-       but still above the viewport's own surface colour. */
-    isolation: isolate;
-    display: flex;
+/* Which slide you are looking at, without competing with the headline. */
+.hero__caption {
+    position: absolute;
+    /* Clear of the floating WhatsApp button, which is fixed to this corner and
+       was sitting straight on top of both the caption and the next arrow. */
+    right: calc(var(--pad-x) + 4.5rem);
+    bottom: clamp(6.5rem, 15vh, 9rem);
+    display: none;
     flex-direction: column;
-    justify-content: flex-end;
-    gap: 0.65rem;
-    padding: clamp(1.5rem, 3vw, 2.25rem);
-    min-height: clamp(20rem, 46vw, 30rem);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.7s var(--ease), visibility 0.7s;
+    gap: 0.35rem;
+    text-align: right;
+    max-width: 18rem;
 }
 
-.slide.is-active { opacity: 1; visibility: visible; }
-
-/* No-JS: the first slide is shown and the rest are simply stacked below. */
-html:not(.js) .slide { opacity: 1; visibility: visible; }
-html:not(.js) .carousel__track { grid-template-areas: none; }
-html:not(.js) .carousel__controls { display: none; }
-
-.slide__visual {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-}
-
-/* Each slide gets its own abstract composition — no stock photos, no
-   fabricated screenshots, nothing implying client work we cannot prove. */
-.slide__visual::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(180deg, transparent 30%, rgba(10, 10, 10, 0.92) 92%),
-        radial-gradient(70% 60% at var(--vx, 70%) var(--vy, 25%), var(--vc, rgba(230, 74, 26, 0.5)), transparent 68%),
-        linear-gradient(150deg, #151515, #0C0C0C);
-}
-
-.slide__visual::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0.5;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-    background-size: 46px 46px;
-    mask-image: radial-gradient(75% 65% at 60% 35%, #000 20%, transparent 78%);
-    -webkit-mask-image: radial-gradient(75% 65% at 60% 35%, #000 20%, transparent 78%);
-}
-
-.slide__tag {
-    align-self: flex-start;
-    padding: 0.3rem 0.8rem;
-    border-radius: var(--r-pill);
-    background: rgba(10, 10, 10, 0.55);
-    border: 1px solid rgba(230, 74, 26, 0.5);
-    color: #FF8A5B;
+.hero__caption-tag {
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    color: #FF8A5B;
 }
 
-/* The slide sits on its own dark composition, so its text is light regardless
-   of the page theme. These cannot inherit the page tokens. */
-.slide h2, .slide h3 {
-    font-size: clamp(1.45rem, 1.1rem + 1.6vw, 2.1rem);
-    max-width: 18ch;
+.hero__caption-line {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+@media (min-width: 900px) {
+    .hero__caption { display: flex; }
+    .hero__slide.is-active .hero__caption { animation: caption-in 0.7s var(--ease) both; }
+}
+
+@keyframes caption-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* A secondary button that has to sit on media rather than on the page. */
+.btn--onmedia {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
     color: #FFFFFF;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-.slide p {
-    max-width: 44ch;
-    color: rgba(255, 255, 255, 0.78);
-    font-size: 0.95rem;
+.btn--onmedia:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: #FFFFFF;
 }
 
-.carousel__controls {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.1rem;
-}
-
-.carousel__dots { display: flex; gap: 0.5rem; margin-right: auto; }
-
-/* The visible bar is 4px, but a 4px tap target fails WCAG 2.5.8 (24x24) and is
-   genuinely hard to hit on a phone. The button keeps a full-height hit area and
-   paints the bar with a pseudo-element. */
-.carousel__dot {
-    position: relative;
-    width: 2rem;
-    height: 24px;
-    padding: 0;
-    background: none;
-    transition: width var(--dur) var(--ease);
-}
-
-.carousel__dot::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border-control);
-    transition: background-color var(--dur) var(--ease);
-}
-
-.carousel__dot[aria-current="true"] { width: 3rem; }
-.carousel__dot[aria-current="true"]::after { background: var(--brand-btn); }
-
-.carousel__arrow {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--border-control);
-    border-radius: 50%;
-    color: var(--text-muted);
-    transition: border-color var(--dur) var(--ease),
-                color var(--dur) var(--ease),
-                background-color var(--dur) var(--ease);
-}
-
-/* Autoplay pause. Required by WCAG 2.2.2, so it is a real control rather than a
-   hover behaviour, and it shows which state it is in. */
-.carousel__pause .carousel__play-icon { display: none; }
-.carousel__pause.is-paused .carousel__pause-icon { display: none; }
-.carousel__pause.is-paused .carousel__play-icon { display: block; }
-
-.carousel__pause.is-paused {
-    background: var(--brand-soft);
-    border-color: var(--border-brand);
-    color: var(--brand-ink);
-}
-
-.carousel__arrow:hover {
-    border-color: var(--border-brand);
-    color: var(--brand-ink);
-    background: var(--brand-soft);
+@media (max-width: 599px) {
+    .hero { min-height: auto; padding-block: 3rem 2rem; }
+    .hero__trust { gap: 0.5rem 1.1rem; font-size: 0.85rem; }
 }
 
 /* 8b. Services showcase
@@ -944,43 +921,163 @@ html:not(.js) .carousel__controls { display: none; }
     padding-top: 1rem;
 }
 
-.showcase__controls {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-}
 
-.showcase__dots { display: flex; gap: 0.5rem; margin-right: auto; flex-wrap: wrap; }
 
-/* Same reasoning as .carousel__dot: visible bar, hittable control. */
-.showcase__dot {
-    position: relative;
-    width: 1.75rem;
-    height: 24px;
-    padding: 0;
-    background: none;
-    transition: width var(--dur) var(--ease);
-}
-
-.showcase__dot::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border-control);
-    transition: background-color var(--dur) var(--ease);
-}
-
-.showcase__dot[aria-current="true"] { width: 2.75rem; }
-.showcase__dot[aria-current="true"]::after { background: var(--brand-btn); }
 
 @media (max-width: 560px) {
     .showcase__item { flex-direction: column; }
+}
+
+/* 8h. Slider controls
+   One control bar, shared by the hero carousel and the services showcase.
+   Previous on the left, position in the middle, next on the right — and the
+   middle never wraps, whatever the item count, which a row of fixed-width dots
+   could not promise.
+   ========================================================================== */
+
+.slider-controls {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 2vw, 0.9rem);
+    width: 100%;
+}
+
+.slider__arrow {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-control);
+    border-radius: 50%;
+    color: var(--text-muted);
+    transition: border-color var(--dur) var(--ease),
+                color var(--dur) var(--ease),
+                background-color var(--dur) var(--ease);
+}
+
+.slider__arrow:hover {
+    border-color: var(--border-brand);
+    color: var(--brand-ink);
+    background: var(--brand-soft);
+}
+
+/* Discrete segments — one per slide, each clickable. flex:1 means they share
+   whatever space is left between the arrows instead of overflowing it. */
+.slider__track {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.slider__seg {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 24px;
+    padding: 0;
+    background: none;
+    position: relative;
+}
+
+.slider__seg::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border-control);
+    transition: background-color var(--dur) var(--ease), height var(--dur) var(--ease);
+}
+
+.slider__seg[aria-current="true"]::after { background: var(--brand-btn); height: 4px; }
+.slider__seg:hover::after { background: var(--text-dim); }
+.slider__seg[aria-current="true"]:hover::after { background: var(--brand-btn); }
+
+/* Continuous track — for the scroll-snap showcase, where the item count is
+   open-ended and position matters more than direct access. */
+.slider__progress {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border-control);
+    overflow: hidden;
+}
+
+.slider__progress-fill {
+    display: block;
+    height: 100%;
+    width: 20%;
+    border-radius: 2px;
+    background: var(--brand-btn);
+    transition: width 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+.slider__pause {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-control);
+    border-radius: 50%;
+    color: var(--text-dim);
+    transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+                background-color var(--dur) var(--ease);
+}
+
+.slider__pause:hover { border-color: var(--border-brand); color: var(--brand-ink); }
+.slider__pause .slider__play-icon { display: none; }
+.slider__pause.is-paused .slider__pause-icon { display: none; }
+.slider__pause.is-paused .slider__play-icon { display: block; }
+
+.slider__pause.is-paused {
+    background: var(--brand-soft);
+    border-color: var(--border-brand);
+    color: var(--brand-ink);
+}
+
+/* Sitting on the dark hero media rather than on the page. */
+.slider-controls--onmedia .slider__arrow,
+.slider-controls--onmedia .slider__pause {
+    border-color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.slider-controls--onmedia .slider__arrow:hover,
+.slider-controls--onmedia .slider__pause:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+}
+
+.slider-controls--onmedia .slider__seg::after { background: rgba(255, 255, 255, 0.45); }
+.slider-controls--onmedia .slider__seg[aria-current="true"]::after { background: #FFFFFF; }
+.slider-controls--onmedia .slider__seg:hover::after { background: rgba(255, 255, 255, 0.75); }
+
+.showcase__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.1rem;
+}
+
+.showcase__position {
+    flex: 0 0 auto;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+}
+
+@media (max-width: 560px) {
+    .slider__arrow, .slider__pause { width: 40px; height: 40px; }
 }
 
 /* 8c. Section rhythm
@@ -1216,11 +1313,8 @@ html:not(.js) .carousel__controls { display: none; }
     width: 1.1rem;
     height: 1.1rem;
     flex-shrink: 0;
-    border-radius: 50%;
-    background-color: var(--brand-soft);
-    border: 1px solid var(--border-brand);
     background-image: var(--tick);
-    background-size: 64% 64%;
+    background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -1253,38 +1347,72 @@ html:not(.js) .carousel__controls { display: none; }
 .strip__item p { font-size: 0.9rem; color: var(--text-muted); }
 
 /* 10. Steps / process
+   A progression, not four stacked paragraphs. The numbers sit on a connecting
+   rail so the order is the first thing you read, and the rail runs horizontally
+   once there is room for the steps to sit side by side.
    ========================================================================== */
 
-.steps { counter-reset: step; }
+.steps { counter-reset: step; display: grid; gap: 1.75rem; }
 
-.step { position: relative; padding-left: 3.5rem; }
+.step {
+    position: relative;
+    padding-left: 3.75rem;
+    counter-increment: step;
+}
 
 .step::before {
-    counter-increment: step;
     content: counter(step, decimal-leading-zero);
     position: absolute;
     left: 0;
     top: 0;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--border-brand);
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 0.85rem;
     font-weight: 700;
+    letter-spacing: 0.02em;
     color: var(--brand-ink);
-    opacity: 0.85;
+    z-index: 1;
 }
 
+/* The rail. Vertical while the steps are stacked. */
 .step::after {
     content: "";
     position: absolute;
-    left: 1.05rem;
-    top: 2.1rem;
-    bottom: -1.25rem;
-    width: 1px;
-    background: linear-gradient(var(--border), transparent);
+    left: 1.25rem;
+    top: 2.5rem;
+    bottom: -1.75rem;
+    width: 2px;
+    background: linear-gradient(var(--border-brand), var(--border));
 }
 
 .step:last-child::after { display: none; }
-.step h3 { margin-bottom: 0.35rem; }
-.step p { color: var(--text-muted); }
+
+.step h3 { margin-bottom: 0.35rem; font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem); }
+.step p { color: var(--text-muted); font-size: 0.95rem; }
+
+@media (min-width: 900px) {
+    .steps { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+
+    .step { padding-left: 0; padding-top: 3.75rem; }
+    .step::before { top: 0; left: 0; }
+
+    /* Horizontal rail, running from each number to the next. */
+    .step::after {
+        left: 2.5rem;
+        top: 1.25rem;
+        bottom: auto;
+        right: -2rem;
+        width: auto;
+        height: 2px;
+        background: linear-gradient(90deg, var(--border-brand), var(--border));
+    }
+}
 
 /* 11. Packages
    ========================================================================== */
@@ -1370,11 +1498,8 @@ html:not(.js) .carousel__controls { display: none; }
     width: 1.15rem;
     height: 1.15rem;
     margin-top: 0.22rem;
-    border-radius: 50%;
-    background-color: var(--brand-soft);
-    border: 1px solid var(--border-brand);
     background-image: var(--tick);
-    background-size: 64% 64%;
+    background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -1438,11 +1563,8 @@ html:not(.js) .carousel__controls { display: none; }
     width: 1.05rem;
     height: 1.05rem;
     margin-top: 0.22rem;
-    border-radius: 50%;
-    background-color: var(--brand-soft);
-    border: 1px solid var(--border-brand);
     background-image: var(--tick);
-    background-size: 64% 64%;
+    background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -1890,14 +2012,11 @@ html:not(.js) .carousel__controls { display: none; }
 /* The tick is the meaning, so it is a shape rather than colour alone. */
 .cell-tick {
     display: inline-block;
-    width: 1.15rem;
-    height: 1.15rem;
-    vertical-align: -0.2rem;
-    border-radius: 50%;
-    background-color: var(--brand-soft);
-    border: 1px solid var(--border-brand);
+    width: 1.05rem;
+    height: 1.05rem;
+    vertical-align: -0.16rem;
     background-image: var(--tick);
-    background-size: 64% 64%;
+    background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -2075,6 +2194,50 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
 .page-head .lead { margin-bottom: 0; }
 .page-head .btn-row { margin-top: 1.85rem; }
 
+/* A page head that fills the width instead of leaving half the screen blank.
+   The heading keeps a readable measure; the space beside it carries something
+   worth reading rather than nothing at all. */
+.page-head__grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+}
+
+@media (min-width: 900px) {
+    .page-head__grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+}
+
+.page-head__aside {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.4rem, 2.5vw, 2rem);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+}
+
+.page-head__figure {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 2.9rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.page-head__figure small {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+}
+
+.page-head__aside .checklist li { font-size: 0.925rem; }
+
 .breadcrumbs {
     display: flex;
     flex-wrap: wrap;
@@ -2098,6 +2261,16 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     .split { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
     .split--reverse > :first-child { order: 2; }
 }
+
+/* A card beside its own explanation, rather than one card stretched across a
+   three-column grid. */
+.split--card { align-items: start; }
+
+@media (min-width: 900px) {
+    .split--card { grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); }
+}
+
+.split--card .prose h3 { margin-bottom: 0.6rem; }
 
 .panel {
     padding: clamp(1.4rem, 2.5vw, 2rem);
@@ -2123,14 +2296,20 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     width: 1.15rem;
     height: 1.15rem;
     margin-top: 0.22rem;
-    border-radius: 50%;
-    background-color: var(--brand-soft);
-    border: 1px solid var(--border-brand);
     background-image: var(--tick);
-    background-size: 64% 64%;
+    background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
+
+/* A checklist that spreads across the width instead of running down one narrow
+   column with the rest of the row empty. */
+.checklist--grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: 1rem 2rem;
+}
+
+.checklist--grid li { font-size: 1rem; color: var(--text); }
 
 .contact-methods { display: grid; gap: 0.75rem; }
 
@@ -2302,6 +2481,16 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     border-radius: 50%;
     box-shadow: var(--shadow-lg);
     transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+
+/* On a phone the reading column is the whole screen, so a button floating over
+   the left of it sits squarely on the words. Back-to-top is the one that can
+   go: phones already have their own way back up (tapping the status bar on
+   iOS, and the address bar on Android), whereas the WhatsApp button is the
+   conversion path and earns its place. */
+@media (max-width: 767px) {
+    .floats--left { display: none; }
+    .float-btn { width: 48px; height: 48px; }
 }
 
 .float-btn:hover { transform: translateY(-3px) scale(1.04); }
@@ -2506,25 +2695,19 @@ html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 3
 
 @media (min-width: 640px) {
     .mockups { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
-    .steps { display: grid; gap: 2rem; }
 }
 
 @media (min-width: 900px) {
-    .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
-    .steps { grid-template-columns: repeat(2, 1fr); }
-    .step::after { display: none; }
 }
 
-/* 1180, not 1060: with eight items the header row genuinely needs that much,
-   and below it the overflow reappears. The mobile overlay carries the same
-   eight links, so nothing is lost by handing over earlier.
+/* Back down to 1000 now the bar carries five links instead of eight. Measured,
+   not guessed: the row needs about 900px, so this leaves headroom.
    Keep in step with the matchMedia query in main.js. */
-@media (min-width: 1180px) {
+@media (min-width: 1000px) {
     .nav { display: flex; }
     .header__actions { display: flex; }
     .menu-toggle { display: none; }
     .mobile-nav { display: none; }
-    .steps { grid-template-columns: repeat(4, 1fr); }
     .footer__top { grid-template-columns: 1.6fr 1fr 1fr 1.4fr; }
 }
 
@@ -2577,8 +2760,8 @@ html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 3
     .cell-tick,
     .checklist li::before { border: 1px solid CanvasText; }
 
-    .carousel__dot[aria-current="true"],
-    .showcase__dot[aria-current="true"] { outline: 2px solid Highlight; }
+    .slider__seg[aria-current="true"]::after { outline: 2px solid Highlight; }
+    .slider__progress-fill { outline: 1px solid Highlight; }
 
     /* box-shadow is dropped entirely; the outline underneath is what survives. */
     :focus-visible { outline: 3px solid Highlight; outline-offset: 2px; }

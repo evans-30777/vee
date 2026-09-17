@@ -238,7 +238,10 @@ class PublicPageTests(TestCase):
     def test_first_hero_slide_is_active_without_javascript(self):
         """The carousel is progressive enhancement: slide one must render on its own."""
         response = self.client.get(reverse("core:home"))
-        self.assertContains(response, 'class="slide is-active"')
+        self.assertContains(response, "hero__slide is-active")
+        # Every slide must also be visible with no JS at all, rather than four
+        # of them sitting hidden behind a script that may never run.
+        self.assertContains(response, "hero__slide", count=6)
 
     def test_home_exposes_faq_schema_for_answer_engines(self):
         response = self.client.get(reverse("core:home"))

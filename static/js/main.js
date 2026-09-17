@@ -124,7 +124,7 @@
 
         // The overlay is a mobile affordance; a resize to desktop must reset it.
         // Must match the nav breakpoint in main.css.
-        var desktop = window.matchMedia("(min-width: 1180px)");
+        var desktop = window.matchMedia("(min-width: 1000px)");
         if (desktop.addEventListener) {
             desktop.addEventListener("change", function (event) {
                 if (event.matches) close(false);
@@ -190,6 +190,7 @@
 
         var index = 0;
         var timer = null;
+        var heroResume = null;
         var INTERVAL = 6000;
 
         function show(nextIndex) {
@@ -242,7 +243,14 @@
             if (event.key === "ArrowRight") { event.preventDefault(); goTo(index + 1); }
         });
 
-        // Autoplay must never fight the user: pause on hover, focus, or a hidden tab.
+        // Autoplay must never fight the user: pause on hover, focus, or a hidden
+        // tab — and on touch, where hover events never arrive, resume on a timer
+        // rather than stopping for good.
+        carousel.addEventListener("pointerdown", function () {
+            stop();
+            if (heroResume) window.clearTimeout(heroResume);
+            heroResume = window.setTimeout(start, 9000);
+        });
         carousel.addEventListener("mouseenter", stop);
         carousel.addEventListener("mouseleave", start);
         carousel.addEventListener("focusin", stop);
@@ -265,7 +273,9 @@
         var viewport = showcase.querySelector("[data-showcase-viewport]");
         var items = Array.prototype.slice.call(showcase.querySelectorAll("[data-showcase-item]"));
         var controls = showcase.querySelector("[data-showcase-controls]");
-        var dots = Array.prototype.slice.call(showcase.querySelectorAll("[data-showcase-dot]"));
+        var progress = showcase.querySelector("[data-showcase-progress]");
+        var progressFill = showcase.querySelector("[data-showcase-progress-fill]");
+        var position = showcase.querySelector("[data-showcase-position]");
         var prev = showcase.querySelector("[data-showcase-prev]");
         var next = showcase.querySelector("[data-showcase-next]");
         if (!viewport || items.length < 2) return;
@@ -277,6 +287,9 @@
         var index = 0;
         var timer = null;
         var INTERVAL = 5000;
+        // Long enough not to yank the card away from someone mid-read, short
+        // enough that the section is clearly still alive.
+        var RESUME_AFTER = 9000;
 
         function scrollToIndex(i) {
             index = (i + items.length) % items.length;
@@ -291,11 +304,25 @@
         }
 
         function paint() {
-            dots.forEach(function (dot, i) {
-                dot.setAttribute("aria-current", i === index ? "true" : "false");
-                dot.setAttribute("tabindex", i === index ? "0" : "-1");
-            });
+            var share = 100 / items.length;
+            if (progressFill) {
+                progressFill.style.width = share + "%";
+                progressFill.style.transform = "translateX(" + (index * 100) + "%)";
+            }
+            if (progress) {
+                progress.setAttribute("aria-valuemax", String(items.length));
+                progress.setAttribute("aria-valuenow", String(index + 1));
+                progress.setAttribute(
+                    "aria-valuetext",
+                    (index + 1) + " of " + items.length
+                );
+            }
+            if (position) {
+                position.textContent = pad(index + 1) + " / " + pad(items.length);
+            }
         }
+
+        function pad(n) { return n < 10 ? "0" + n : String(n); }
 
         // Keep the dots honest when the user swipes or scrolls by hand.
         var scrollTick = false;
@@ -330,9 +357,6 @@
 
         pause = buildPauseControl(showcase, { start: start, stop: stop });
 
-        dots.forEach(function (dot, i) {
-            dot.addEventListener("click", function () { scrollToIndex(i); start(); });
-        });
         if (prev) prev.addEventListener("click", function () { scrollToIndex(index - 1); start(); });
         if (next) next.addEventListener("click", function () { scrollToIndex(index + 1); start(); });
 
@@ -342,13 +366,28 @@
         });
 
         // Never fight the user, and never animate a tab nobody is looking at.
+        //
+        // On a touch screen `mouseenter`/`mouseleave` never fire, so a pause on
+        // interaction had nothing to un-pause it: one tap or swipe anywhere on
+        // the showcase stopped the auto-advance for the rest of the visit. It
+        // now resumes on a timer after the interaction ends, which is what
+        // "it should slide by itself" actually requires.
+        var resumeTimer = null;
+
+        function pauseBriefly() {
+            stop();
+            if (resumeTimer) window.clearTimeout(resumeTimer);
+            resumeTimer = window.setTimeout(start, RESUME_AFTER);
+        }
+
         showcase.addEventListener("mouseenter", stop);
         showcase.addEventListener("mouseleave", start);
         showcase.addEventListener("focusin", stop);
         showcase.addEventListener("focusout", function (event) {
             if (!showcase.contains(event.relatedTarget)) start();
         });
-        viewport.addEventListener("pointerdown", stop);
+        viewport.addEventListener("pointerdown", pauseBriefly);
+        viewport.addEventListener("touchend", pauseBriefly, { passive: true });
         document.addEventListener("visibilitychange", function () {
             if (document.hidden) stop(); else start();
         });
@@ -405,7 +444,14 @@
         var ticking = false;
 
         function update() {
-            button.classList.toggle("is-visible", window.scrollY > window.innerHeight * 0.8);
+            // Only once there is a real journey to undo. At 0.8 of a viewport it
+            // appeared almost immediately and then sat over the text.
+            var scrolled = window.scrollY;
+            var total = document.documentElement.scrollHeight - window.innerHeight;
+            button.classList.toggle(
+                "is-visible",
+                scrolled > window.innerHeight * 1.8 && total > window.innerHeight
+            );
             ticking = false;
         }
 

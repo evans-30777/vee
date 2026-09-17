@@ -29,47 +29,72 @@
             <li><a href="{% url 'core:home' %}">Home</a></li>
             <li aria-current="page">Web Development</li>
         </ol>
-        <p class="eyebrow">Website design &amp; development · Kenya</p>
-        <h1>A website that <span class="accent">earns its cost</span></h1>
-        <p class="lead">
-            Custom websites built to bring in enquiries — designed mobile-first and structured
-            for SEO, AEO and GEO from day one. For businesses in Nairobi, Machakos, Kajiado,
-            Kiambu and across Kenya.
-        </p>
-        <div class="btn-row">
-            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get a quote for my website</a>
-            {% if site_settings %}
-            <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question</a>
+
+        {% comment %}
+        Two columns rather than a left-hand text column with the right half of
+        the screen empty. The price is the first thing people want from this
+        page, so it goes beside the headline instead of a scroll further down.
+        {% endcomment %}
+        <div class="page-head__grid">
+            <div>
+                <p class="eyebrow">Website design &amp; development · Kenya</p>
+                <h1>A website that <span class="accent">earns its cost</span></h1>
+                <p class="lead">
+                    Custom websites built to bring in enquiries — designed mobile-first and
+                    structured for SEO, AEO and GEO from day one. For businesses in Nairobi,
+                    Machakos, Kajiado, Kiambu and across Kenya.
+                </p>
+                <div class="btn-row">
+                    <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}?service=website">Get a quote for my website</a>
+                    {% if site_settings %}
+                    <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if website_package %}
+            <aside class="page-head__aside">
+                <p class="eyebrow">What it costs</p>
+                <p class="page-head__figure">
+                    {% if website_package.price_is_from %}<small>from</small>{% endif %}
+                    KES&nbsp;{{ website_package.price|floatformat:0|intcomma }}
+                </p>
+                <ul class="checklist">
+                    <li>Complete, search-ready website</li>
+                    <li>Scope and price agreed in writing first</li>
+                    <li>Bigger builds quoted individually</li>
+                </ul>
+            </aside>
             {% endif %}
         </div>
     </div>
 </section>
 
-{% if website_package %}
-<section class="section">
-    <div class="container split">
-        <div>
-            <p class="eyebrow">Investment</p>
-            <p class="package__amount" style="margin:.5rem 0 .75rem">
-                {% if website_package.price_is_from %}<span class="package__period">from</span> {% endif %}KES&nbsp;{{ website_package.price|floatformat:0|intcomma }}
-            </p>
-            {% if website_package.short_description %}<p class="lead">{{ website_package.short_description }}</p>{% endif %}
-            <p class="muted" style="margin-top:1rem">
-                That base covers a complete, professional, search-ready website. Larger builds —
-                an e-commerce store with a full catalogue, or a hotel with a booking system —
-                are quoted individually, because the work genuinely is bigger. You get that
-                number in writing before anything starts.
+{% if website_package.features %}
+{% comment %}
+The price now sits in the page head, so this section carries what you get for
+it rather than repeating the number underneath itself.
+{% endcomment %}
+<section class="section section--tinted">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="eyebrow">What you get</p>
+            <h2>Every website includes</h2>
+            <p class="lead">
+                Not a list of features for their own sake — each of these is something that
+                decides whether the site brings in enquiries or just exists.
             </p>
         </div>
 
-        {% if website_package.features %}
-        <aside class="panel">
-            <h2>Every website includes</h2>
-            <ul class="checklist">
-                {% for feature in website_package.features %}<li>{{ feature }}</li>{% endfor %}
-            </ul>
-        </aside>
-        {% endif %}
+        <ul class="checklist checklist--grid reveal-group">
+            {% for feature in website_package.features %}<li>{{ feature }}</li>{% endfor %}
+        </ul>
+
+        <p class="muted" style="margin-top:2rem; max-width:62ch">
+            Larger builds — an e-commerce store with a full catalogue, or a hotel with a
+            booking system — are quoted individually, because the work genuinely is bigger.
+            You get that number in writing before anything starts.
+        </p>
     </div>
 </section>
 {% endif %}

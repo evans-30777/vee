@@ -188,8 +188,32 @@ is why this is a matrix and not three lists. See apps/packages/comparison.py.
             <p class="lead">Defined pieces of work with a start and a finish — no ongoing commitment.</p>
         </div>
 
-        <div class="grid grid--3 reveal-group">
+        {% comment %}
+        A three-column grid holding one card stretched it across the full width,
+        leaving a six-item list and an enormous button adrift in white space.
+        The card now keeps a card's proportions, and the space beside it answers
+        the question that follows it.
+        {% endcomment %}
+        <div class="split split--card reveal-group">
             {% for package in one_time_packages %}{% include "partials/package_card.html" %}{% endfor %}
+
+            <div class="prose">
+                <h3>What decides the price</h3>
+                <p>
+                    KES 30,000 covers a complete, professional, search-ready website. What moves
+                    it above that is scope, not page count: an e-commerce store needs product
+                    management, a cart and checkout; a hotel needs availability logic. Those are
+                    extra systems, not extra pages.
+                </p>
+                <p>
+                    Whichever it is, you get the number in writing before anything starts.
+                </p>
+                <p>
+                    <a class="btn btn--ghost" href="{% url 'core:web_development' %}">
+                        See how each type is built <span class="btn__arrow">&rarr;</span>
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 </section>

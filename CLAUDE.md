@@ -123,8 +123,22 @@ architecture that came out of it, which later work must not undo:
   Update the date when you change the wording; never render `{% now %}`.
 - **Tests run against a dummy cache** because LocMemCache is not rolled back
   between tests. `SiteSettingsCacheTests` opts back in to cover the caching.
-- **The desktop nav breakpoint is 1180px**, in both `main.css` and the
-  matchMedia query in `main.js`. Keep them in step.
+- **The top bar carries five links** — Services, Packages, Web Development,
+  Blog, Contact (owner, 2026-09-17). The logo is the route home; About and
+  Areas We Serve live in the footer and in the mobile overlay. Adding a sixth
+  brings back the crowding this was meant to fix.
+- **The desktop nav breakpoint is 1000px**, in both `main.css` and the
+  matchMedia query in `main.js`. Keep them in step, and re-measure if the
+  number of links ever changes.
+- **The hero is full-bleed media with the copy over it**, after the recordings
+  in `nvidia inspiration/`. `.hero__visual` is a CSS stand-in: replace it with
+  a `<video>` or `<img>` and nothing else needs to move. The headline is fixed
+  and only the media rotates — five rotating `h2`s used to pollute the outline.
+- **Included markers are bare green ticks, never circled** (owner,
+  2026-09-17). `--tick` and `--tick-ink` carry this; the peach disc is gone.
+- **Slider controls are one shared component**: previous, position, next, then
+  pause. The position element must be able to take any width — a row of
+  fixed-width dots wrapped onto two lines on a phone.
 
 Still needed from the owner: Facebook and Instagram URLs, bio and headshot;
 a lawyer's review of the four legal documents; a decision on contract length,

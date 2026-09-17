@@ -47,10 +47,93 @@
 
 {% block content %}
 
-{# ---------------------------------------------------------------- Hero #}
-<section class="hero">
-    <div class="container hero__grid">
-        <div class="hero__copy reveal">
+{% comment %}
+---------------------------------------------------------------------- Hero
+
+Full-bleed media with the copy laid over it, after the NVIDIA reference in
+`nvidia inspiration/`. The media is the point, so it gets the whole width and
+most of the viewport height rather than half a column.
+
+The headline is fixed and the media rotates beneath it. Previously each slide
+carried its own h2, which meant five rotating headings in the document outline
+above the page's real first heading, and four of them invisible at any moment.
+What each slide is about now rides in a small caption instead.
+{% endcomment %}
+<section class="hero" data-carousel role="region"
+         aria-roledescription="carousel" aria-label="What VEE Agency does">
+    <div class="hero__media">
+        <div class="hero__slides">
+                <article class="hero__slide is-active" data-slide
+                         role="group" aria-roledescription="slide" aria-label="1 of 5: Web Development">
+                    {% comment %}
+                    The visual is a CSS composition standing in for real media.
+                    Swap this span for a <video> or <img> and nothing else needs
+                    to change — the slide is already sized and scrimmed for it.
+                    {% endcomment %}
+                    <span class="hero__visual" style="--vx:72%; --vy:22%; --vc:rgba(230,74,26,.55)" aria-hidden="true"></span>
+                    <p class="hero__caption">
+                        <span class="hero__caption-tag">Web Development</span>
+                        <span class="hero__caption-line">Websites built to sell</span>
+                    </p>
+                </article>
+                <article class="hero__slide" data-slide
+                         role="group" aria-roledescription="slide" aria-label="2 of 5: SEO and AEO">
+                    {% comment %}
+                    The visual is a CSS composition standing in for real media.
+                    Swap this span for a <video> or <img> and nothing else needs
+                    to change — the slide is already sized and scrimmed for it.
+                    {% endcomment %}
+                    <span class="hero__visual" style="--vx:28%; --vy:30%; --vc:rgba(136,0,0,.65)" aria-hidden="true"></span>
+                    <p class="hero__caption">
+                        <span class="hero__caption-tag">SEO &amp; AEO</span>
+                        <span class="hero__caption-line">Found when Kenya searches</span>
+                    </p>
+                </article>
+                <article class="hero__slide" data-slide
+                         role="group" aria-roledescription="slide" aria-label="3 of 5: Google Business Profile">
+                    {% comment %}
+                    The visual is a CSS composition standing in for real media.
+                    Swap this span for a <video> or <img> and nothing else needs
+                    to change — the slide is already sized and scrimmed for it.
+                    {% endcomment %}
+                    <span class="hero__visual" style="--vx:80%; --vy:70%; --vc:rgba(230,74,26,.45)" aria-hidden="true"></span>
+                    <p class="hero__caption">
+                        <span class="hero__caption-tag">Google Business Profile</span>
+                        <span class="hero__caption-line">Your spot on the map</span>
+                    </p>
+                </article>
+                <article class="hero__slide" data-slide
+                         role="group" aria-roledescription="slide" aria-label="4 of 5: Social Media">
+                    {% comment %}
+                    The visual is a CSS composition standing in for real media.
+                    Swap this span for a <video> or <img> and nothing else needs
+                    to change — the slide is already sized and scrimmed for it.
+                    {% endcomment %}
+                    <span class="hero__visual" style="--vx:20%; --vy:70%; --vc:rgba(255,99,51,.5)" aria-hidden="true"></span>
+                    <p class="hero__caption">
+                        <span class="hero__caption-tag">Social Media</span>
+                        <span class="hero__caption-line">Consistent and credible</span>
+                    </p>
+                </article>
+                <article class="hero__slide" data-slide
+                         role="group" aria-roledescription="slide" aria-label="5 of 5: Digital Ad Campaigns">
+                    {% comment %}
+                    The visual is a CSS composition standing in for real media.
+                    Swap this span for a <video> or <img> and nothing else needs
+                    to change — the slide is already sized and scrimmed for it.
+                    {% endcomment %}
+                    <span class="hero__visual" style="--vx:50%; --vy:18%; --vc:rgba(136,0,0,.7)" aria-hidden="true"></span>
+                    <p class="hero__caption">
+                        <span class="hero__caption-tag">Digital Ad Campaigns</span>
+                        <span class="hero__caption-line">Spend that brings buyers</span>
+                    </p>
+                </article>
+        </div>
+        <span class="hero__scrim" aria-hidden="true"></span>
+    </div>
+
+    <div class="hero__inner container">
+        <div class="hero__copy">
             <p class="eyebrow">Digital Growth Agency · Kenya</p>
             <h1>Get found. Build trust. <span class="accent">Grow online.</span></h1>
             <p class="lead">
@@ -62,7 +145,7 @@
             <div class="btn-row">
                 <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Get my free audit</a>
                 {% if site_settings %}
-                <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+                <a class="btn btn--onmedia btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
                 {% endif %}
             </div>
 
@@ -73,79 +156,33 @@
             </ul>
         </div>
 
-        {% comment %}
-        Slides describe what VEE offers. They are deliberately abstract — no stock
-        photography and nothing that implies client work.
-        {% endcomment %}
-        <div class="carousel reveal" data-carousel role="region" aria-roledescription="carousel" aria-label="What VEE Agency does">
-            <div class="carousel__viewport">
-                <div class="carousel__track">
-                    <article class="slide is-active" data-slide role="group" aria-roledescription="slide" aria-label="1 of 5">
-                        <span class="slide__visual" style="--vx:72%; --vy:22%; --vc:rgba(230,74,26,.55)" aria-hidden="true"></span>
-                        <span class="slide__tag">Web Development</span>
-                        <h2>Websites built to sell, not just to exist</h2>
-                        <p>Fast, mobile-first sites for Kenyan businesses — portfolio, e-commerce or booking — structured for search from day one.</p>
-                    </article>
+        <div class="slider-controls slider-controls--onmedia">
+            <button class="slider__arrow" data-carousel-prev type="button" aria-label="Previous slide">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
 
-                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="2 of 5">
-                        <span class="slide__visual" style="--vx:28%; --vy:30%; --vc:rgba(136,0,0,.65)" aria-hidden="true"></span>
-                        <span class="slide__tag">SEO &amp; AEO</span>
-                        <h2>Be the answer when Nairobi searches</h2>
-                        <p>Optimised for Google and for AI answer engines, so your business is the one that gets named.</p>
-                    </article>
-
-                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="3 of 5">
-                        <span class="slide__visual" style="--vx:80%; --vy:70%; --vc:rgba(230,74,26,.45)" aria-hidden="true"></span>
-                        <span class="slide__tag">Google Business Profile</span>
-                        <h2>Own your spot on the map</h2>
-                        <p>A complete, active Google profile so nearby customers in Machakos, Kajiado and Kiambu find you first.</p>
-                    </article>
-
-                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="4 of 5">
-                        <span class="slide__visual" style="--vx:20%; --vy:70%; --vc:rgba(255,99,51,.5)" aria-hidden="true"></span>
-                        <span class="slide__tag">Social Media</span>
-                        <h2>Show up consistently, look professional</h2>
-                        <p>Planned content and managed pages that keep your brand credible between enquiries.</p>
-                    </article>
-
-                    <article class="slide" data-slide role="group" aria-roledescription="slide" aria-label="5 of 5">
-                        <span class="slide__visual" style="--vx:50%; --vy:18%; --vc:rgba(136,0,0,.7)" aria-hidden="true"></span>
-                        <span class="slide__tag">Digital Ad Campaigns</span>
-                        <h2>Spend that brings buyers, not noise</h2>
-                        <p>Targeted campaigns aimed at the counties and customers that actually convert for your business.</p>
-                    </article>
-                </div>
+            <div class="slider__track" aria-label="Choose slide">
+                <button class="slider__seg" data-dot type="button" aria-current="true" aria-label="Web Development"></button>
+                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="SEO and AEO"></button>
+                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="Google Business Profile"></button>
+                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="Social Media"></button>
+                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="Digital Ad Campaigns"></button>
             </div>
 
-            <div class="carousel__controls">
-                {% comment %}
-                Plain buttons, not tabs: the slides are role="group" with no
-                tabpanel, so a tablist described a relationship that did not exist.
-                {% endcomment %}
-                <div class="carousel__dots" aria-label="Choose slide">
-                    <button class="carousel__dot" data-dot type="button" aria-current="true" aria-label="Web Development"></button>
-                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="SEO and AEO"></button>
-                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="Google Business Profile"></button>
-                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="Social Media"></button>
-                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="Digital Ad Campaigns"></button>
-                </div>
-                <button class="carousel__arrow carousel__pause" data-autoplay-toggle type="button"
-                        hidden aria-pressed="false" aria-label="Pause automatic sliding">
-                    <svg class="carousel__pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                        <rect x="6.5" y="4.5" width="4" height="15" rx="1.3"/>
-                        <rect x="13.5" y="4.5" width="4" height="15" rx="1.3"/>
-                    </svg>
-                    <svg class="carousel__play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                        <path d="M7.5 5.2a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 7.5 15.8Z"/>
-                    </svg>
-                </button>
-                <button class="carousel__arrow" data-carousel-prev type="button" aria-label="Previous slide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-                </button>
-                <button class="carousel__arrow" data-carousel-next type="button" aria-label="Next slide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-                </button>
-            </div>
+            <button class="slider__arrow" data-carousel-next type="button" aria-label="Next slide">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+
+            <button class="slider__pause" data-autoplay-toggle type="button"
+                    hidden aria-pressed="false" aria-label="Pause automatic sliding">
+                <svg class="slider__pause-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                    <rect x="6.5" y="4.5" width="4" height="15" rx="1.3"/>
+                    <rect x="13.5" y="4.5" width="4" height="15" rx="1.3"/>
+                </svg>
+                <svg class="slider__play-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                    <path d="M7.5 5.2a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 7.5 15.8Z"/>
+                </svg>
+            </button>
         </div>
     </div>
 </section>
@@ -245,30 +282,40 @@ describes what is verifiably true of the situation instead.
             {% endfor %}
         </div>
 
+        {% comment %}
+        A continuous progress track rather than one dot per service. Seven dots
+        wrapped onto a second line on a phone; a track reflects position however
+        many services there are, and cannot wrap at all.
+        {% endcomment %}
         <div class="container showcase__controls" data-showcase-controls hidden>
-            <div class="showcase__dots" aria-label="Choose service">
-                {% for service in services %}
-                <button class="showcase__dot" data-showcase-dot type="button"
-                        aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
-                        aria-label="{{ service.name }}"></button>
-                {% endfor %}
+            <div class="slider-controls">
+                <button class="slider__arrow" data-showcase-prev type="button" aria-label="Previous service">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+
+                <div class="slider__progress" data-showcase-progress
+                     role="progressbar" aria-label="Position in the service list"
+                     aria-valuemin="1" aria-valuemax="1" aria-valuenow="1">
+                    <span class="slider__progress-fill" data-showcase-progress-fill></span>
+                </div>
+
+                <button class="slider__arrow" data-showcase-next type="button" aria-label="Next service">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+
+                <button class="slider__pause" data-autoplay-toggle type="button"
+                        hidden aria-pressed="false" aria-label="Pause automatic sliding">
+                    <svg class="slider__pause-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <rect x="6.5" y="4.5" width="4" height="15" rx="1.3"/>
+                        <rect x="13.5" y="4.5" width="4" height="15" rx="1.3"/>
+                    </svg>
+                    <svg class="slider__play-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M7.5 5.2a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 7.5 15.8Z"/>
+                    </svg>
+                </button>
             </div>
-            <button class="carousel__arrow carousel__pause" data-autoplay-toggle type="button"
-                    hidden aria-pressed="false" aria-label="Pause automatic sliding">
-                <svg class="carousel__pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                    <rect x="6.5" y="4.5" width="4" height="15" rx="1.3"/>
-                    <rect x="13.5" y="4.5" width="4" height="15" rx="1.3"/>
-                </svg>
-                <svg class="carousel__play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                    <path d="M7.5 5.2a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 7.5 15.8Z"/>
-                </svg>
-            </button>
-            <button class="carousel__arrow" data-showcase-prev type="button" aria-label="Previous service">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <button class="carousel__arrow" data-showcase-next type="button" aria-label="Next service">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
+
+            <p class="showcase__position" data-showcase-position aria-live="polite"></p>
         </div>
     </div>
 </section>

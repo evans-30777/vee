@@ -7,15 +7,17 @@
             <span>VEE<span class="text-brand">.</span>Agency</span>
         </a>
 
+        {% comment %}
+        Five links, owner's choice (2026-09-17). The bar was carrying eight plus
+        two buttons, which read as a sitemap rather than a route through the
+        site. The home page is reached by the logo, and About and Areas We Serve
+        live in the footer — neither is what a visitor comes here to do.
+        {% endcomment %}
         <nav class="nav" aria-label="Main">
-            <a href="{% url 'core:home' %}"{% if ns == 'core' and un == 'home' %} aria-current="page"{% endif %}>Home</a>
             <a href="{% url 'services:list' %}"{% if ns == 'services' %} aria-current="page"{% endif %}>Services</a>
             <a href="{% url 'packages:list' %}"{% if ns == 'packages' %} aria-current="page"{% endif %}>Packages</a>
             <a href="{% url 'core:web_development' %}"{% if un == 'web_development' %} aria-current="page"{% endif %}>Web Development</a>
-            <a href="{% url 'core:about' %}"{% if un == 'about' %} aria-current="page"{% endif %}>About</a>
             <a href="{% url 'blog:list' %}"{% if ns == 'blog' %} aria-current="page"{% endif %}>Blog</a>
-            {# Was mobile-only, which hid the local landing pages on the device most research happens on. #}
-            <a href="{% url 'locations:list' %}"{% if ns == 'locations' %} aria-current="page"{% endif %}>Areas We Serve</a>
             <a href="{% url 'contact:contact' %}"{% if ns == 'contact' %} aria-current="page"{% endif %}>Contact</a>
         </nav>
 
@@ -42,6 +44,10 @@
 </header>
 
 <div class="mobile-nav" id="mobile-nav" data-mobile-nav>
+    {% comment %}
+    The overlay keeps the full set. It has the room, and on a phone it is the
+    only route to the pages the top bar no longer carries.
+    {% endcomment %}
     <nav class="mobile-nav__links" aria-label="Mobile">
         <a href="{% url 'core:home' %}"{% if ns == 'core' and un == 'home' %} aria-current="page"{% endif %}>Home</a>
         <a href="{% url 'services:list' %}"{% if ns == 'services' %} aria-current="page"{% endif %}>Services</a>
