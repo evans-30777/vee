@@ -1,0 +1,52 @@
+# Render blueprint — STAGING ONLY.
+#
+# This is the test deployment. Production is HostAfrica (see DEPLOYMENT.md).
+# It deliberately runs the real production settings module so that what gets
+# tested here is what ships there — the only differences are supplied through
+# the environment below.
+services:
+  - type: web
+    name: vee-agency-staging
+    runtime: python
+    plan: starter        # A persistent disk is not available on the free plan.
+    region: frankfurt    # Closest Render region to Kenya.
+    branch: main
+    buildCommand: "./render-build.sh"
+    startCommand: "gunicorn veeagency.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 60"
+
+    # SQLite serialises writes, so extra workers buy nothing on writes and only
+    # increase lock contention. Two workers with threads suits a read-heavy site.
+
+    disk:
+      # Without this the filesystem is ephemeral: the database and every
+      # uploaded image would be wiped on each deploy and restart.
+      name: vee-data
+      mountPath: /var/data
+      sizeGB: 1
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.15"
+
+      - key: DJANGO_SETTINGS_MODULE
+        value: veeagency.settings.prod
+
+      - key: DJANGO_SECRET_KEY
+        generateValue: true          # Render generates it; never in the repo.
+
+      - key: SITE_IS_STAGING
+        value: "true"                # noindex + robots Disallow + staging banner.
+
+      # Both live on the persistent disk, so they survive deploys.
+      - key: SQLITE_PATH
+        value: /var/data/db.sqlite3
+      - key: MEDIA_ROOT
+        value: /var/data/media
+
+      # ALLOWED_HOSTS, the CSRF origin and SITE_BASE_URL are derived
+      # automatically from RENDER_EXTERNAL_HOSTNAME, which Render sets for you.
+      # Nothing to fill in for the site to come up on its .onrender.com URL.
+      #
+      # Add these in the Render dashboard only when you want to test enquiry
+      # emails end to end:
+      #   EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD

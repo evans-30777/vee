@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.packages.models import Package
@@ -34,6 +34,55 @@ class SiteSettingsTests(TestCase):
             with self.subTest(entered=entered):
                 settings_obj = SiteSettings(phone_calls=entered)
                 self.assertEqual(settings_obj.phone_calls_e164, "+254717115737")
+
+
+class StagingModeTests(TestCase):
+    """A public test copy must never be indexable.
+
+    Left crawlable it competes with the live site as duplicate content, which is
+    expensive to undo once Google has indexed it.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+
+    @override_settings(SITE_IS_STAGING=True)
+    def test_every_page_sends_noindex_in_staging(self):
+        for url in [
+            reverse("core:home"),
+            reverse("core:about"),
+            reverse("core:web_development"),
+            reverse("packages:list"),
+            reverse("contact:contact"),
+        ]:
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertTrue(response.context["noindex"])
+                self.assertContains(response, "noindex")
+
+    @override_settings(SITE_IS_STAGING=True)
+    def test_robots_disallows_everything_in_staging(self):
+        response = self.client.get("/robots.txt")
+        self.assertContains(response, "Disallow: /")
+        # The sitemap must not be advertised, or crawlers are invited in anyway.
+        self.assertNotContains(response, "Sitemap:")
+
+    @override_settings(SITE_IS_STAGING=True)
+    def test_staging_banner_is_shown(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "staging-flag")
+        self.assertContains(response, "not the live site")
+
+    def test_production_is_indexable_and_unbannered(self):
+        """The guard must not leak into the real site."""
+        response = self.client.get(reverse("core:home"))
+        self.assertFalse(response.context["noindex"])
+        self.assertNotContains(response, "staging-flag")
+
+        robots = self.client.get("/robots.txt")
+        self.assertContains(robots, "Allow: /")
+        self.assertContains(robots, "Sitemap:")
 
 
 class PublicPageTests(TestCase):

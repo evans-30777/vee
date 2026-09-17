@@ -81,6 +81,13 @@
 
     <a class="skip-link" href="#main">Skip to content</a>
 
+    {% if site_is_staging %}
+    {# Unmissable on purpose: a test copy must never be mistaken for the live site. #}
+    <p class="staging-flag" role="status">
+        <strong>Staging</strong> — test copy, not the live site. Not indexed by search engines.
+    </p>
+    {% endif %}
+
     {% include "partials/header.html" %}
 
     <main id="main" tabindex="-1">

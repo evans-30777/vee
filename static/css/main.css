@@ -230,6 +230,26 @@ p { text-wrap: pretty; }
 
 .skip-link:focus { top: 1rem; }
 
+/* Staging notice. Deliberately unstyled-looking and impossible to miss. */
+.staging-flag {
+    position: relative;
+    z-index: 101;
+    padding: 0.5rem var(--pad-x);
+    background: repeating-linear-gradient(
+        45deg, #3A1B00, #3A1B00 12px, #2E1500 12px, #2E1500 24px
+    );
+    border-bottom: 1px solid var(--border-brand);
+    color: #FFD9C7;
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+.staging-flag strong {
+    color: var(--brand);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
 .visually-hidden {
     position: absolute !important;
     width: 1px; height: 1px;

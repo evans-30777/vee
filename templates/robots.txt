@@ -1,6 +1,11 @@
+{% if site_is_staging %}# Staging deployment — must never be indexed.
+# A crawlable copy of the site would compete with veeagency.co.ke as duplicate content.
 User-agent: *
+Disallow: /
+{% else %}User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /contact/thank-you/
 
 Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+{% endif %}

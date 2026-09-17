@@ -49,6 +49,14 @@ Apply these skills from `vee_claude_skills/` directory:
   PostgreSQL). This suits the site's write volume — enquiries, newsletter signups and
   owner admin edits. `prod.py` enables WAL mode and a 20s lock timeout. PostgreSQL is
   revisited only if sustained concurrent writes cause real `database is locked` errors.
+- **Staging runs on Render** (`*.onrender.com`, no custom domain), added 2026-09-17,
+  to test everything before going live on HostAfrica. It runs the *same*
+  `veeagency.settings.prod` module so staging tests what ships; only the
+  environment differs. `render.yaml` holds the blueprint.
+- **`SITE_IS_STAGING=true` must stay set on any non-production deployment.** It
+  forces `noindex` site-wide, makes `robots.txt` disallow everything, points
+  canonical URLs at the staging host, and shows a STAGING banner. Without it a
+  public copy gets indexed as duplicate content competing with veeagency.co.ke.
 - **The SQLite file must live outside the public web root** (`SQLITE_PATH` env var).
   Inside the web root it is directly downloadable, exposing every enquiry and the admin
   password hash. This is a security requirement, not a preference.

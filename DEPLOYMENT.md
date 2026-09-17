@@ -1,4 +1,78 @@
-# Deploying VEE Agency to HostAfrica
+# Deployment
+
+Two environments:
+
+| | Where | Purpose |
+|---|---|---|
+| **Staging** | Render (`*.onrender.com`) | Test everything before launch — see [Staging on Render](#staging-on-render) |
+| **Production** | HostAfrica + `veeagency.co.ke` | The live site — the rest of this document |
+
+Both run the **same settings module** (`veeagency.settings.prod`), so what you
+test on Render is what ships. The only differences come from the environment.
+
+---
+
+## Staging on Render
+
+### Deploying it
+
+1. In Render, **New → Blueprint**, and point it at this repository. It reads
+   `render.yaml`; there is nothing to configure by hand.
+2. Wait for the first build. `render-build.sh` installs, runs `collectstatic`
+   and applies migrations.
+3. Open the `.onrender.com` URL. You should see an orange **STAGING** bar across
+   the top.
+
+`ALLOWED_HOSTS`, the CSRF origin and `SITE_BASE_URL` are all derived from
+`RENDER_EXTERNAL_HOSTNAME`, which Render sets itself — so the site comes up on
+its own URL with no host configuration.
+
+### First run
+
+The database starts empty, so parts of the site will be missing until you fill
+it in — that is the empty-state rule working, not a fault. The WhatsApp button
+and contact details stay hidden until Site settings exists.
+
+```bash
+# In the Render shell for the service:
+python manage.py createsuperuser
+```
+
+Then log in at `/admin/` and create the **Site settings** record first.
+
+### What staging mode changes
+
+`SITE_IS_STAGING=true` is set in `render.yaml`, which:
+
+- sends `noindex, nofollow` on **every** page
+- serves a `robots.txt` that disallows everything and advertises no sitemap
+- shows the STAGING bar
+
+> **Do not remove this on a public test URL.** Without it Google indexes the
+> staging site as a duplicate of `veeagency.co.ke`, the two compete, and it is
+> slow and awkward to undo once indexed.
+
+Canonical URLs also point at the staging host rather than the live domain, so a
+staging page never claims a live URL as its canonical.
+
+### The disk matters
+
+`render.yaml` requests a 1GB persistent disk at `/var/data`, holding both the
+SQLite database and uploaded media. **Without it Render's filesystem is
+ephemeral** and every deploy would wipe your content and images. A persistent
+disk needs a paid instance type; on the free plan expect to lose the database on
+each deploy and restart.
+
+### Staging is not a rehearsal for the HostAfrica specifics
+
+It genuinely tests the application, the production settings, the templates and
+the content. It does **not** test HostAfrica's Passenger setup, its filesystem
+layout, or the `/media/` serving rule — those are only exercised on the real
+host.
+
+---
+
+# Production: HostAfrica
 
 Application-level deployment steps for [veeagency.co.ke](https://veeagency.co.ke).
 

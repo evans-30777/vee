@@ -82,11 +82,21 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+# Configurable so uploads can be pointed at a persistent volume; on hosts with
+# an ephemeral filesystem, the project directory does not survive a redeploy.
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT") or BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SITE_BASE_URL = os.environ.get("SITE_BASE_URL", "https://veeagency.co.ke")
+
+# Staging mode. Set on any deployment that is not veeagency.co.ke.
+#
+# A public copy of the site is a real SEO hazard: left crawlable, Google indexes
+# it as a duplicate of the live site and the two compete with each other. With
+# this on, every page sends noindex, robots.txt disallows everything, and a
+# banner makes clear the site is not live.
+SITE_IS_STAGING = os.environ.get("SITE_IS_STAGING", "false").lower() == "true"
 
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "hello@veeagency.co.ke")
 ENQUIRY_NOTIFICATION_EMAIL = os.environ.get(

@@ -12,5 +12,6 @@ def page_meta(request, *, title, description, page_class="", noindex=False, imag
         "meta": {"title": title, "description": description, "image": image},
         "canonical_url": canonical_url,
         "page_class": page_class,
-        "noindex": noindex,
+        # A staging deployment is never indexable, whatever the view asked for.
+        "noindex": noindex or settings.SITE_IS_STAGING,
     }
