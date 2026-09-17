@@ -829,8 +829,8 @@ html:not(.js) .carousel__controls { display: none; }
     transition: background-color var(--dur) var(--ease);
 }
 
-.carousel__dot[aria-selected="true"] { width: 3rem; }
-.carousel__dot[aria-selected="true"]::after { background: var(--brand-btn); }
+.carousel__dot[aria-current="true"] { width: 3rem; }
+.carousel__dot[aria-current="true"]::after { background: var(--brand-btn); }
 
 .carousel__arrow {
     display: grid;
@@ -976,8 +976,8 @@ html:not(.js) .carousel__controls { display: none; }
     transition: background-color var(--dur) var(--ease);
 }
 
-.showcase__dot[aria-selected="true"] { width: 2.75rem; }
-.showcase__dot[aria-selected="true"]::after { background: var(--brand-btn); }
+.showcase__dot[aria-current="true"] { width: 2.75rem; }
+.showcase__dot[aria-current="true"]::after { background: var(--brand-btn); }
 
 @media (max-width: 560px) {
     .showcase__item { flex-direction: column; }
@@ -2277,7 +2277,8 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
 .floats {
     position: fixed;
     right: clamp(0.9rem, 3vw, 1.75rem);
-    bottom: clamp(0.9rem, 3vw, 1.75rem);
+    /* Plus the iOS home-indicator inset, or these sit partly underneath it. */
+    bottom: calc(clamp(0.9rem, 3vw, 1.75rem) + env(safe-area-inset-bottom, 0px));
     z-index: 90;
     display: flex;
     flex-direction: column;
@@ -2325,7 +2326,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
     position: fixed;
     left: clamp(0.75rem, 3vw, 1.5rem);
     right: clamp(0.75rem, 3vw, 1.5rem);
-    bottom: clamp(0.75rem, 3vw, 1.5rem);
+    bottom: calc(clamp(0.75rem, 3vw, 1.5rem) + env(safe-area-inset-bottom, 0px));
     z-index: 95;
     max-width: 62rem;
     margin-inline: auto;
@@ -2384,7 +2385,10 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
    wraps and its buttons stack on narrow screens. */
 body.cookie-banner-open .floats,
 body.cookie-banner-open .floats--left {
-    bottom: calc(clamp(0.9rem, 3vw, 1.75rem) + var(--cookie-banner-height, 0px) + 0.75rem);
+    bottom: calc(
+        clamp(0.9rem, 3vw, 1.75rem) + env(safe-area-inset-bottom, 0px)
+        + var(--cookie-banner-height, 0px) + 0.75rem
+    );
 }
 
 .footer__cookie-settings {
@@ -2551,6 +2555,31 @@ html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 3
 
     .btn:hover, .card:hover, .package:hover,
     .mockup:hover, .float-btn:hover { transform: none; }
+}
+
+/* 23b. Forced colours (Windows High Contrast)
+   The system repaints text and backgrounds with its own palette but honours
+   `color: transparent`, so gradient-clipped text simply disappears — taking
+   the emphasised half of three H1s with it.
+   ========================================================================== */
+
+@media (forced-colors: active) {
+    .accent {
+        background: none;
+        -webkit-text-fill-color: currentColor;
+        color: CanvasText;
+    }
+
+    /* Decorative fills carry meaning in these components, and forced colours
+       flattens them, so give each a real border to keep the shape readable. */
+    .cell-tick,
+    .checklist li::before { border: 1px solid CanvasText; }
+
+    .carousel__dot[aria-current="true"],
+    .showcase__dot[aria-current="true"] { outline: 2px solid Highlight; }
+
+    /* box-shadow is dropped entirely; the outline underneath is what survives. */
+    :focus-visible { outline: 3px solid Highlight; outline-offset: 2px; }
 }
 
 /* 24. Print

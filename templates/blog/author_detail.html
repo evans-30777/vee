@@ -42,6 +42,8 @@ Person entity the byline is just text.
         {% if author.headshot %}
         <img src="{{ author.headshot.url }}"
              alt="{{ author.display_name }}"
+             width="{{ author.headshot.width }}"
+             height="{{ author.headshot.height }}"
              style="border-radius:var(--r-lg); border:1px solid var(--border)"
              loading="lazy">
         {% endif %}

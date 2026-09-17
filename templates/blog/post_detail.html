@@ -72,10 +72,15 @@
         </header>
 
         {% if post.featured_image %}
+        {# Dimensions reserved so the article does not jump when the image
+           arrives. Eager because it is above the fold and usually the LCP. #}
         <img src="{{ post.featured_image.url }}"
              alt="{{ post.featured_image_alt }}"
+             width="{{ post.featured_image.width }}"
+             height="{{ post.featured_image.height }}"
              style="margin-block:2rem; border-radius:var(--r-lg); border:1px solid var(--border)"
-             loading="eager">
+             loading="eager"
+             fetchpriority="high">
         {% endif %}
 
         {% if post.quick_answer %}

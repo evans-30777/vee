@@ -5,4 +5,3 @@ whitenoise==6.9.0
 gunicorn==23.0.0
 bleach==6.2.0
 markdown==3.8.2
-python-slugify==8.0.4

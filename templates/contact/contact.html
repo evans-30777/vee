@@ -84,8 +84,11 @@
                 <div class="form__row">
                     <div class="field{% if form.phone.errors %} field--invalid{% endif %}">
                         <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                        {# aria-describedby is appended, not replaced: Django already
+                           points it at the error list, and the hint has to join that
+                           rather than overwrite it. #}
                         {{ form.phone }}
-                        <span class="field__help">Optional — but it's the fastest way to reach you.</span>
+                        <span class="field__help" id="{{ form.phone.id_for_label }}_help">Optional — but it's the fastest way to reach you.</span>
                         {{ form.phone.errors }}
                     </div>
                     <div class="field{% if form.service.errors %} field--invalid{% endif %}">
@@ -98,7 +101,7 @@
                 <div class="field{% if form.budget.errors %} field--invalid{% endif %}">
                     <label for="{{ form.budget.id_for_label }}">{{ form.budget.label }}</label>
                     {{ form.budget }}
-                    <span class="field__help">A rough range is enough. It helps us recommend something realistic.</span>
+                    <span class="field__help" id="{{ form.budget.id_for_label }}_help">A rough range is enough. It helps us recommend something realistic.</span>
                     {{ form.budget.errors }}
                 </div>
 

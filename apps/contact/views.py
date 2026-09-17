@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from apps.core.models import NewsletterSubscriber
@@ -11,7 +12,7 @@ from apps.packages.models import Package
 from .forms import ContactForm, NewsletterForm
 from .models import ContactSubmission
 from .services import dispatch_enquiry_notifications
-from .utils import get_client_ip, is_rate_limited
+from .utils import get_client_ip, is_newsletter_rate_limited, is_rate_limited
 
 VALID_SERVICES = {choice.value for choice in ContactSubmission.Service}
 
@@ -110,12 +111,20 @@ def newsletter_subscribe(request):
     form = NewsletterForm(request.POST)
     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
 
+    if is_newsletter_rate_limited(get_client_ip(request)):
+        message = "That's several signups from here in a short time. Try again later."
+        if is_ajax:
+            return JsonResponse({"success": False, "message": message})
+        messages.error(request, message)
+        return redirect(_safe_referer(request))
+
     if form.is_valid():
         NewsletterSubscriber.objects.update_or_create(
             email=form.cleaned_data["email"],
             defaults={
                 "is_active": True,
                 "source": form.cleaned_data.get("source", ""),
+                "signup_ip": get_client_ip(request),
             },
         )
         message = "You're subscribed. Thanks for joining."
@@ -128,4 +137,21 @@ def newsletter_subscribe(request):
         return JsonResponse({"success": success, "message": message})
 
     messages.success(request, message) if success else messages.error(request, message)
-    return redirect(request.META.get("HTTP_REFERER") or reverse("core:home"))
+    return redirect(_safe_referer(request))
+
+
+def _safe_referer(request):
+    """Where to send a non-AJAX newsletter post back to.
+
+    The Referer is attacker-influenced, and `redirect()` will happily send a
+    visitor to any absolute URL it is given. CSRF makes this hard to exploit,
+    but an unvalidated redirect is not worth keeping for the convenience.
+    """
+    referer = request.META.get("HTTP_REFERER", "")
+    if referer and url_has_allowed_host_and_scheme(
+        referer,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return referer
+    return reverse("core:home")

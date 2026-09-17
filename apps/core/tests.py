@@ -2,6 +2,7 @@ import html
 import json
 import re
 
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.template.loader import render_to_string
@@ -413,3 +414,51 @@ class SeedCommandTests(TestCase):
                     "slug", definition,
                     f"{name} lost its slug key — the seeder mutated its own constants",
                 )
+
+
+@override_settings(
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "sitesettings-cache-test",
+        }
+    }
+)
+class SiteSettingsCacheTests(TestCase):
+    """The singleton is read on every request by the context processor.
+
+    Tests run against a dummy cache, so this class opts back in to a real one
+    and clears it itself — otherwise the values would outlive the rows they
+    came from, which is the reason tests are uncached in the first place.
+    """
+
+    def setUp(self):
+        cache.clear()
+        self.addCleanup(cache.clear)
+
+    def test_the_singleton_is_only_queried_once(self):
+        SiteSettings.objects.create()
+        SiteSettings.load()
+        with self.assertNumQueries(0):
+            SiteSettings.load()
+            SiteSettings.load()
+
+    def test_saving_shows_up_immediately(self):
+        current = SiteSettings.objects.create()
+        SiteSettings.load()
+
+        current.tagline = "A brand new tagline."
+        current.save()
+
+        self.assertEqual(SiteSettings.load().tagline, "A brand new tagline.")
+
+    def test_having_no_settings_row_is_cached_too(self):
+        """Otherwise a missing row costs a query on every single request."""
+        self.assertIsNone(SiteSettings.load())
+        with self.assertNumQueries(0):
+            self.assertIsNone(SiteSettings.load())
+
+    def test_creating_the_first_row_invalidates_the_empty_result(self):
+        self.assertIsNone(SiteSettings.load())
+        SiteSettings.objects.create(tagline="Now it exists.")
+        self.assertIsNotNone(SiteSettings.load())

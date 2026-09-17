@@ -72,6 +72,10 @@
                     <label class="visually-hidden" for="newsletter-email">Your email address</label>
                     <input type="email" name="email" id="newsletter-email" placeholder="you@business.co.ke" required>
                     <input type="hidden" name="source" value="{{ page_class|default:'footer' }}">
+                    <div class="honeypot" aria-hidden="true">
+                        <label for="newsletter-website">Leave this empty</label>
+                        <input type="text" name="website" id="newsletter-website" tabindex="-1" autocomplete="off">
+                    </div>
                     <button class="btn btn--primary btn--sm" type="submit">Subscribe</button>
                 </form>
                 <p class="newsletter__status" data-newsletter-status role="status" aria-live="polite"></p>

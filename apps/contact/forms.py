@@ -34,6 +34,13 @@ class ContactForm(forms.ModelForm):
         self.fields["budget"].required = False
         self.fields["phone"].required = False
 
+        # Point each hinted field at its hint. Django sets aria-describedby to
+        # the error list when a field is invalid and appends to whatever is
+        # already there, so the hint stays announced either way.
+        for name in ("phone", "budget"):
+            widget = self.fields[name].widget
+            widget.attrs["aria-describedby"] = f"id_{name}_help"
+
         self.fields["service"].label = "What are you interested in?"
         self.fields["budget"].label = "Monthly budget"
         self.fields["phone"].label = "Phone or WhatsApp number"
@@ -57,3 +64,12 @@ class ContactForm(forms.ModelForm):
 class NewsletterForm(forms.Form):
     email = forms.EmailField()
     source = forms.CharField(required=False, max_length=80, widget=forms.HiddenInput)
+    # Same trap as the enquiry form. The newsletter had no protection at all,
+    # and because it upserts on a unique email every junk address becomes a
+    # permanent row.
+    website = forms.CharField(required=False, widget=forms.HiddenInput)
+
+    def clean_website(self):
+        if self.cleaned_data.get("website"):
+            raise forms.ValidationError("Submission rejected.")
+        return ""

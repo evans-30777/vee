@@ -17,6 +17,8 @@ def site_settings(request):
         # Every schema block points at one business entity rather than each
         # page declaring its own unlinked copy.
         "organisation_id": f"{site_base_url()}/#organization",
+        # robots.txt advertises the sitemap on the same host the canonicals use.
+        "site_base_url": site_base_url(),
         "default_social_image_url": (
             current.social_image_url if current else absolute_url(static(DEFAULT_SOCIAL_IMAGE))
         ),

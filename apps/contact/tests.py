@@ -4,13 +4,14 @@ from unittest import mock
 
 from django.conf import settings
 from django.core import mail
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import RequestFactory, TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from apps.core.models import NewsletterSubscriber, SiteSettings
 from apps.packages.models import Package
 
 from .models import ContactSubmission
+from .utils import get_client_ip
 
 # The enquiry redirect carries the chosen service so the conversion can be
 # segmented in analytics without setting a session cookie for every enquirer.
@@ -287,3 +288,100 @@ class EnquiryContextTests(TestCase):
         )
         self.assertNotContains(response, "alert(1)")
         self.assertContains(response, "holding you back")
+
+
+class AbuseControlTests(TestCase):
+    """The rate limit was trivially bypassable, and the newsletter had nothing."""
+
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+
+    @override_settings(CONTACT_TRUSTED_PROXY_COUNT=0)
+    def test_a_forged_forwarded_header_is_ignored_with_no_proxy(self):
+        request = RequestFactory().post(
+            "/contact/", HTTP_X_FORWARDED_FOR="1.2.3.4", REMOTE_ADDR="10.0.0.1"
+        )
+        self.assertEqual(get_client_ip(request), "10.0.0.1")
+
+    @override_settings(CONTACT_TRUSTED_PROXY_COUNT=1)
+    def test_only_the_address_our_own_proxy_appended_is_trusted(self):
+        """The client controls the left of the header; our edge appends right."""
+        request = RequestFactory().post(
+            "/contact/",
+            HTTP_X_FORWARDED_FOR="9.9.9.9, 203.0.113.7",
+            REMOTE_ADDR="10.0.0.1",
+        )
+        self.assertEqual(get_client_ip(request), "203.0.113.7")
+
+    @override_settings(CONTACT_TRUSTED_PROXY_COUNT=1)
+    def test_a_short_header_falls_back_to_the_socket_address(self):
+        request = RequestFactory().post("/contact/", REMOTE_ADDR="10.0.0.1")
+        self.assertEqual(get_client_ip(request), "10.0.0.1")
+
+    def test_the_newsletter_honeypot_rejects_a_bot(self):
+        response = self.client.post(
+            reverse("contact:newsletter_subscribe"),
+            {"email": "bot@example.com", "website": "http://spam.example"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertFalse(response.json()["success"])
+        self.assertFalse(NewsletterSubscriber.objects.filter(email="bot@example.com").exists())
+
+    @override_settings(NEWSLETTER_RATE_LIMIT_PER_HOUR=2)
+    def test_the_newsletter_is_rate_limited(self):
+        for index in range(2):
+            self.client.post(
+                reverse("contact:newsletter_subscribe"),
+                {"email": f"person{index}@example.com"},
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+                REMOTE_ADDR="10.0.0.9",
+            )
+        response = self.client.post(
+            reverse("contact:newsletter_subscribe"),
+            {"email": "third@example.com"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            REMOTE_ADDR="10.0.0.9",
+        )
+        self.assertFalse(response.json()["success"])
+        self.assertFalse(NewsletterSubscriber.objects.filter(email="third@example.com").exists())
+
+    def test_the_newsletter_will_not_redirect_off_site(self):
+        """Referer is attacker-influenced and redirect() accepts any URL."""
+        response = self.client.post(
+            reverse("contact:newsletter_subscribe"),
+            {"email": "person@example.com"},
+            HTTP_REFERER="https://evil.example/phish",
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("core:home"))
+
+    def test_the_newsletter_returns_to_a_page_on_this_site(self):
+        response = self.client.post(
+            reverse("contact:newsletter_subscribe"),
+            {"email": "person2@example.com"},
+            HTTP_REFERER="http://testserver/blog/",
+        )
+        self.assertEqual(response["Location"], "http://testserver/blog/")
+
+
+class SecurityHeaderTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+
+    def test_a_content_security_policy_is_sent(self):
+        response = self.client.get(reverse("core:home"))
+        policy = response["Content-Security-Policy"]
+        self.assertIn("default-src 'self'", policy)
+        self.assertIn("frame-ancestors 'none'", policy)
+        self.assertIn("object-src 'none'", policy)
+
+    def test_fonts_may_only_come_from_this_origin(self):
+        """They are self-hosted; anything else would be a regression."""
+        policy = self.client.get(reverse("core:home"))["Content-Security-Policy"]
+        self.assertIn("font-src 'self'", policy)
+
+    def test_a_permissions_policy_is_sent(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertIn("geolocation=()", response["Permissions-Policy"])

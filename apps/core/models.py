@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.templatetags.static import static
@@ -103,7 +104,14 @@ class SiteSettings(TimeStampedModel):
             max_width=SOCIAL_IMAGE_MAX[0],
             max_height=SOCIAL_IMAGE_MAX[1],
         )
-        return super().save(*args, **kwargs)
+        result = super().save(*args, **kwargs)
+        # An admin edit has to show up immediately, not in five minutes.
+        cache.delete(self.CACHE_KEY)
+        return result
+
+    def delete(self, *args, **kwargs):
+        cache.delete(self.CACHE_KEY)
+        return super().delete(*args, **kwargs)
 
     @property
     def whatsapp_url(self):
@@ -146,9 +154,26 @@ class SiteSettings(TimeStampedModel):
             digits = f"254{digits}"
         return f"+{digits}"
 
+    CACHE_KEY = "core.sitesettings.singleton"
+
     @classmethod
     def load(cls):
-        return cls.objects.first()
+        """The singleton, cached.
+
+        Read by the context processor on every request, so without this every
+        page view costs a query for a row that changes a few times a year.
+        Invalidated on save, and the cache is per-process — which is correct
+        here, where there is one process per deployment.
+        """
+        cached = cache.get(cls.CACHE_KEY)
+        if cached is not None:
+            return cached or None
+
+        current = cls.objects.first()
+        # `or False` so "there is no SiteSettings row" is cached too, rather
+        # than falling through to a query on every request.
+        cache.set(cls.CACHE_KEY, current or False, 300)
+        return current
 
 
 class Testimonial(TimeStampedModel):
@@ -215,6 +240,11 @@ class NewsletterSubscriber(TimeStampedModel):
         max_length=80,
         blank=True,
         help_text="Where the subscription came from, e.g. 'home', 'blog-post'.",
+    )
+    signup_ip = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text="Recorded to rate-limit automated signups. Not used for anything else.",
     )
 
     class Meta:

@@ -1,5 +1,9 @@
+from urllib.parse import urlsplit
+
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+
+from apps.core.seo import site_base_url
 
 from apps.blog.models import BlogPost, Category
 from apps.core.models import CaseStudy
@@ -26,7 +30,23 @@ STATIC_PAGE_PRIORITY = {
 }
 
 
-class StaticViewSitemap(Sitemap):
+class CanonicalSitemap(Sitemap):
+    """Emits the same host the canonical tags use.
+
+    Canonicals come from SITE_BASE_URL while the sitemap defaulted to the
+    request's host. The day those disagree — www versus bare, or a stale env
+    var after the move to HostAfrica — the sitemap lists URLs whose canonical
+    points somewhere else, which is a conflicting signal and very hard to spot.
+    """
+
+    def get_protocol(self, protocol=None):
+        return urlsplit(site_base_url()).scheme or "https"
+
+    def get_domain(self, site=None):
+        return urlsplit(site_base_url()).netloc
+
+
+class StaticViewSitemap(CanonicalSitemap):
     changefreq = "monthly"
 
     def lastmod(self, item):
@@ -59,7 +79,7 @@ class StaticViewSitemap(Sitemap):
         return STATIC_PAGE_PRIORITY.get(item, 0.5)
 
 
-class ServiceSitemap(Sitemap):
+class ServiceSitemap(CanonicalSitemap):
     changefreq = "monthly"
     priority = 0.9
 
@@ -70,7 +90,7 @@ class ServiceSitemap(Sitemap):
         return obj.updated_at
 
 
-class LocationSitemap(Sitemap):
+class LocationSitemap(CanonicalSitemap):
     changefreq = "monthly"
     priority = 0.8
 
@@ -81,7 +101,7 @@ class LocationSitemap(Sitemap):
         return obj.updated_at
 
 
-class BlogPostSitemap(Sitemap):
+class BlogPostSitemap(CanonicalSitemap):
     changefreq = "weekly"
     priority = 0.7
 
@@ -92,7 +112,7 @@ class BlogPostSitemap(Sitemap):
         return obj.updated_at
 
 
-class BlogCategorySitemap(Sitemap):
+class BlogCategorySitemap(CanonicalSitemap):
     changefreq = "weekly"
     priority = 0.5
 

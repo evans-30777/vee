@@ -70,6 +70,10 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
+# One proxy in front (Render's edge, HostAfrica's web server), so the address
+# it appended is the last trustworthy entry in X-Forwarded-For.
+CONTACT_TRUSTED_PROXY_COUNT = int(os.environ.get("CONTACT_TRUSTED_PROXY_COUNT", "1"))
+
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = True

@@ -202,7 +202,7 @@
             });
 
             dots.forEach(function (dot, i) {
-                dot.setAttribute("aria-selected", i === index ? "true" : "false");
+                dot.setAttribute("aria-current", i === index ? "true" : "false");
                 dot.setAttribute("tabindex", i === index ? "0" : "-1");
             });
         }
@@ -292,7 +292,7 @@
 
         function paint() {
             dots.forEach(function (dot, i) {
-                dot.setAttribute("aria-selected", i === index ? "true" : "false");
+                dot.setAttribute("aria-current", i === index ? "true" : "false");
                 dot.setAttribute("tabindex", i === index ? "0" : "-1");
             });
         }
@@ -630,6 +630,15 @@
             window.requestAnimationFrame(function () {
                 banner.classList.add("is-open");
                 publishHeight();
+                // A dialog nobody is sent to is a dialog keyboard and screen
+                // reader users have to go looking for, at the very end of the
+                // document. Focus the heading rather than a button, so neither
+                // choice is presented as the default.
+                var heading = banner.querySelector(".cookie-banner__title");
+                if (heading) {
+                    heading.setAttribute("tabindex", "-1");
+                    heading.focus();
+                }
             });
         }
 

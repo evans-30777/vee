@@ -118,12 +118,14 @@
             </div>
 
             <div class="carousel__controls">
-                <div class="carousel__dots" role="tablist" aria-label="Choose slide">
-                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="true" aria-label="Web Development"></button>
-                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="SEO and AEO"></button>
-                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="Google Business Profile"></button>
-                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="Social Media"></button>
-                    <button class="carousel__dot" data-dot type="button" role="tab" aria-selected="false" aria-label="Digital Ad Campaigns"></button>
+                {# Plain buttons, not tabs: the slides are role="group" with no tabpanel,
+   so a tablist described a relationship that did not exist. #}
+                <div class="carousel__dots" aria-label="Choose slide">
+                    <button class="carousel__dot" data-dot type="button" aria-current="true" aria-label="Web Development"></button>
+                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="SEO and AEO"></button>
+                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="Google Business Profile"></button>
+                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="Social Media"></button>
+                    <button class="carousel__dot" data-dot type="button" aria-current="false" aria-label="Digital Ad Campaigns"></button>
                 </div>
                 <button class="carousel__arrow carousel__pause" data-autoplay-toggle type="button"
                         hidden aria-pressed="false" aria-label="Pause automatic sliding">
@@ -242,10 +244,10 @@ describes what is verifiably true of the situation instead.
         </div>
 
         <div class="container showcase__controls" data-showcase-controls hidden>
-            <div class="showcase__dots" role="tablist" aria-label="Choose service">
+            <div class="showcase__dots" aria-label="Choose service">
                 {% for service in services %}
-                <button class="showcase__dot" data-showcase-dot type="button" role="tab"
-                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                <button class="showcase__dot" data-showcase-dot type="button"
+                        aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
                         aria-label="{{ service.name }}"></button>
                 {% endfor %}
             </div>

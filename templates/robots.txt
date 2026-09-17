@@ -7,5 +7,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /contact/thank-you/
 
-Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+Sitemap: {{ site_base_url }}/sitemap.xml
 {% endif %}
