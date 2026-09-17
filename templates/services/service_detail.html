@@ -70,11 +70,11 @@
             <h2>Talk it through</h2>
             {% endif %}
             <p class="muted" style="margin-bottom:1.25rem">
-                Every business is different. Get a free audit and we'll tell you whether
-                {{ service.name|lower }} is the right next step — honestly.
+                Every business is different. The free audit tells you whether
+                {{ service.name|lower }} is your best next step — or whether something else matters more right now.
             </p>
             <div class="stack">
-                <a class="btn btn--primary btn--block" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                <a class="btn btn--primary btn--block" href="{% url 'contact:contact' %}">Check if this is your priority</a>
                 {% if site_settings %}
                 <a class="btn btn--whatsapp btn--block" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
                 {% endif %}

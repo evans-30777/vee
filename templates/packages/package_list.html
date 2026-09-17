@@ -60,13 +60,13 @@
 <section class="section section--tight">
     <div class="container">
         <div class="cta-band reveal">
-            <p class="eyebrow">Still deciding?</p>
-            <h2>Let's work out which package fits</h2>
-            <p>Book a free audit and we'll recommend the right level based on your business — not the most expensive one.</p>
+            <p class="eyebrow">Free audit</p>
+            <h2>Not sure which one fits?</h2>
+            <p>Take the free audit and you will get a straight recommendation based on your business — including when the cheapest option is the right one.</p>
             <div class="btn-row">
-                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Get a recommendation</a>
                 {% if site_settings %}
-                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask on WhatsApp</a>
+                <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask which fits me</a>
                 {% endif %}
             </div>
         </div>

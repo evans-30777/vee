@@ -54,13 +54,13 @@
             <p class="eyebrow">Digital Growth Agency · Kenya</p>
             <h1>Get found. Build trust. <span class="accent">Grow online.</span></h1>
             <p class="lead">
-                VEE Agency builds the websites, search visibility and campaigns that turn
-                online attention into real customers — for businesses in Nairobi, Machakos,
+                We build the website, search presence and campaigns that make a customer
+                choose you when they go looking — for businesses in Nairobi, Machakos,
                 Kajiado, Kiambu and across Kenya.
             </p>
 
             <div class="btn-row">
-                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Get my free audit</a>
                 {% if site_settings %}
                 <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
                 {% endif %}
@@ -69,7 +69,7 @@
             <ul class="hero__trust">
                 <li>Websites from KES 30,000</li>
                 <li>SEO, AEO &amp; GEO ready</li>
-                <li>Based in Syokimau, serving all of Kenya</li>
+                <li>Free audit before you commit</li>
             </ul>
         </div>
 
@@ -136,27 +136,54 @@
     </div>
 </section>
 
-{# ------------------------------------------------------------ Trust strip #}
-<section class="strip">
+{# ------------------------------------------------------------- 01 Problem #}
+{% comment %}
+Spec section 2. Deliberately framed as observation, not accusation: the content
+rules forbid claiming a business is losing customers without evidence, so this
+describes what is verifiably true of the situation instead.
+{% endcomment %}
+<section class="section section--tinted">
     <div class="container">
-        <ul class="strip__grid reveal-group">
-            <li class="strip__item">
-                <h3>KES 30,000</h3>
-                <p>Starting price for a complete, search-ready business website.</p>
-            </li>
-            <li class="strip__item">
-                <h3>4 counties</h3>
-                <p>Close local focus on Nairobi, Machakos, Kajiado and Kiambu.</p>
-            </li>
-            <li class="strip__item">
-                <h3>47 counties</h3>
-                <p>Nationwide delivery — distance is not a limit on the work.</p>
-            </li>
-            <li class="strip__item">
-                <h3>One partner</h3>
-                <p>You deal directly with the person doing the work. No account handoffs.</p>
-            </li>
-        </ul>
+        <div class="section-head reveal">
+            <p class="section-index"><b>01</b> <span>The gap</span></p>
+            <h2>Being online isn't the same as being found</h2>
+            <p class="lead">
+                Most businesses already have something online. The real question is what a
+                customer finds in the thirty seconds after they first hear your name.
+            </p>
+        </div>
+
+        <div class="problem grid grid--3 reveal-group">
+            <div class="problem__item">
+                <h3>They check before they call</h3>
+                <p>
+                    Someone hears about you and looks you up first. That check happens whether
+                    or not you planned for it, and what it turns up is the impression you get.
+                </p>
+            </div>
+            <div class="problem__item">
+                <h3>Pieces that don't talk to each other</h3>
+                <p>
+                    A website built once, a Facebook page updated sometimes, a Google listing
+                    set up years ago. Each one half-works, and none of them pull in the same
+                    direction.
+                </p>
+            </div>
+            <div class="problem__item">
+                <h3>Effort with no way to read it</h3>
+                <p>
+                    Posting regularly, maybe boosting a post now and then. Plenty of activity —
+                    but no clear line between what you do and what actually brings in business.
+                </p>
+            </div>
+        </div>
+
+        <div class="problem__turn reveal">
+            <p>
+                None of that is a marketing problem. It's a visibility and structure problem —
+                and structure is fixable.
+            </p>
+        </div>
     </div>
 </section>
 
@@ -166,7 +193,7 @@
     <div class="container">
         <div class="section-head section-head--split reveal">
             <div>
-                <p class="eyebrow">What we do</p>
+                <p class="section-index"><b>02</b> <span>What we do</span></p>
                 <h2>Everything your business needs to be found online</h2>
                 <p class="lead">Each service works on its own — but they compound when they run together around one goal.</p>
             </div>
@@ -227,7 +254,7 @@
 <section class="section section--tight">
     <div class="container">
         <div class="section-head reveal">
-            <p class="eyebrow">Website Development · Kenya</p>
+            <p class="section-index"><b>03</b> <span>Website development</span></p>
             <h2>Your website should match how you actually sell</h2>
             <p class="lead">
                 A photographer, an electronics shop and a hotel do not need the same website.
@@ -239,8 +266,8 @@
         {% include "partials/website_type_mockups.html" %}
 
         <div class="btn-row" style="margin-top:2rem">
-            <a class="btn btn--primary" href="{% url 'core:web_development' %}">Explore website development</a>
-            <a class="btn btn--secondary" href="{% url 'contact:contact' %}">Get a quote</a>
+            <a class="btn btn--primary" href="{% url 'core:web_development' %}">See how each type is built</a>
+            <a class="btn btn--secondary" href="{% url 'contact:contact' %}">Get a quote for mine</a>
         </div>
     </div>
 </section>
@@ -250,7 +277,7 @@
 <section class="section">
     <div class="container">
         <div class="section-head reveal">
-            <p class="eyebrow">Growth packages</p>
+            <p class="section-index"><b>07</b> <span>Growth packages</span></p>
             <h2>Ongoing growth, priced up front</h2>
             <p class="lead">Monthly packages for businesses that want steady visibility instead of one-off pushes.</p>
         </div>
@@ -261,7 +288,7 @@
         </div>
 
         <div class="btn-row" style="margin-top:2rem">
-            <a class="btn btn--ghost" href="{% url 'packages:list' %}">Compare packages in full <span class="btn__arrow">&rarr;</span></a>
+            <a class="btn btn--ghost" href="{% url 'packages:list' %}">See everything each package includes <span class="btn__arrow">&rarr;</span></a>
         </div>
     </div>
 </section>
@@ -276,9 +303,9 @@
             <h2>{% if website_package.price_is_from %}Websites from {% else %}Websites at {% endif %}KES {{ website_package.price|floatformat:0|intcomma }}</h2>
             {% if website_package.short_description %}<p>{{ website_package.short_description }}</p>{% endif %}
             <div class="btn-row">
-                <a class="btn btn--primary btn--lg" href="{% url 'core:web_development' %}">Get your website</a>
+                <a class="btn btn--primary btn--lg" href="{% url 'core:web_development' %}">See what that includes</a>
                 {% if site_settings %}
-                <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question</a>
+                <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask what mine would cost</a>
                 {% endif %}
             </div>
         </div>
@@ -286,32 +313,152 @@
 </section>
 {% endif %}
 
-{# ---------------------------------------------------------------- Process #}
-<section class="section">
+{# -------------------------------------------------------- 04 Growth system #}
+{% comment %}
+Spec section 4. The connected system is VEE's actual differentiator — services
+that compound rather than isolated activities — so it gets a dark band of its
+own rather than being another card grid.
+{% endcomment %}
+<section class="section section--dark">
     <div class="container">
         <div class="section-head reveal">
-            <p class="eyebrow">How it works</p>
-            <h2>A simple path from first call to results</h2>
+            <p class="section-index"><b>04</b> <span>How it fits together</span></p>
+            <h2>The VEE Digital Growth System</h2>
+            <p class="lead">
+                Five stages, in order. Each one works on its own — run together, each makes
+                the next one cheaper and more effective.
+            </p>
         </div>
 
-        <ol class="steps reveal-group">
-            <li class="step">
-                <h3>Free audit</h3>
-                <p>We look at your current website, search presence and Google profile, then tell you plainly what is costing you customers.</p>
+        <ol class="system reveal-group">
+            <li class="system__step">
+                <p class="system__num">01</p>
+                <h3>Get Found</h3>
+                <p>Show up when someone searches for what you sell — on Google, on Maps, and in the AI answers people increasingly rely on.</p>
             </li>
-            <li class="step">
-                <h3>Clear proposal</h3>
-                <p>You get the scope, the timeline and the price in writing before anything starts. No surprise invoices.</p>
+            <li class="system__step">
+                <p class="system__num">02</p>
+                <h3>Look Professional</h3>
+                <p>A website and profiles that hold up to the check a customer makes before they commit to talking to you.</p>
             </li>
-            <li class="step">
-                <h3>Build &amp; launch</h3>
-                <p>We build, you review, we refine. Everything ships search-ready rather than optimised as an afterthought.</p>
+            <li class="system__step">
+                <p class="system__num">03</p>
+                <h3>Stay Visible</h3>
+                <p>Planned, consistent content, so you are still there next month — not only in the week you launched.</p>
             </li>
-            <li class="step">
-                <h3>Grow &amp; report</h3>
-                <p>On a monthly package, we keep improving and show you what changed. You always know what you are paying for.</p>
+            <li class="system__step">
+                <p class="system__num">04</p>
+                <h3>Reach More People</h3>
+                <p>Targeted campaigns, once the foundations can actually convert the traffic they bring. Ads before that is spending to be ignored.</p>
+            </li>
+            <li class="system__step">
+                <p class="system__num">05</p>
+                <h3>Turn Interest Into Action</h3>
+                <p>Clear paths to call, message or enquire, so attention turns into a conversation instead of a bounce.</p>
             </li>
         </ol>
+
+        <p class="system__note dim">
+            This is why the work is sold as packages rather than one-off pushes — the stages
+            compound, and doing one in isolation usually wastes the others.
+        </p>
+    </div>
+</section>
+
+{# ------------------------------------------------------------ 05 The audit #}
+{% comment %}
+The free audit is the primary CTA on every page, and nothing previously said
+what it actually was. A cold visitor will not book something undefined.
+{% endcomment %}
+<section class="section">
+    <div class="container audit">
+        <div class="reveal">
+            <p class="section-index"><b>05</b> <span>Before you commit</span></p>
+            <h2>What the free audit actually is</h2>
+            <p class="lead">
+                Not a sales call with a slide deck. A straight read on where your business
+                stands online right now, and what is worth doing about it.
+            </p>
+
+            <div class="btn-row" style="margin-top:1.75rem">
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book my free audit</a>
+                {% if site_settings %}
+                <a class="btn btn--secondary btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Ask a question first</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="audit__panel reveal">
+            <ol class="audit__list">
+                <li>
+                    <div>
+                        <strong>We look at what already exists</strong>
+                        <span>Your website, your Google Business Profile, and how you currently turn up in search.</span>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>You get it in plain language</strong>
+                        <span>What is working, what is not, and which of the problems actually matter for your business.</span>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>Three things worth fixing first</strong>
+                        <span>Ranked by what would make the most difference — not by what we would like to sell you.</span>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>An honest answer on whether you need us</strong>
+                        <span>Sometimes the fix is something you can do yourself in an afternoon. We will say so.</span>
+                    </div>
+                </li>
+            </ol>
+
+            <p class="audit__assurance">
+                <span aria-hidden="true">&#10003;</span>
+                Free, no obligation, and the findings are yours either way.
+            </p>
+        </div>
+    </div>
+</section>
+
+{# ----------------------------------------------------------- 06 Why VEE #}
+{% comment %}
+With no testimonials yet, the trust section has to carry real weight. Spec
+section 7 allows a truthful trust section in place of empty proof — every claim
+here is verifiable, none of it is invented social proof.
+{% endcomment %}
+<section class="section section--tinted">
+    <div class="container">
+        <div class="section-head reveal">
+            <p class="section-index"><b>06</b> <span>Why VEE</span></p>
+            <h2>What you can count on</h2>
+            <p class="lead">
+                We are not going to show you logos we have not earned. Here is what we will
+                commit to instead.
+            </p>
+        </div>
+
+        <div class="reasons reveal-group">
+            <article class="reason">
+                <h3>You deal with the person doing the work</h3>
+                <p>No account manager, no handover, no being passed around. The person you talk to is the person building it.</p>
+            </article>
+            <article class="reason">
+                <h3>Prices agreed in writing first</h3>
+                <p>Scope and cost settled before anything starts. No surprise invoices, and no meter running while you think.</p>
+            </article>
+            <article class="reason">
+                <h3>You own everything</h3>
+                <p>Your website, your domain, your Google and social accounts — all registered in your name, not ours. Leaving is always possible.</p>
+            </article>
+            <article class="reason">
+                <h3>We say when you don't need us</h3>
+                <p>If the work would not pay for itself yet, that is what you will hear. A client who is not ready is not a good client for either of us.</p>
+            </article>
+        </div>
     </div>
 </section>
 
@@ -434,14 +581,14 @@
 <section class="section section--tight">
     <div class="container">
         <div class="cta-band reveal">
-            <p class="eyebrow">Ready when you are</p>
-            <h2>Let's find what's holding your business back online</h2>
+            <p class="eyebrow">One small step</p>
+            <h2>Start by finding out where you actually stand</h2>
             <p>
                 Tell us about your business and we'll come back with a clear, honest read on your website,
                 search visibility and Google presence — free, and with no obligation to hire us.
             </p>
             <div class="btn-row">
-                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+                <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Get my free audit</a>
                 {% if site_settings %}
                 <a class="btn btn--whatsapp btn--lg" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
                 {% endif %}

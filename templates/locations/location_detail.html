@@ -32,7 +32,7 @@
         <p class="eyebrow">{{ location.county }} · Kenya</p>
         <h1>{{ location.hero_headline }}</h1>
         <div class="btn-row">
-            <a class="btn btn--primary" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+            <a class="btn btn--primary" href="{% url 'contact:contact' %}">Get my free audit</a>
             {% if site_settings %}
             <a class="btn btn--secondary" href="{{ site_settings.whatsapp_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
             {% endif %}
@@ -85,7 +85,7 @@
             <p class="eyebrow">{{ location.county }} &amp; beyond</p>
             <h2>Let's grow your {{ location.county }} business online</h2>
             <p>We also serve clients across every county in Kenya remotely — start with a free audit and see where you stand.</p>
-            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Book Your Free Audit</a>
+            <a class="btn btn--primary btn--lg" href="{% url 'contact:contact' %}">Get my free audit</a>
         </div>
     </div>
 </section>
