@@ -98,6 +98,14 @@ SITE_BASE_URL = os.environ.get("SITE_BASE_URL", "https://veeagency.co.ke")
 # banner makes clear the site is not live.
 SITE_IS_STAGING = os.environ.get("SITE_IS_STAGING", "false").lower() == "true"
 
+# Bound how long a stalled mail host can hold a socket. Python's default is no
+# timeout at all, which is what turns a slow SMTP server into a hung request.
+EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "10"))
+
+# Send enquiry mail on a background thread. Off here so development and tests
+# stay synchronous and deterministic; production turns it on.
+EMAIL_SEND_ASYNC = False
+
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "hello@veeagency.co.ke")
 ENQUIRY_NOTIFICATION_EMAIL = os.environ.get(
     "ENQUIRY_NOTIFICATION_EMAIL", "hello@veeagency.co.ke"

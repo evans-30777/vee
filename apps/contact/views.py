@@ -9,7 +9,7 @@ from apps.core.seo import page_meta
 
 from .forms import ContactForm, NewsletterForm
 from .models import ContactSubmission
-from .services import send_enquiry_notifications
+from .services import dispatch_enquiry_notifications
 from .utils import get_client_ip, is_rate_limited
 
 VALID_SERVICES = {choice.value for choice in ContactSubmission.Service}
@@ -30,8 +30,11 @@ def contact(request):
             submission.ip_address = ip_address
             submission.user_agent = request.META.get("HTTP_USER_AGENT", "")[:300]
             submission.save()
-            send_enquiry_notifications(submission)
-            return redirect("contact:thank_you")
+            dispatch_enquiry_notifications(submission)
+            destination = reverse("contact:thank_you")
+            if submission.service:
+                destination = f"{destination}?service={submission.service}"
+            return redirect(destination)
     else:
         # "Choose Plan" links prefill the form; only accept known service values.
         requested_service = request.GET.get("service", "")
@@ -55,13 +58,19 @@ def contact(request):
 
 
 def thank_you(request):
-    context = page_meta(
-        request,
-        title="Thank You — VEE Agency",
-        description="Your enquiry has reached VEE Agency. We'll be in touch shortly.",
-        page_class="thank-you",
-        noindex=True,
-    )
+    # Only ever a known choice: this value is published to analytics, and the
+    # URL is user-controlled.
+    requested_service = request.GET.get("service", "")
+    context = {
+        "enquiry_service": requested_service if requested_service in VALID_SERVICES else "",
+        **page_meta(
+            request,
+            title="Thank You — VEE Agency",
+            description="Your enquiry has reached VEE Agency. We'll be in touch shortly.",
+            page_class="thank-you",
+            noindex=True,
+        ),
+    }
     return render(request, "contact/thank_you.html", context)
 
 

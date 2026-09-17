@@ -1,12 +1,19 @@
+import threading
+import time
 from unittest import mock
 
+from django.conf import settings
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from apps.core.models import NewsletterSubscriber, SiteSettings
 
 from .models import ContactSubmission
+
+# The enquiry redirect carries the chosen service so the conversion can be
+# segmented in analytics without setting a session cookie for every enquirer.
+THANK_YOU_FOR_STANDARD = "/contact/thank-you/?service=standard"
 
 VALID_PAYLOAD = {
     "name": "Jane Mwangi",
@@ -25,7 +32,7 @@ class ContactFormTests(TestCase):
 
     def test_valid_submission_saves_and_redirects(self):
         response = self.client.post(reverse("contact:contact"), VALID_PAYLOAD)
-        self.assertRedirects(response, reverse("contact:thank_you"))
+        self.assertRedirects(response, THANK_YOU_FOR_STANDARD)
         submission = ContactSubmission.objects.get()
         self.assertEqual(submission.name, "Jane Mwangi")
         self.assertEqual(submission.service, "standard")
@@ -46,9 +53,14 @@ class ContactFormTests(TestCase):
         ):
             response = self.client.post(reverse("contact:contact"), VALID_PAYLOAD)
 
-        self.assertRedirects(response, reverse("contact:thank_you"))
+        self.assertRedirects(response, THANK_YOU_FOR_STANDARD)
         submission = ContactSubmission.objects.get()
         self.assertFalse(submission.notification_sent)
+
+    def test_email_timeout_is_bounded(self):
+        """An unbounded SMTP socket is what turns a slow mail host into a 502."""
+        self.assertTrue(settings.EMAIL_TIMEOUT)
+        self.assertLessEqual(settings.EMAIL_TIMEOUT, 30)
 
     def test_invalid_submission_preserves_entered_values(self):
         payload = {**VALID_PAYLOAD, "email": "not-an-email"}
@@ -117,3 +129,86 @@ class NewsletterTests(TestCase):
     def test_invalid_email_is_rejected(self):
         self.client.post(reverse("contact:newsletter_subscribe"), {"email": "nope"})
         self.assertEqual(NewsletterSubscriber.objects.count(), 0)
+
+
+class AsyncEnquiryDeliveryTests(TransactionTestCase):
+    """The production path, where mail is handed to a thread.
+
+    TransactionTestCase rather than TestCase because the sending thread opens
+    its own database connection: wrapped in a test transaction it would see an
+    empty database, which is a property of the harness, not of the code.
+    """
+
+    def setUp(self):
+        SiteSettings.objects.create()
+
+    @override_settings(EMAIL_SEND_ASYNC=True)
+    def test_response_does_not_wait_for_smtp_but_mail_still_goes_out(self):
+        response = self.client.post(reverse("contact:contact"), VALID_PAYLOAD)
+        self.assertRedirects(response, THANK_YOU_FOR_STANDARD)
+        self.assertEqual(ContactSubmission.objects.count(), 1)
+
+        self._join_sending_threads()
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue(ContactSubmission.objects.get().notification_sent)
+
+    @override_settings(EMAIL_SEND_ASYNC=True)
+    def test_enquiry_survives_a_failing_mail_host_on_the_thread(self):
+        with mock.patch(
+            "apps.contact.services.get_connection", side_effect=OSError("SMTP down")
+        ):
+            response = self.client.post(reverse("contact:contact"), VALID_PAYLOAD)
+            self.assertRedirects(response, THANK_YOU_FOR_STANDARD)
+            self._join_sending_threads()
+
+        submission = ContactSubmission.objects.get()
+        self.assertFalse(submission.notification_sent)
+        self.assertEqual(submission.name, "Jane Mwangi")
+
+    def tearDown(self):
+        # A sending thread that outlives its test would write against a
+        # database the next test has already torn down.
+        self._join_sending_threads(strict=False)
+        super().tearDown()
+
+    def _join_sending_threads(self, strict=True):
+        deadline = time.time() + 10
+        while time.time() < deadline:
+            threads = [
+                thread for thread in threading.enumerate()
+                if thread.name.startswith("enquiry-mail-")
+            ]
+            if not threads:
+                return
+            for thread in threads:
+                thread.join(timeout=deadline - time.time())
+            if strict:
+                for thread in threads:
+                    self.assertFalse(thread.is_alive(), "enquiry mail thread did not finish")
+                return
+        if strict:
+            self.fail("enquiry mail thread did not finish")
+
+
+class ThankYouPageTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        SiteSettings.objects.create()
+
+    def test_conversion_marker_carries_the_service(self):
+        response = self.client.get(reverse("contact:thank_you"), {"service": "premium"})
+        self.assertContains(response, '"service": "premium"')
+        self.assertContains(response, '"name": "generate_lead"')
+
+    def test_unknown_service_is_not_echoed_into_the_page(self):
+        """The value reaches analytics, and the URL is user-controlled."""
+        response = self.client.get(
+            reverse("contact:thank_you"), {"service": "<script>alert(1)</script>"}
+        )
+        self.assertNotContains(response, "alert(1)")
+        self.assertContains(response, '"service": ""')
+
+    def test_thank_you_is_never_indexed(self):
+        response = self.client.get(reverse("contact:thank_you"))
+        self.assertContains(response, "noindex")

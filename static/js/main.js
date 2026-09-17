@@ -369,7 +369,12 @@
         var form = document.querySelector("[data-newsletter]");
         if (!form) return;
 
-        var status = form.querySelector("[data-newsletter-status]");
+        // The status line is a sibling of the form, not a child, so it has to be
+        // looked up from the surrounding block. Scoped to the form first in case
+        // a future layout moves it inside.
+        var status = form.querySelector("[data-newsletter-status]") ||
+                     (form.parentNode && form.parentNode.querySelector("[data-newsletter-status]")) ||
+                     document.querySelector("[data-newsletter-status]");
         var button = form.querySelector("button[type='submit']");
 
         form.addEventListener("submit", function (event) {
@@ -390,12 +395,19 @@
             })
                 .then(function (response) { return response.json(); })
                 .then(function (payload) {
+                    var ok = Boolean(payload && payload.success);
+
+                    // Deliberately before the status update: a missing status
+                    // element must not be able to swallow the conversion.
+                    if (ok) {
+                        form.reset();
+                        track("newsletter_signup", { page: document.body.className || "page" });
+                    }
+
                     if (!status) return;
-                    var ok = payload && payload.success;
                     status.className = "newsletter__status " + (ok ? "is-success" : "is-error");
                     status.textContent = (payload && payload.message) ||
                         (ok ? "You're subscribed. Thanks!" : "That didn't work. Please try again.");
-                    if (ok) form.reset();
                 })
                 .catch(function () {
                     if (!status) return;
@@ -411,6 +423,47 @@
     /* ------------------------------------------------------ Cookies & analytics */
 
     var CONSENT_KEY = "vee-cookie-consent";
+
+    /* Conversion tracking.
+     *
+     * Every event goes through track(). Nothing is sent unless analytics have
+     * actually been loaded, which only happens after consent, so this is inert
+     * on a site with no IDs configured and on every visit that declined.
+     *
+     * Events raised before consent is decided are queued rather than dropped:
+     * the thank-you page is a first visit for many people, and that is the one
+     * conversion we cannot afford to lose to a banner still being on screen.
+     */
+    var analyticsReady = false;
+    var pendingEvents = [];
+
+    /* GA4 event name -> Meta standard event. Anything absent is GA4 only. */
+    var META_EVENTS = {
+        generate_lead: "Lead",
+        contact_whatsapp: "Contact",
+        contact_call: "Contact",
+        contact_email: "Contact",
+        newsletter_signup: "Subscribe"
+    };
+
+    function track(name, params) {
+        if (!analyticsReady) {
+            // Bounded: a page nobody consents on must not grow a list forever.
+            if (pendingEvents.length < 20) pendingEvents.push([name, params]);
+            return;
+        }
+        var payload = params || {};
+        if (window.gtag) window.gtag("event", name, payload);
+        if (window.fbq && META_EVENTS[name]) {
+            window.fbq("track", META_EVENTS[name], payload);
+        }
+    }
+
+    function flushPendingEvents() {
+        var queued = pendingEvents;
+        pendingEvents = [];
+        queued.forEach(function (entry) { track(entry[0], entry[1]); });
+    }
 
     function readConsent() {
         try {
@@ -457,6 +510,9 @@
             window.fbq("init", config.pixel);
             window.fbq("track", "PageView");
         }
+
+        analyticsReady = Boolean(config.ga4 || config.pixel);
+        if (analyticsReady) flushPendingEvents();
     }
 
     // Best effort: withdrawing consent should take the cookies with it. These are
@@ -538,6 +594,8 @@
             writeConsent("declined");
             hide();
             clearAnalyticsCookies();
+            // No consent means no events, ever. Drop what was waiting.
+            pendingEvents = [];
         }
 
         if (accept) accept.addEventListener("click", onAccept);
@@ -567,6 +625,57 @@
         else if (stored !== "declined") show();
     }
 
+    /* ------------------------------------------------- Conversion tracking */
+
+    function initConversionTracking() {
+        /* A server-confirmed conversion. The thank-you page is only reached
+         * after the enquiry row is committed, so this counts real leads rather
+         * than submit attempts. */
+        var marker = document.getElementById("conversion-event");
+        if (marker) {
+            try {
+                var conversion = JSON.parse(marker.textContent);
+                if (conversion && conversion.name) track(conversion.name, conversion.params);
+            } catch (error) {
+                /* A malformed marker must never break the page it is on. */
+            }
+        }
+
+        /* WhatsApp and phone are the channels this business actually converts
+         * on, and both leave the site. Delegated from the document so links
+         * added later — a rendered blog body, an admin-edited panel — are
+         * covered without re-binding. */
+        document.addEventListener("click", function (event) {
+            var link = event.target.closest && event.target.closest("a[href]");
+            if (!link) return;
+
+            var href = link.getAttribute("href") || "";
+            var where = link.getAttribute("data-track-context") ||
+                        (document.body.className || "page");
+
+            if (href.indexOf("wa.me/") !== -1 || href.indexOf("api.whatsapp.com") !== -1) {
+                track("contact_whatsapp", { method: "whatsapp", page: where });
+            } else if (href.indexOf("tel:") === 0) {
+                track("contact_call", { method: "phone", page: where });
+            } else if (href.indexOf("mailto:") === 0) {
+                track("contact_email", { method: "email", page: where });
+            }
+        });
+
+        /* Submit attempts, so the gap between starting and finishing an
+         * enquiry is visible. The lead itself is counted on the thank-you
+         * page, not here. */
+        var enquiry = document.querySelector("form.form[method='post']");
+        if (enquiry) {
+            enquiry.addEventListener("submit", function () {
+                var service = enquiry.querySelector("[name='service']");
+                track("enquiry_submitted", {
+                    service: service && service.value ? service.value : "unspecified"
+                });
+            });
+        }
+    }
+
     /* --------------------------------------------------------------- Bootstrap */
 
     function init() {
@@ -577,6 +686,7 @@
         initBackToTop();
         initNewsletter();
         initCookieConsent();
+        initConversionTracking();
 
         Array.prototype.forEach.call(
             document.querySelectorAll("[data-carousel]"),

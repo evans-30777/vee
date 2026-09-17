@@ -82,6 +82,9 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 X_FRAME_OPTIONS = "DENY"
 SESSION_COOKIE_HTTPONLY = True
 
+# The visitor's response must not wait on SMTP. See contact/services.py.
+EMAIL_SEND_ASYNC = os.environ.get("EMAIL_SEND_ASYNC", "true").lower() == "true"
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
