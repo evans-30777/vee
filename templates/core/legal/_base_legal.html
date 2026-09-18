@@ -2,7 +2,7 @@
 
 {% block content %}
 <section class="page-head">
-    <div class="container container--narrow">
+    <div class="container container--narrow reveal-group">
         <ol class="breadcrumbs">
             <li><a href="{% url 'core:home' %}">Home</a></li>
             <li aria-current="page">{{ doc_title }}</li>
@@ -15,7 +15,7 @@
 
 <section class="section">
     <div class="container container--narrow">
-        <article class="prose legal-document">
+        <article class="prose legal-document reveal">
             {% block legal_content %}{% endblock %}
 
             <h2>Contact us</h2>

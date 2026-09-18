@@ -257,8 +257,25 @@ p { text-wrap: pretty; }
 
 .grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); }
 .grid--2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
-.grid--3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 18.5rem), 1fr)); }
 .grid--4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+
+/* Flex rather than grid, so a row that does not fill centres instead of
+   leaving a hole. Seven services in three columns is 3 + 3 + 1, and as a grid
+   that last card sat hard left with two thirds of the row empty — the dead
+   space the owner called out. Items still share a row equally, because they
+   grow from a common basis. */
+.grid--3 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.grid--3 > * {
+    flex: 1 1 18.5rem;
+    /* Without a ceiling, a lone trailing card stretches the full width and
+       stops looking like the cards above it. */
+    max-width: min(100%, 26rem);
+}
 
 .stack > * + * { margin-top: 1rem; }
 
@@ -506,6 +523,32 @@ p { text-wrap: pretty; }
     padding-block: 0.6rem;
     background: transparent;
 }
+
+/* A floating bar leaves the page visible around it, and text sliding through
+   those gaps — the gutters either side, the sliver above — read as a mess.
+   This softens the strip the bar sits in once the page has moved.
+
+   It blurs rather than tints, because the same strip is over a dark video on
+   the home page and over off-white everywhere else, and blur is right for
+   both. The mask fades it out downwards so there is no edge to notice. */
+.header::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: calc(100% + 0.75rem);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    mask-image: linear-gradient(180deg, #000 58%, transparent);
+    -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur) var(--ease);
+}
+
+.header.is-scrolled::before { opacity: 1; }
+
+/* Above the strip, so the bar is never the thing being blurred. */
+.header > .container { position: relative; z-index: 1; }
 
 .header__bar {
     display: flex;
@@ -2832,33 +2875,93 @@ html.preloader-seen .preloader { display: none; }
     100% { transform: translateX(350%); }
 }
 
-/* 21. Scroll reveal
+/* 21. Motion
+   The vocabulary the whole site moves in, taken from `pinterest/vid 1.mp4`:
+   things arrive by rising and settling — a short lift plus a touch of scale,
+   never a slide across or a spin. Groups arrive in sequence rather than all at
+   once, which is what makes a row of cards read as a row rather than a flash.
+
    Only armed once JS confirms it can un-arm them, so a JS failure can never
-   leave content permanently invisible.
+   leave content permanently invisible. Everything here animates `opacity` and
+   `transform` only: both are composited, so a mid-range phone does not have to
+   re-lay-out the page on every frame.
    ========================================================================== */
 
 html.js-motion .reveal {
     opacity: 0;
-    transform: translateY(22px);
-    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+    transform: translateY(26px) scale(0.985);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    will-change: opacity, transform;
 }
 
-html.js-motion .reveal.is-visible { opacity: 1; transform: none; }
+html.js-motion .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+}
 
 html.js-motion .reveal-group > * {
     opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    transform: translateY(22px) scale(0.985);
+    transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
 }
 
 html.js-motion .reveal-group.is-visible > * { opacity: 1; transform: none; }
 
 html.js-motion .reveal-group.is-visible > *:nth-child(1) { transition-delay: 0ms; }
-html.js-motion .reveal-group.is-visible > *:nth-child(2) { transition-delay: 70ms; }
-html.js-motion .reveal-group.is-visible > *:nth-child(3) { transition-delay: 140ms; }
-html.js-motion .reveal-group.is-visible > *:nth-child(4) { transition-delay: 210ms; }
-html.js-motion .reveal-group.is-visible > *:nth-child(5) { transition-delay: 280ms; }
-html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 350ms; }
+html.js-motion .reveal-group.is-visible > *:nth-child(2) { transition-delay: 80ms; }
+html.js-motion .reveal-group.is-visible > *:nth-child(3) { transition-delay: 160ms; }
+html.js-motion .reveal-group.is-visible > *:nth-child(4) { transition-delay: 240ms; }
+html.js-motion .reveal-group.is-visible > *:nth-child(5) { transition-delay: 320ms; }
+html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 400ms; }
+
+/* A phone shows one card at a time, so a long stagger becomes a wait rather
+   than a rhythm — and the travel has to be shorter because the whole viewport
+   is shorter. */
+@media (max-width: 767px) {
+    html.js-motion .reveal { transform: translateY(16px) scale(0.99); }
+    html.js-motion .reveal-group > * { transform: translateY(14px) scale(0.99); }
+    html.js-motion .reveal-group.is-visible > *:nth-child(2) { transition-delay: 50ms; }
+    html.js-motion .reveal-group.is-visible > *:nth-child(3) { transition-delay: 100ms; }
+    html.js-motion .reveal-group.is-visible > *:nth-child(4) { transition-delay: 150ms; }
+    html.js-motion .reveal-group.is-visible > *:nth-child(n+5) { transition-delay: 200ms; }
+}
+
+/* A heading whose words rise on their own does not also rise as a block — one
+   motion, not two stacked on top of each other. The attribute is added by
+   main.js, so with no JS the heading animates as an ordinary group child. */
+html.js-motion .reveal-group > [data-words] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+}
+
+/* Headline reveal, after `pinterest/vid 11.mp4`: each word rises out from
+   behind the line above it, a beat apart. main.js wraps the words; without it
+   the heading is an ordinary heading, which is the point.
+
+   The mask is `.word`, so `.word__i` needs somewhere to hide. The padding and
+   the matching negative margin give descenders room inside the mask without
+   changing where the line sits. */
+html.js-motion [data-words] .word {
+    display: inline-block;
+    overflow: hidden;
+    padding-bottom: 0.14em;
+    margin-bottom: -0.14em;
+    vertical-align: bottom;
+}
+
+html.js-motion [data-words] .word__i {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(105%);
+    transition: opacity 0.7s var(--ease), transform 0.75s var(--ease);
+}
+
+html.js-motion [data-words].is-visible .word__i {
+    opacity: 1;
+    transform: none;
+}
 
 /* 22. Responsive
    ========================================================================== */
@@ -2903,7 +3006,8 @@ html.js-motion .reveal-group.is-visible > *:nth-child(n+6) { transition-delay: 3
     }
 
     html.js-motion .reveal,
-    html.js-motion .reveal-group > * {
+    html.js-motion .reveal-group > *,
+    html.js-motion [data-words] .word__i {
         opacity: 1 !important;
         transform: none !important;
     }

@@ -3,7 +3,7 @@
 
 {% block content %}
 <section class="page-head">
-    <div class="container">
+    <div class="container reveal-group">
         {% if chosen_package %}
         {% comment %}
         Arriving from a priced choice and landing on a generic form throws away
@@ -38,7 +38,7 @@
 </section>
 
 <section class="section">
-    <div class="container split">
+    <div class="container split reveal-group">
         <div>
             {% comment %}
             `novalidate` is deliberately absent. The fields already carry

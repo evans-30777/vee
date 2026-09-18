@@ -146,6 +146,58 @@ cancellation and setup fees so the pricing FAQ can answer them; and geo
 coordinates, opening hours and a Google Business Profile link from the real
 GBP.
 
+## Hero Video & Site Motion (2026-09-18)
+
+The owner supplied five reference clips in `pinterest/`. Three are the home
+hero; `vid 1.mp4` and `vid 11.mp4` are layout and motion references only.
+
+- **`tools/build_hero_video.py` builds every hero asset and documents every
+  edit. Read it before touching `pinterest/`, and re-run it after any change.**
+  The clips are other agencies' footage, so two edits are not cosmetic and must
+  not be undone:
+  - `vid hero 2` (the clock) is **cut at 22.0s** — a "GET IN TOUCH /
+    MarketingBeast360" card starts at 22.6s — and its nine text elements are
+    blacked out. Its header claims "Full-Spectrum Digital Marketing" and four
+    of the eight service labels (Brand Strategy, Social Media Management,
+    Influencer Marketing, Content Creation) name services VEE does not sell.
+    The icons stay; an icon claims nothing. Each mask was measured against the
+    hand's sweep (192px from the hub at 360,640) so removing text never clips
+    the animation.
+  - `vid hero digital growth` is framed below the "RANK YOU UP" corner logo
+    rather than painted over it — the blurred words sweep through that corner,
+    so a filled box left a visible notch.
+- **Two framings, chosen by viewport shape, not width.** `(max-aspect-ratio: 5/4)`
+  gets the portrait cut. A tablet held upright is 820px across but nearly
+  square, and the landscape cut lost its subject off the sides there. **The same
+  query appears in `main.css` (which picks the poster) and in `heroFraming()`
+  in `main.js` (which picks the video). A test enforces that they match.**
+- **MP4 first, WebM behind it.** On this footage H.264 beat VP9 at matched
+  quality every time, so the smaller file is what nearly everyone gets. The
+  WebM is for browsers built without H.264 — and is the only reason this
+  pipeline can be checked in a headless browser.
+- **Only the first clip loads on arrival.** The next is fetched 2.5s later, the
+  third when it is next up, and nothing at all under `prefers-reduced-motion`,
+  where the posters carry the hero. Each slide holds for exactly as long as its
+  own clip runs (`HERO_SLIDES` in `apps/core/views.py` — keep the durations in
+  step with the encoded files; a test checks them).
+- **The top bar is one floating island** (`.header__bar`), after `vid 11`: logo,
+  links and CTA inside a single pill, CTA inset against its right end. The home
+  hero is pulled up by `--header-h` so the video runs behind it. A blurred strip
+  (`.header::before`) softens content passing through the gaps once scrolled.
+- **Motion vocabulary, after `vid 1`:** things arrive by rising and settling —
+  a short lift plus a touch of scale, staggered in groups, never a slide across.
+  Only `opacity` and `transform`, both composited, so a mid-range phone does not
+  re-lay-out on every frame. Travel and stagger are shorter below 768px.
+- **Every page's h1 splits into words** and rises a beat apart, wrapped by
+  `main.js` at runtime. A heading that does this does not also animate as a
+  block — one motion, not two.
+- **`.grid--3` is flex, not grid**, so a row that does not fill centres instead
+  of leaving a hole. Seven services in three columns is 3 + 3 + 1.
+
+Still open: the clock clip's eight icons are generic but they are still another
+agency's artwork, and the word wheel includes "Shoots", which VEE does not do.
+Both are interim until the owner's own Canva footage replaces them.
+
 ## Decided Against — Do Not Build
 
 Owner-approved decisions (2026-09-17), not backlog. Do not implement these

@@ -513,8 +513,67 @@
 
     /* ------------------------------------------------------------ Scroll reveal */
 
+    /* Split a heading into per-word spans so each word can rise on its own,
+     * after `pinterest/vid 11.mp4`.
+     *
+     * Walks the tree rather than rewriting innerHTML, so inner markup survives:
+     * the hero's `<span class="accent">` keeps its class and simply ends up
+     * holding wrapped words of its own. The spaces stay as their own text
+     * nodes, so the heading still reads as separate words to a screen reader
+     * and still copies as plain text.
+     */
+    function splitWords(node) {
+        var children = Array.prototype.slice.call(node.childNodes);
+        children.forEach(function (child) {
+            if (child.nodeType === 1) {
+                splitWords(child);
+                return;
+            }
+            if (child.nodeType !== 3 || !child.nodeValue.trim()) return;
+
+            var fragment = document.createDocumentFragment();
+            child.nodeValue.split(/(\s+)/).forEach(function (piece) {
+                if (!piece) return;
+                if (!piece.trim()) {
+                    fragment.appendChild(document.createTextNode(piece));
+                    return;
+                }
+                var mask = document.createElement("span");
+                mask.className = "word";
+                var inner = document.createElement("span");
+                inner.className = "word__i";
+                inner.textContent = piece;
+                mask.appendChild(inner);
+                fragment.appendChild(mask);
+            });
+            child.parentNode.replaceChild(fragment, child);
+        });
+    }
+
+    function initWordReveals() {
+        if (reduceMotion) return;
+        // Every page's own heading, not just the home page's — the owner asked
+        // for this to be the site's motion, not the landing page's. `data-words`
+        // stays an explicit opt-in for anything that is not an h1.
+        var headings = document.querySelectorAll("main h1, [data-words]");
+        if (!headings.length) return;
+
+        Array.prototype.forEach.call(headings, function (heading) {
+            if (heading.querySelector(".word__i")) return;   // already split
+            splitWords(heading);
+            var words = heading.querySelectorAll(".word__i");
+            if (!words.length) return;
+            // The attribute is what the stylesheet keys off, so headings picked
+            // up by the `main h1` half of the selector get it here.
+            heading.setAttribute("data-words", "");
+            Array.prototype.forEach.call(words, function (word, i) {
+                word.style.transitionDelay = (i * 55) + "ms";
+            });
+        });
+    }
+
     function initReveals() {
-        var targets = document.querySelectorAll(".reveal, .reveal-group");
+        var targets = document.querySelectorAll(".reveal, .reveal-group, [data-words]");
         if (!targets.length) return;
 
         // Without IntersectionObserver, reveal everything immediately rather than
@@ -1027,6 +1086,9 @@
         initPreloader();
         initHeader();
         initMobileNav();
+        // Words are wrapped before the observer is wired, so a heading that is
+        // already on screen is armed rather than revealed half-split.
+        initWordReveals();
         initReveals();
         initBackToTop();
         initNewsletter();
