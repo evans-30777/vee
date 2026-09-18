@@ -1,6 +1,7 @@
 import html
 import json
 import re
+from pathlib import Path
 
 from django.conf import settings
 from django.core.cache import cache
@@ -15,6 +16,7 @@ from apps.packages.models import Package
 from apps.services.models import Service
 
 from .models import SiteSettings, Testimonial
+from .views import HERO_SLIDES
 
 
 class SiteSettingsTests(TestCase):
@@ -239,9 +241,90 @@ class PublicPageTests(TestCase):
         """The carousel is progressive enhancement: slide one must render on its own."""
         response = self.client.get(reverse("core:home"))
         self.assertContains(response, "hero__slide is-active")
-        # Every slide must also be visible with no JS at all, rather than four
-        # of them sitting hidden behind a script that may never run.
-        self.assertContains(response, "hero__slide", count=6)
+        # One slide, one caption and one dot per clip — counted from the view's
+        # own list rather than a hard-coded number, so adding or dropping a clip
+        # cannot leave the controls out of step with the media.
+        count = len(HERO_SLIDES)
+        self.assertContains(response, 'aria-roledescription="slide"', count=count)
+        self.assertContains(response, "data-slide-caption", count=count)
+        self.assertContains(response, "data-dot", count=count)
+
+    def test_hero_videos_offer_every_framing_codec_and_poster(self):
+        """A phone gets the portrait cut, and every slide falls back to a still.
+
+        The <video> elements deliberately carry no `src`: main.js chooses the
+        framing and the codec. If that regressed to a hard-coded source, a phone
+        would download the landscape file and show the wrong crop, and a browser
+        without H.264 would show nothing at all.
+        """
+        response = self.client.get(reverse("core:home"))
+        page = response.content.decode()
+        for slide in HERO_SLIDES:
+            name = slide["name"]
+            for asset in [
+                f"hero-{name}-wide.mp4",
+                f"hero-{name}-wide.webm",
+                f"hero-{name}-tall.mp4",
+                f"hero-{name}-tall.webm",
+                f"hero-{name}-poster-wide.jpg",
+                f"hero-{name}-poster-tall.jpg",
+            ]:
+                with self.subTest(asset=asset):
+                    self.assertIn(asset, page)
+                    self.assertTrue(
+                        (Path(settings.BASE_DIR) / "static" / "video" / asset).exists(),
+                        f"{asset} is referenced but was never built",
+                    )
+        self.assertNotIn("<video class=\"hero__video\" src=", page)
+
+    def test_poster_media_query_matches_the_framing_the_script_picks(self):
+        """The CSS still and the JS video must agree on which crop to use.
+
+        They are two independent breakpoints for one decision. Drifting apart
+        means the poster shows one framing and the video dissolves into another.
+        """
+        static_dir = Path(settings.BASE_DIR) / "static"
+        css = (static_dir / "css" / "main.css").read_text()
+        js = (static_dir / "js" / "main.js").read_text()
+        query = "(max-aspect-ratio: 5/4)"
+        self.assertIn(f"@media {query}", css)
+        self.assertIn(query, js)
+
+    def test_hero_slide_durations_match_the_encoded_clips(self):
+        """Each slide holds for its clip's real length.
+
+        These files are built by `tools/build_hero_video.py`. If a clip is
+        re-cut to a different length and HERO_SLIDES is not updated with it,
+        the hero either cuts away mid-clip or sits on a frozen frame.
+        """
+        import subprocess
+
+        import imageio_ffmpeg
+
+        ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        for slide in HERO_SLIDES:
+            path = (
+                Path(settings.BASE_DIR)
+                / "static"
+                / "video"
+                / f"hero-{slide['name']}-wide.mp4"
+            )
+            self.assertTrue(path.exists(), f"missing encoded clip: {path}")
+            probe = subprocess.run(
+                [ffmpeg, "-i", str(path)], capture_output=True, text=True
+            ).stderr
+            stamp = probe.split("Duration: ")[1].split(",")[0]
+            hours, minutes, seconds = stamp.split(":")
+            actual_ms = (int(hours) * 3600 + int(minutes) * 60 + float(seconds)) * 1000
+            self.assertAlmostEqual(
+                actual_ms,
+                slide["duration"],
+                delta=350,
+                msg=(
+                    f"{slide['name']}: the clip runs {actual_ms:.0f}ms but "
+                    f"HERO_SLIDES says {slide['duration']}ms"
+                ),
+            )
 
     def test_home_exposes_faq_schema_for_answer_engines(self):
         response = self.client.get(reverse("core:home"))
@@ -576,8 +659,11 @@ class StylesheetIntegrityTests(TestCase):
         css = self._css()
         defined = set(re.findall(r"^\s*(--[a-zA-Z0-9-]+)\s*:", css, re.M))
         used = set(re.findall(r"var\(\s*(--[a-zA-Z0-9-]+)", css))
-        # These are supplied at runtime (inline styles, or set by main.js) and
-        # every use of them carries a fallback.
-        runtime = {"--vx", "--vy", "--vc", "--cookie-banner-height"}
+        # Supplied at runtime rather than in the stylesheet: --cookie-banner-height
+        # is set by main.js, and the two poster URLs are written onto each
+        # <video> as an inline style because they differ per slide. Both poster
+        # rules sit on a declaration that also sets `background-color`, so a
+        # missing value degrades to flat near-black rather than nothing.
+        runtime = {"--poster-wide", "--poster-tall", "--cookie-banner-height"}
         missing = sorted(used - defined - runtime)
         self.assertEqual(missing, [], f"used but never defined: {missing}")

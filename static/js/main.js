@@ -181,8 +181,60 @@
 
     /* ----------------------------------------------------------------- Carousel */
 
+    // Which rendition a screen gets. The portrait cut is not a smaller copy of
+    // the landscape one — it is framed differently — so this is a real choice,
+    // made once at load. Re-picking on resize would restart a playing video for
+    // no visual gain, and phones do not become desktops mid-visit.
+    //
+    // The test is the viewport's shape, not its width. A tablet held upright is
+    // 820px across but nearly square, and the landscape cut lost its subject
+    // off the sides there; the portrait cut fills it properly.
+    // Which framing a screen gets. The portrait cut is not a smaller copy of
+    // the landscape one — it is framed differently — so this is a real choice,
+    // made once at load. Re-picking on resize would restart a playing video for
+    // no visual gain, and phones do not become desktops mid-visit.
+    //
+    // The test is the viewport's shape, not its width. A tablet held upright is
+    // 820px across but nearly square, and the landscape cut lost its subject
+    // off the sides there; the portrait cut fills it properly.
+    //
+    // This query must stay in step with the one that picks the poster in
+    // main.css, or the still and the video it dissolves into disagree.
+    function heroFraming() {
+        var squarish = window.matchMedia
+            && window.matchMedia("(max-aspect-ratio: 5/4)").matches;
+        return squarish ? "tall" : "wide";
+    }
+
+    // MP4 wherever it can be decoded: on this footage H.264 came out
+    // substantially smaller than VP9 at matched quality. The WebM exists for
+    // browsers built without H.264, which would otherwise show only a poster.
+    function heroCodec(video) {
+        return video.canPlayType('video/mp4; codecs="avc1.4d401f"') ? "Mp4" : "Webm";
+    }
+
+    function heroSource(slide) {
+        return slide.querySelector("video[data-video-wide-mp4]");
+    }
+
+    // Attach the source for one slide's video, once. Slides other than the first
+    // are left empty until they are needed: on a phone, three hero clips is
+    // three times the data for one headline.
+    function loadSlideVideo(slide, framing) {
+        var video = heroSource(slide);
+        if (!video || video.getAttribute("src")) return video;
+        var key = "video" + framing.charAt(0).toUpperCase() + framing.slice(1)
+            + heroCodec(video);
+        var src = video.dataset[key];
+        if (!src) return video;
+        video.setAttribute("preload", "auto");
+        video.setAttribute("src", src);
+        return video;
+    }
+
     function initCarousel(carousel) {
         var slides = Array.prototype.slice.call(carousel.querySelectorAll("[data-slide]"));
+        var captions = Array.prototype.slice.call(carousel.querySelectorAll("[data-slide-caption]"));
         var dots = Array.prototype.slice.call(carousel.querySelectorAll("[data-dot]"));
         var prev = carousel.querySelector("[data-carousel-prev]");
         var next = carousel.querySelector("[data-carousel-next]");
@@ -191,7 +243,39 @@
         var index = 0;
         var timer = null;
         var heroResume = null;
-        var INTERVAL = 6000;
+        var framing = heroFraming();
+        var prefetch = null;
+        var DEFAULT_INTERVAL = 7000;
+
+        // Each slide holds for as long as its own clip runs, so a video is
+        // never cut off mid-sweep or left sitting on a frozen last frame.
+        function intervalFor(i) {
+            var ms = parseInt(slides[i].getAttribute("data-duration"), 10);
+            return ms > 0 ? ms : DEFAULT_INTERVAL;
+        }
+
+        // Only the slide on screen plays. The others are rewound and paused —
+        // decoding three videos at once for the sake of one visible costs
+        // battery on exactly the phones this hero is meant to work on.
+        function syncVideo(slide, active) {
+            var video = heroSource(slide);
+            if (!video) return;
+            if (!active) {
+                video.pause();
+                return;
+            }
+            // Someone who has asked their system for less motion should not be
+            // handed three looping videos. The poster frames are real frames of
+            // each clip, so the hero still reads — and nothing is downloaded.
+            if (reduceMotion) return;
+            loadSlideVideo(slide, framing);
+            // Autoplay can be refused (a data saver, a platform policy). The
+            // poster stays up and the slide still reads, so there is nothing to
+            // recover from — but the promise must be handled or it reports as
+            // an unhandled rejection.
+            var played = video.play();
+            if (played && played.catch) played.catch(function () {});
+        }
 
         function show(nextIndex) {
             index = (nextIndex + slides.length) % slides.length;
@@ -200,17 +284,32 @@
                 var active = i === index;
                 slide.classList.toggle("is-active", active);
                 slide.setAttribute("aria-hidden", active ? "false" : "true");
+                syncVideo(slide, active);
+            });
+
+            captions.forEach(function (caption, i) {
+                caption.classList.toggle("is-active", i === index);
             });
 
             dots.forEach(function (dot, i) {
                 dot.setAttribute("aria-current", i === index ? "true" : "false");
                 dot.setAttribute("tabindex", i === index ? "0" : "-1");
             });
+
+            // Fetch the next clip while this one plays, so a change of slide is
+            // never the thing waiting on the network — but not immediately:
+            // the visible video should win the connection first.
+            if (prefetch) window.clearTimeout(prefetch);
+            if (!reduceMotion) {
+                prefetch = window.setTimeout(function () {
+                    loadSlideVideo(slides[(index + 1) % slides.length], framing);
+                }, 2500);
+            }
         }
 
         function stop() {
             if (timer) {
-                window.clearInterval(timer);
+                window.clearTimeout(timer);
                 timer = null;
             }
         }
@@ -221,7 +320,7 @@
             if (reduceMotion) return;
             if (pause && pause.isUserPaused()) return;
             stop();
-            timer = window.setInterval(function () { show(index + 1); }, INTERVAL);
+            timer = window.setTimeout(function () { show(index + 1); start(); }, intervalFor(index));
         }
 
         function goTo(i) {
@@ -229,7 +328,23 @@
             start();
         }
 
-        pause = buildPauseControl(carousel, { start: start, stop: stop });
+        // The pause button stops the video too, not just the slide advance.
+        // A hero that keeps playing after you press pause has not paused.
+        function activeVideo() {
+            return heroSource(slides[index]);
+        }
+
+        pause = buildPauseControl(carousel, {
+            start: function () {
+                start();
+                syncVideo(slides[index], true);
+            },
+            stop: function () {
+                stop();
+                var video = activeVideo();
+                if (video) video.pause();
+            }
+        });
 
         dots.forEach(function (dot, i) {
             dot.addEventListener("click", function () { goTo(i); });

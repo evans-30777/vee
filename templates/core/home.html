@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load humanize static %}
 
 {% block schema_extra %}
 {# FAQPage schema: every answer below is drawn from confirmed business facts. #}
@@ -50,84 +50,45 @@
 {% comment %}
 ---------------------------------------------------------------------- Hero
 
-Full-bleed media with the copy laid over it, after the NVIDIA reference in
-`nvidia inspiration/`. The media is the point, so it gets the whole width and
-most of the viewport height rather than half a column.
+Full-bleed video with the copy laid over it. Three clips, each cut and re-framed
+by `tools/build_hero_video.py` — read that file before touching the sources;
+it documents what had to be removed from each one and why.
 
-The headline is fixed and the media rotates beneath it. Previously each slide
-carried its own h2, which meant five rotating headings in the document outline
-above the page's real first heading, and four of them invisible at any moment.
-What each slide is about now rides in a small caption instead.
+The headline is fixed and only the media rotates. Each slide carries the length
+of its own clip in `data-duration` so a slide holds the stage for exactly as
+long as its video runs, rather than cutting away mid-sweep or dwelling on a
+frozen last frame.
+
+The videos have no `src` in the markup. `main.js` picks the portrait or the
+landscape rendition for the screen actually being used, picks MP4 unless the
+browser cannot decode H.264, and loads the second and third clips only once the
+visitor has seen the first — a phone on a Kenyan mobile connection should not
+pay for three videos to read one headline.
+
+The poster is a CSS background rather than the `poster` attribute, because the
+right poster depends on which rendition the screen gets and CSS can answer that
+before any script runs. With no JavaScript at all, that poster — a real frame
+of the clip, cut to the same framing — is what the hero shows.
 {% endcomment %}
 <section class="hero" data-carousel role="region"
          aria-roledescription="carousel" aria-label="What VEE Agency does">
     <div class="hero__media">
         <div class="hero__slides">
-                <article class="hero__slide is-active" data-slide
-                         role="group" aria-roledescription="slide" aria-label="1 of 5: Web Development">
-                    {% comment %}
-                    The visual is a CSS composition standing in for real media.
-                    Swap this span for a <video> or <img> and nothing else needs
-                    to change — the slide is already sized and scrimmed for it.
-                    {% endcomment %}
-                    <span class="hero__visual" style="--vx:72%; --vy:22%; --vc:rgba(230,74,26,.55)" aria-hidden="true"></span>
-                    <p class="hero__caption">
-                        <span class="hero__caption-tag">Web Development</span>
-                        <span class="hero__caption-line">Websites built to sell</span>
-                    </p>
-                </article>
-                <article class="hero__slide" data-slide
-                         role="group" aria-roledescription="slide" aria-label="2 of 5: SEO and AEO">
-                    {% comment %}
-                    The visual is a CSS composition standing in for real media.
-                    Swap this span for a <video> or <img> and nothing else needs
-                    to change — the slide is already sized and scrimmed for it.
-                    {% endcomment %}
-                    <span class="hero__visual" style="--vx:28%; --vy:30%; --vc:rgba(136,0,0,.65)" aria-hidden="true"></span>
-                    <p class="hero__caption">
-                        <span class="hero__caption-tag">SEO &amp; AEO</span>
-                        <span class="hero__caption-line">Found when Kenya searches</span>
-                    </p>
-                </article>
-                <article class="hero__slide" data-slide
-                         role="group" aria-roledescription="slide" aria-label="3 of 5: Google Business Profile">
-                    {% comment %}
-                    The visual is a CSS composition standing in for real media.
-                    Swap this span for a <video> or <img> and nothing else needs
-                    to change — the slide is already sized and scrimmed for it.
-                    {% endcomment %}
-                    <span class="hero__visual" style="--vx:80%; --vy:70%; --vc:rgba(230,74,26,.45)" aria-hidden="true"></span>
-                    <p class="hero__caption">
-                        <span class="hero__caption-tag">Google Business Profile</span>
-                        <span class="hero__caption-line">Your spot on the map</span>
-                    </p>
-                </article>
-                <article class="hero__slide" data-slide
-                         role="group" aria-roledescription="slide" aria-label="4 of 5: Social Media">
-                    {% comment %}
-                    The visual is a CSS composition standing in for real media.
-                    Swap this span for a <video> or <img> and nothing else needs
-                    to change — the slide is already sized and scrimmed for it.
-                    {% endcomment %}
-                    <span class="hero__visual" style="--vx:20%; --vy:70%; --vc:rgba(255,99,51,.5)" aria-hidden="true"></span>
-                    <p class="hero__caption">
-                        <span class="hero__caption-tag">Social Media</span>
-                        <span class="hero__caption-line">Consistent and credible</span>
-                    </p>
-                </article>
-                <article class="hero__slide" data-slide
-                         role="group" aria-roledescription="slide" aria-label="5 of 5: Digital Ad Campaigns">
-                    {% comment %}
-                    The visual is a CSS composition standing in for real media.
-                    Swap this span for a <video> or <img> and nothing else needs
-                    to change — the slide is already sized and scrimmed for it.
-                    {% endcomment %}
-                    <span class="hero__visual" style="--vx:50%; --vy:18%; --vc:rgba(136,0,0,.7)" aria-hidden="true"></span>
-                    <p class="hero__caption">
-                        <span class="hero__caption-tag">Digital Ad Campaigns</span>
-                        <span class="hero__caption-line">Spend that brings buyers</span>
-                    </p>
-                </article>
+            {% for slide in hero_slides %}
+            <article class="hero__slide{% if forloop.first %} is-active{% endif %}" data-slide
+                     data-duration="{{ slide.duration }}"
+                     role="group" aria-roledescription="slide"
+                     aria-label="{{ forloop.counter }} of {{ hero_slides|length }}: {{ slide.tag }}">
+                <video class="hero__video" muted playsinline loop
+                       width="{{ slide.width }}" height="{{ slide.height }}"
+                       style="--poster-wide: url('{% static slide.poster_wide %}'); --poster-tall: url('{% static slide.poster_tall %}')"
+                       data-video-wide-mp4="{% static slide.wide_mp4 %}"
+                       data-video-wide-webm="{% static slide.wide_webm %}"
+                       data-video-tall-mp4="{% static slide.tall_mp4 %}"
+                       data-video-tall-webm="{% static slide.tall_webm %}"
+                       aria-hidden="true" tabindex="-1"></video>
+            </article>
+            {% endfor %}
         </div>
         <span class="hero__scrim" aria-hidden="true"></span>
     </div>
@@ -135,7 +96,7 @@ What each slide is about now rides in a small caption instead.
     <div class="hero__inner container">
         <div class="hero__copy">
             <p class="eyebrow">Digital Growth Agency · Kenya</p>
-            <h1>Get found. Build trust. <span class="accent">Grow online.</span></h1>
+            <h1 data-words>Get found. Build trust. <span class="accent">Grow online.</span></h1>
             <p class="lead">
                 We build the website, search presence and campaigns that make a customer
                 choose you when they go looking — for businesses in Nairobi, Machakos,
@@ -156,33 +117,50 @@ What each slide is about now rides in a small caption instead.
             </ul>
         </div>
 
-        <div class="slider-controls slider-controls--onmedia">
-            <button class="slider__arrow" data-carousel-prev type="button" aria-label="Previous slide">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
+        <div class="hero__foot">
+            {% comment %}
+            The captions sit in the page flow rather than pinned to a corner, so
+            they read the same on a phone as on a desktop and can never land
+            under the floating WhatsApp button. They stack: the active one is
+            shown, and with no JavaScript the first one wins on stacking order.
+            {% endcomment %}
+            <p class="hero__captions">
+                {% for slide in hero_slides %}
+                <span class="hero__caption{% if forloop.first %} is-active{% endif %}" data-slide-caption>
+                    <span class="hero__caption-tag">{{ slide.tag }}</span>
+                    <span class="hero__caption-line">{{ slide.line }}</span>
+                </span>
+                {% endfor %}
+            </p>
 
-            <div class="slider__track" aria-label="Choose slide">
-                <button class="slider__seg" data-dot type="button" aria-current="true" aria-label="Web Development"></button>
-                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="SEO and AEO"></button>
-                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="Google Business Profile"></button>
-                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="Social Media"></button>
-                <button class="slider__seg" data-dot type="button" aria-current="false" aria-label="Digital Ad Campaigns"></button>
+            <div class="slider-controls slider-controls--onmedia">
+                <button class="slider__arrow" data-carousel-prev type="button" aria-label="Previous slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+
+                <div class="slider__track" aria-label="Choose slide">
+                    {% for slide in hero_slides %}
+                    <button class="slider__seg" data-dot type="button"
+                            aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                            aria-label="{{ slide.tag }}"></button>
+                    {% endfor %}
+                </div>
+
+                <button class="slider__arrow" data-carousel-next type="button" aria-label="Next slide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+
+                <button class="slider__pause" data-autoplay-toggle type="button"
+                        hidden aria-pressed="false" aria-label="Pause automatic sliding">
+                    <svg class="slider__pause-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <rect x="6.5" y="4.5" width="4" height="15" rx="1.3"/>
+                        <rect x="13.5" y="4.5" width="4" height="15" rx="1.3"/>
+                    </svg>
+                    <svg class="slider__play-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M7.5 5.2a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 7.5 15.8Z"/>
+                    </svg>
+                </button>
             </div>
-
-            <button class="slider__arrow" data-carousel-next type="button" aria-label="Next slide">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-            </button>
-
-            <button class="slider__pause" data-autoplay-toggle type="button"
-                    hidden aria-pressed="false" aria-label="Pause automatic sliding">
-                <svg class="slider__pause-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                    <rect x="6.5" y="4.5" width="4" height="15" rx="1.3"/>
-                    <rect x="13.5" y="4.5" width="4" height="15" rx="1.3"/>
-                </svg>
-                <svg class="slider__play-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                    <path d="M7.5 5.2a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 7.5 15.8Z"/>
-                </svg>
-            </button>
         </div>
     </div>
 </section>

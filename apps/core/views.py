@@ -25,8 +25,66 @@ LEGAL_PAGES = {
 }
 
 
+# The three hero clips, in the order they play, with the copy written to match
+# what each one actually shows. `duration` is the real length of the encoded
+# clip in milliseconds, so a slide holds for exactly as long as its video runs.
+# Re-run `tools/build_hero_video.py` and update these numbers together.
+HERO_SLIDES = [
+    {
+        # A wheel of single words turning past a marker: Website, Design, Seo,
+        # Content, Ranking, Growth, Profit. It names the work, so it opens.
+        "name": "words",
+        "duration": 8000,
+        "tag": "The work",
+        "line": "Websites, search and content",
+    },
+    {
+        # A clock hand sweeping past service icons that light up one by one.
+        "name": "clock",
+        "duration": 11000,
+        "tag": "Always on",
+        "line": "Managed month after month",
+    },
+    {
+        # A field of particles drawn into a single point — the closest thing in
+        # the set to what search actually does for a business.
+        "name": "vortex",
+        "duration": 7000,
+        "tag": "Get found",
+        "line": "Search that pulls buyers in",
+    },
+]
+
+
+def hero_slides():
+    """Expand HERO_SLIDES into what the template needs to render each <video>.
+
+    Two framings (portrait and landscape) times two codecs, plus a poster per
+    framing. All eight paths go through `{% static %}` in the template rather
+    than being assembled in JavaScript, because production hashes static
+    filenames and a path built at runtime would not resolve.
+    """
+    return [
+        dict(
+            slide,
+            poster_wide=f"video/hero-{slide['name']}-poster-wide.jpg",
+            poster_tall=f"video/hero-{slide['name']}-poster-tall.jpg",
+            wide_mp4=f"video/hero-{slide['name']}-wide.mp4",
+            wide_webm=f"video/hero-{slide['name']}-wide.webm",
+            tall_mp4=f"video/hero-{slide['name']}-tall.mp4",
+            tall_webm=f"video/hero-{slide['name']}-tall.webm",
+            # The landscape rendition's intrinsic size. It reserves the right
+            # box before the video arrives, so the hero does not jump.
+            width=1152,
+            height=648,
+        )
+        for slide in HERO_SLIDES
+    ]
+
+
 def home(request):
     context = {
+        "hero_slides": hero_slides(),
         # All of them. The slice hid Digital Ads Management — a service the
         # Growth System section on this same page argues for by name.
         "services": Service.objects.filter(is_active=True),
