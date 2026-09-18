@@ -493,30 +493,45 @@ p { text-wrap: pretty; }
 .card--flat { background: var(--surface); }
 
 /* 7. Header
+   One rounded island, after `pinterest/vid 11.mp4`: the logo, the links and the
+   call to action all live inside a single bar, with the CTA inset against its
+   right end rather than floating beside it. The header element itself carries
+   no background — it is only the sticky frame the bar sits in.
    ========================================================================== */
 
 .header {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(251, 250, 249, 0.80);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border-bottom: 1px solid transparent;
-    transition: border-color var(--dur) var(--ease),
-                background-color var(--dur) var(--ease);
+    padding-block: 0.6rem;
+    background: transparent;
 }
 
-.header.is-scrolled {
-    background: rgba(251, 250, 249, 0.94);
-    border-bottom-color: var(--border);
-}
-
-.header__inner {
+.header__bar {
     display: flex;
     align-items: center;
     gap: 1.25rem;
-    min-height: var(--header-h);
+    min-height: calc(var(--header-h) - 1.2rem);
+    /* Tight on the right so the CTA reads as set into the bar's end, roomier
+       on the left where the wordmark needs air. */
+    padding: 0.4rem 0.45rem 0.4rem 1rem;
+    border: 1px solid rgba(23, 20, 18, 0.10);
+    border-radius: 999px;
+    background: rgba(251, 250, 249, 0.82);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    box-shadow: 0 1px 2px rgba(23, 20, 18, 0.04), 0 8px 24px -12px rgba(23, 20, 18, 0.18);
+    transition: background-color var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                box-shadow var(--dur) var(--ease);
+}
+
+/* Once the page has moved, the bar is floating over content rather than over
+   the top of the page, so it earns a firmer edge. */
+.header.is-scrolled .header__bar {
+    background: rgba(251, 250, 249, 0.94);
+    border-color: rgba(23, 20, 18, 0.14);
+    box-shadow: 0 2px 4px rgba(23, 20, 18, 0.05), 0 14px 34px -14px rgba(23, 20, 18, 0.26);
 }
 
 .brand {
@@ -679,10 +694,11 @@ p { text-wrap: pretty; }
 
 body.nav-open { overflow: hidden; }
 
-/* The header is translucent by design, but not while it caps an open menu. */
-body.nav-open .header {
+/* The bar is translucent by design, but not while it caps an open menu — the
+   overlay behind it is opaque, so a see-through bar showed the seam. */
+body.nav-open .header__bar {
     background: var(--bg);
-    border-bottom-color: var(--border);
+    border-color: var(--border);
 }
 
 /* 8. Hero
@@ -697,7 +713,12 @@ body.nav-open .header {
     display: flex;
     align-items: flex-end;
     min-height: min(88vh, 46rem);
-    padding-block: clamp(3.5rem, 12vh, 7rem) clamp(1.5rem, 4vh, 2.5rem);
+    /* Pulled up the height of the header so the video runs behind the floating
+       bar, then padded back out so the copy still clears it. The bar has its
+       own background; this is what makes it read as sitting on the media
+       rather than as a strip above it. */
+    margin-top: calc(var(--header-h) * -1);
+    padding-block: calc(var(--header-h) + clamp(2rem, 8vh, 4.5rem)) clamp(1.5rem, 4vh, 2.5rem);
     background: #141110;
     overflow: hidden;
 }
@@ -913,7 +934,7 @@ html:not(.js) .hero__caption { opacity: 1; visibility: visible; transform: none;
        so a mobile browser's collapsing address bar does not crop it. */
     .hero {
         min-height: min(86svh, 40rem);
-        padding-block: 2.5rem 1.75rem;
+        padding-block: calc(var(--header-h) + 1.25rem) 1.75rem;
     }
     .hero__trust { gap: 0.5rem 1.1rem; margin-top: 1.4rem; font-size: 0.85rem; }
     .hero__captions { min-height: 2.7rem; }
