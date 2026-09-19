@@ -56,6 +56,31 @@ PRICING_FAQS = [
             "fixing something yourself before paying for anything."
         ),
     },
+    {
+        "question": "Is there a minimum contract length?",
+        "answer": (
+            "Digital growth takes time to compound, so we ask for an initial 3-month "
+            "commitment for our monthly packages. This gives the strategy enough time "
+            "to show real results. After that, it becomes a rolling month-to-month "
+            "agreement."
+        ),
+    },
+    {
+        "question": "What are the cancellation terms?",
+        "answer": (
+            "Once past the initial 3 months, you can cancel or pause your monthly "
+            "package at any time with 30 days' notice. You keep everything we built, "
+            "and there are no exit fees."
+        ),
+    },
+    {
+        "question": "Are there any setup fees?",
+        "answer": (
+            "No. There are no hidden onboarding or setup fees for our growth packages. "
+            "If your business needs a new website before we can start marketing it, "
+            "that is a separate one-time project quoted upfront."
+        ),
+    },
 ]
 
 
