@@ -1295,7 +1295,6 @@ html:not(.js) .hero__caption { opacity: 1; visibility: visible; transform: none;
 /* 8d. Problem statement
    ========================================================================== */
 
-.problem { display: grid; gap: clamp(1.25rem, 3vw, 2rem); }
 
 .problem__item {
     display: grid;
