@@ -2280,7 +2280,7 @@ html:not(.js) .hero__caption { opacity: 1; visibility: visible; transform: none;
 a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
 
 /* FAQ */
-.faq { display: grid; gap: 0.75rem; max-width: 70ch; }
+.faq { display: grid; gap: 0.75rem; max-width: 90ch; margin-inline: auto; }
 
 .faq__item {
     border: 1px solid var(--border);
@@ -2396,6 +2396,7 @@ a.tag:hover { border-color: var(--border-brand); color: var(--brand-ink); }
 
 @media (min-width: 900px) {
     .page-head__grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+    .page-head__grid > :only-child { grid-column: 1 / -1; }
 }
 
 .page-head__aside {
