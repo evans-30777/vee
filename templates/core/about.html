@@ -28,7 +28,13 @@ empty, which is what made the page feel unfinished.
             {% if site_settings %}
             <aside class="page-head__aside">
                 <p class="eyebrow">Who you're dealing with</p>
-                <p class="page-head__figure">One <small>person, start to finish</small></p>
+                <div class="page-head__author">
+                    <img src="/media/authors/evans-ngumbau.jpg" alt="Evans Ngumbau" class="author-headshot">
+                    <div>
+                        <p class="page-head__figure">Evans Ngumbau</p>
+                        <p class="muted">Founder & Digital Growth Lead</p>
+                    </div>
+                </div>
                 <ul class="checklist">
                     <li>Based in {{ site_settings.location_label }}</li>
                     <li>Working across every county in Kenya</li>

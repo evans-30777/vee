@@ -38,6 +38,17 @@ Person entity the byline is just text.
     <div class="container split">
         <div class="prose">
             {% if author.bio %}{{ author.bio|linebreaks }}{% endif %}
+            
+            {% if author.facebook or author.instagram %}
+            <div class="btn-row" style="margin-top: 1.5rem;">
+                {% if author.facebook %}
+                <a class="btn btn--secondary btn--sm" href="{{ author.facebook }}" target="_blank" rel="noopener">Facebook</a>
+                {% endif %}
+                {% if author.instagram %}
+                <a class="btn btn--secondary btn--sm" href="{{ author.instagram }}" target="_blank" rel="noopener">Instagram</a>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         {% if author.headshot %}
         <img src="{{ author.headshot.url }}"
