@@ -1482,30 +1482,11 @@ html:not(.js) .hero__caption { opacity: 1; visibility: visible; transform: none;
 .reason {
     display: grid;
     gap: 0.4rem;
-    padding: clamp(1.15rem, 2vw, 1.5rem);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    box-shadow: var(--shadow);
 }
 
 .reason h3 {
-    font-size: 1rem;
-    align-items: start;
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-}
-
-.reason h3::before {
-    content: "";
-    width: 1.1rem;
-    height: 1.1rem;
-    flex-shrink: 0;
-    background-image: var(--tick);
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
 }
 
 .reason p { font-size: 0.92rem; color: var(--text-muted); }

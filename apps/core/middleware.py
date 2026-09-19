@@ -56,7 +56,7 @@ class SecurityHeadersMiddleware:
             "font-src 'self'",
             f"img-src 'self' data: {self.ANALYTICS_IMG}",
             f"connect-src 'self' {self.ANALYTICS_CONNECT}",
-            "frame-src 'none'",
+            "frame-src 'self' https://www.google.com/maps/",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",
